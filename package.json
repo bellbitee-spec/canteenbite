@@ -1,0 +1,12 @@
+{
+  "name": "my-canteen",
+  "version": "1.0.0",
+  "description": "College Canteen Ordering System – monorepo root",
+  "private": true,
+  "scripts": {
+    "client": "npm run dev --prefix client",
+    "admin": "npm run dev --prefix admin",
+    "server": "npm run dev --prefix server",
+    "install:all": "npm install --prefix client && npm install --prefix admin && npm install --prefix server"
+  }
+}

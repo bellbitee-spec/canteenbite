@@ -1,0 +1,71 @@
+import React, { useState } from "react";
+import { Link } from "react-router-dom";
+import { getFoodImage, getCategoryIcon } from "../../utils/foodImages";
+
+const PASTEL_THEMES = [
+  { bg: "bg-amber-100/70 border-amber-200/60 text-amber-800" },
+  { bg: "bg-orange-100/70 border-orange-200/60 text-orange-800" },
+  { bg: "bg-emerald-100/70 border-emerald-200/60 text-emerald-800" },
+  { bg: "bg-purple-100/70 border-purple-200/60 text-purple-800" },
+  { bg: "bg-rose-100/70 border-rose-200/60 text-rose-800" },
+  { bg: "bg-sky-100/70 border-sky-200/60 text-sky-800" },
+];
+
+const CategoryCard = ({ category, isSelected = false }) => {
+  const [imgError, setImgError] = useState(false);
+  const fallbackUrl = getFoodImage(category);
+  const icon = getCategoryIcon(category?.name);
+
+  const hash = (category.name || category.id || "")
+    .split("")
+    .reduce((acc, char) => acc + char.charCodeAt(0), 0);
+  const theme = PASTEL_THEMES[hash % PASTEL_THEMES.length];
+
+  return (
+    <Link
+      to={`/categories?category=${category.id}`}
+      className="flex flex-col items-center gap-1.5 shrink-0 group cursor-pointer w-[72px] sm:w-[80px] select-none"
+    >
+      {/* Soft Pastel Square Icon Container (Reference Inspired) */}
+      <div
+        className={`w-14 h-14 sm:w-16 sm:h-16 rounded-2xl sm:rounded-3xl flex items-center justify-center transition-all duration-300 shadow-2xs group-hover:scale-105 group-hover:-translate-y-1 border ${
+          isSelected
+            ? "bg-brand-500 text-white shadow-md shadow-brand-500/25 ring-2 ring-brand-500/20"
+            : theme.bg
+        }`}
+      >
+        {category.image && !imgError ? (
+          <img
+            src={category.image}
+            alt={category.name}
+            loading="lazy"
+            className="w-8 h-8 sm:w-9 sm:h-9 object-cover rounded-xl"
+            onError={() => setImgError(true)}
+          />
+        ) : fallbackUrl && !imgError ? (
+          <img
+            src={fallbackUrl}
+            alt={category.name}
+            loading="lazy"
+            className="w-8 h-8 sm:w-9 sm:h-9 object-cover rounded-xl"
+            onError={() => setImgError(true)}
+          />
+        ) : (
+          <span className="text-2xl sm:text-3xl select-none">{icon}</span>
+        )}
+      </div>
+
+      {/* Category Label Underneath */}
+      <span
+        className={`font-bold text-[11px] sm:text-xs truncate tracking-tight text-center w-full block transition-colors leading-tight ${
+          isSelected ? "text-brand-600 font-black" : "text-slate-700 group-hover:text-brand-600"
+        }`}
+        title={category.name}
+      >
+        {category.name}
+      </span>
+    </Link>
+  );
+};
+
+export default CategoryCard;

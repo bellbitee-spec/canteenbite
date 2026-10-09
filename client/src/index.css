@@ -1,0 +1,98 @@
+@import "tailwindcss";
+
+@theme {
+  --color-brand-50: #FFF7ED;
+  --color-brand-100: #FFEDD5;
+  --color-brand-200: #FED7AA;
+  --color-brand-300: #FDBA74;
+  --color-brand-400: #FB923C;
+  --color-brand-500: #FF5A1F;
+  --color-brand-600: #EA4C10;
+  --color-brand-700: #C23805;
+  --color-brand-800: #9A2D07;
+  --color-brand-900: #7C2408;
+
+  --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+
+  --animate-shimmer: shimmer 1.8s infinite linear;
+  --animate-fade-in: fadeIn 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  --animate-slide-up: slideUp 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  --animate-scale-in: scaleIn 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+
+  --shadow-subtle: 0 1px 2px 0 rgba(0, 0, 0, 0.04), 0 1px 3px 0 rgba(0, 0, 0, 0.03);
+  --shadow-elevated: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
+  --shadow-float: 0 16px 36px -6px rgba(15, 23, 42, 0.07), 0 6px 16px -4px rgba(15, 23, 42, 0.04);
+  --shadow-card: 0 10px 25px -4px rgba(15, 23, 42, 0.05), 0 4px 10px -2px rgba(15, 23, 42, 0.03);
+  --shadow-dish: 0 16px 30px -6px rgba(0, 0, 0, 0.13), 0 6px 12px -3px rgba(0, 0, 0, 0.07);
+  --shadow-glow: 0 0 20px -3px rgba(255, 90, 31, 0.25);
+}
+
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+@keyframes fadeIn {
+  0% { opacity: 0; }
+  100% { opacity: 1; }
+}
+
+@keyframes slideUp {
+  0% { transform: translateY(12px); opacity: 0; }
+  100% { transform: translateY(0); opacity: 1; }
+}
+
+@keyframes scaleIn {
+  0% { transform: scale(0.96); opacity: 0; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+@layer base {
+  *, *::before, *::after {
+    box-sizing: border-box;
+  }
+
+  html {
+    scroll-behavior: smooth;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  body {
+    @apply bg-[#F1F4F9] text-slate-900 min-h-screen selection:bg-brand-500 selection:text-white font-sans;
+    margin: 0;
+  }
+}
+
+@layer utilities {
+  /* Hide scrollbar for Chrome, Safari and Opera */
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+  /* Hide scrollbar for IE, Edge and Firefox */
+  .no-scrollbar {
+    -ms-overflow-style: none;  /* IE and Edge */
+    scrollbar-width: none;  /* Firefox */
+  }
+
+  .skeleton-shimmer {
+    background: linear-gradient(
+      90deg,
+      rgba(241, 245, 249, 1) 0%,
+      rgba(226, 232, 240, 0.8) 50%,
+      rgba(241, 245, 249, 1) 100%
+    );
+    background-size: 200% 100%;
+    animation: shimmer 1.5s infinite linear;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, ::before, ::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

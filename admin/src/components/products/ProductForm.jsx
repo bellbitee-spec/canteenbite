@@ -1,0 +1,570 @@
+import React, { useState, useEffect } from "react";
+import ImageUpload from "../common/ImageUpload";
+
+// Slug generation utility
+const generateSlug = (text) => {
+  return (text || "")
+    .toLowerCase()
+    .trim()
+    .replace(/[^\w\s-]/g, "") // Remove non-word chars
+    .replace(/[\s_-]+/g, "-") // Collapse whitespace and underscores to hyphens
+    .replace(/^-+|-+$/g, ""); // Trim leading and trailing hyphens
+};
+
+const ProductForm = ({
+  initialData = null,
+  categories = [],
+  onSubmit,
+  onCancel,
+  submitting = false,
+  serverError = null,
+}) => {
+  const isEdit = Boolean(initialData && initialData.id);
+
+  // Form states
+  const [formData, setFormData] = useState({
+    name: initialData?.name || "",
+    slug: initialData?.slug || "",
+    description: initialData?.description || "",
+    image: initialData?.image || "",
+    category: initialData?.category?.id || initialData?.category || "",
+    price: initialData?.price !== undefined ? initialData.price : "",
+    stock: initialData?.stock !== undefined ? initialData.stock : "",
+    lowStockThreshold:
+      initialData?.lowStockThreshold !== undefined
+        ? initialData.lowStockThreshold
+        : 5,
+    preparationTime:
+      initialData?.preparationTime !== undefined
+        ? initialData.preparationTime
+        : 10,
+    sortOrder:
+      initialData?.sortOrder !== undefined ? initialData.sortOrder : 0,
+    isAvailable:
+      initialData?.isAvailable !== undefined ? initialData.isAvailable : true,
+  });
+
+  const [slugManuallyEdited, setSlugManuallyEdited] = useState(isEdit);
+  const [errors, setErrors] = useState({});
+  const [imagePreviewError, setImagePreviewError] = useState(false);
+
+  // Auto-generate slug when name changes (unless user manually touched slug)
+  const handleNameChange = (e) => {
+    const newName = e.target.value;
+    setFormData((prev) => ({
+      ...prev,
+      name: newName,
+      slug: slugManuallyEdited ? prev.slug : generateSlug(newName),
+    }));
+    if (errors.name) {
+      setErrors((prev) => ({ ...prev, name: null }));
+    }
+  };
+
+  const handleSlugChange = (e) => {
+    setSlugManuallyEdited(true);
+    setFormData((prev) => ({ ...prev, slug: e.target.value.toLowerCase() }));
+    if (errors.slug) {
+      setErrors((prev) => ({ ...prev, slug: null }));
+    }
+  };
+
+  const handleChange = (e) => {
+    const { name, value, type, checked } = e.target;
+    setFormData((prev) => ({
+      ...prev,
+      [name]: type === "checkbox" ? checked : value,
+    }));
+    if (errors[name]) {
+      setErrors((prev) => ({ ...prev, [name]: null }));
+    }
+    if (name === "image") {
+      setImagePreviewError(false);
+    }
+  };
+
+  const validate = () => {
+    const newErrors = {};
+
+    // Name
+    if (!formData.name || !formData.name.trim()) {
+      newErrors.name = "Product name is required";
+    } else if (formData.name.trim().length > 150) {
+      newErrors.name = "Name must not exceed 150 characters";
+    }
+
+    // Slug
+    if (!formData.slug || !formData.slug.trim()) {
+      newErrors.slug = "Product slug is required";
+    } else if (!/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(formData.slug.trim())) {
+      newErrors.slug =
+        "Slug must be lowercase alphanumeric with hyphens (e.g. 'veg-burger')";
+    }
+
+    // Category
+    if (!formData.category) {
+      newErrors.category = "Please select a category";
+    }
+
+    // Price
+    if (formData.price === "" || formData.price === null) {
+      newErrors.price = "Price is required";
+    } else {
+      const numPrice = Number(formData.price);
+      if (isNaN(numPrice) || numPrice < 0) {
+        newErrors.price = "Price must be a number greater than or equal to 0";
+      }
+    }
+
+    // Stock
+    if (formData.stock === "" || formData.stock === null) {
+      newErrors.stock = "Stock is required";
+    } else {
+      const numStock = Number(formData.stock);
+      if (isNaN(numStock) || !Number.isInteger(numStock) || numStock < 0) {
+        newErrors.stock = "Stock must be a non-negative integer (e.g. 0, 10, 24)";
+      }
+    }
+
+    // Low stock threshold
+    if (
+      formData.lowStockThreshold !== "" &&
+      formData.lowStockThreshold !== null
+    ) {
+      const numThreshold = Number(formData.lowStockThreshold);
+      if (
+        isNaN(numThreshold) ||
+        !Number.isInteger(numThreshold) ||
+        numThreshold < 0
+      ) {
+        newErrors.lowStockThreshold = "Threshold must be a non-negative integer";
+      }
+    }
+
+    // Preparation time
+    if (formData.preparationTime !== "" && formData.preparationTime !== null) {
+      const numPrep = Number(formData.preparationTime);
+      if (isNaN(numPrep) || !Number.isInteger(numPrep) || numPrep < 0) {
+        newErrors.preparationTime = "Preparation time must be a non-negative integer (minutes)";
+      }
+    }
+
+    // Sort order
+    if (formData.sortOrder !== "" && formData.sortOrder !== null) {
+      const numSort = Number(formData.sortOrder);
+      if (isNaN(numSort) || !Number.isInteger(numSort) || numSort < 0) {
+        newErrors.sortOrder = "Sort order must be a non-negative integer";
+      }
+    }
+
+    // Image URL format (if provided)
+    if (formData.image && formData.image.trim()) {
+      const imgVal = formData.image.trim();
+      if (!/^https?:\/\/.+/i.test(imgVal)) {
+        newErrors.image = "Image must be a valid web URL starting with http:// or https://";
+      }
+    }
+
+    // Description length
+    if (formData.description && formData.description.length > 1000) {
+      newErrors.description = "Description cannot exceed 1000 characters";
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    if (!validate()) return;
+
+    // Build payload with authoritative numeric types
+    const payload = {
+      name: formData.name.trim(),
+      slug: formData.slug.trim(),
+      description: formData.description.trim(),
+      image: formData.image ? formData.image.trim() : "",
+      category: formData.category,
+      price: Number(formData.price),
+      stock: Number(formData.stock),
+      lowStockThreshold:
+        formData.lowStockThreshold !== "" ? Number(formData.lowStockThreshold) : 5,
+      preparationTime:
+        formData.preparationTime !== "" ? Number(formData.preparationTime) : 10,
+      sortOrder:
+        formData.sortOrder !== "" ? Number(formData.sortOrder) : 0,
+      isAvailable: Boolean(formData.isAvailable),
+    };
+
+    onSubmit(payload);
+  };
+
+  return (
+    <form onSubmit={handleSubmit} className="space-y-5" noValidate>
+      {/* Global Server Error Banner */}
+      {serverError && (
+        <div
+          role="alert"
+          className="p-3.5 rounded-xl bg-red-500/10 border border-red-500/20 text-red-400 text-sm flex items-start gap-3"
+        >
+          <svg
+            className="w-5 h-5 flex-shrink-0 mt-0.5 text-red-400"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+            />
+          </svg>
+          <span className="leading-snug">{serverError}</span>
+        </div>
+      )}
+
+      {/* Row 1: Name and Category */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div>
+          <label
+            htmlFor="prod-name"
+            className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1.5"
+          >
+            Product Name <span className="text-red-400">*</span>
+          </label>
+          <input
+            id="prod-name"
+            name="name"
+            type="text"
+            required
+            value={formData.name}
+            onChange={handleNameChange}
+            placeholder="e.g. Crispy Veg Burger"
+            className={`w-full px-3.5 py-2.5 bg-slate-950/60 border rounded-xl text-slate-100 placeholder-slate-500 text-sm focus:outline-none focus:ring-2 transition-colors ${
+              errors.name
+                ? "border-red-500/60 focus:ring-red-500"
+                : "border-slate-750 focus:ring-indigo-500 focus:border-indigo-500"
+            }`}
+          />
+          {errors.name && (
+            <p className="mt-1 text-xs text-red-400">{errors.name}</p>
+          )}
+        </div>
+
+        <div>
+          <label
+            htmlFor="prod-category"
+            className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1.5"
+          >
+            Category <span className="text-red-400">*</span>
+          </label>
+          {categories.length === 0 ? (
+            <div className="p-2.5 rounded-xl bg-amber-500/10 border border-amber-500/20 text-amber-300 text-xs">
+              No categories available. Create a category first.
+            </div>
+          ) : (
+            <select
+              id="prod-category"
+              name="category"
+              required
+              value={formData.category}
+              onChange={handleChange}
+              className={`w-full px-3.5 py-2.5 bg-slate-950/60 border rounded-xl text-slate-100 text-sm focus:outline-none focus:ring-2 transition-colors ${
+                errors.category
+                  ? "border-red-500/60 focus:ring-red-500"
+                  : "border-slate-750 focus:ring-indigo-500 focus:border-indigo-500"
+              }`}
+            >
+              <option value="" disabled className="bg-slate-900 text-slate-400">
+                Select a category...
+              </option>
+              {categories.map((cat) => (
+                <option key={cat.id} value={cat.id} className="bg-slate-900 text-white">
+                  {cat.name}
+                </option>
+              ))}
+            </select>
+          )}
+          {errors.category && (
+            <p className="mt-1 text-xs text-red-400">{errors.category}</p>
+          )}
+        </div>
+      </div>
+
+      {/* Row 2: Slug */}
+      <div>
+        <label
+          htmlFor="prod-slug"
+          className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1.5"
+        >
+          Product Slug <span className="text-red-400">*</span>
+          <span className="text-slate-400 normal-case ml-1 font-normal">
+            (URL identifier, e.g. crispy-veg-burger)
+          </span>
+        </label>
+        <input
+          id="prod-slug"
+          name="slug"
+          type="text"
+          required
+          value={formData.slug}
+          onChange={handleSlugChange}
+          placeholder="e.g. crispy-veg-burger"
+          className={`w-full px-3.5 py-2.5 bg-slate-950/60 border rounded-xl text-slate-100 placeholder-slate-500 text-sm font-mono focus:outline-none focus:ring-2 transition-colors ${
+            errors.slug
+              ? "border-red-500/60 focus:ring-red-500"
+              : "border-slate-750 focus:ring-indigo-500 focus:border-indigo-500"
+          }`}
+        />
+        {errors.slug && (
+          <p className="mt-1 text-xs text-red-400">{errors.slug}</p>
+        )}
+      </div>
+
+      {/* Row 3: Price, Stock, Low Stock Threshold */}
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        <div>
+          <label
+            htmlFor="prod-price"
+            className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1.5"
+          >
+            Price (₹) <span className="text-red-400">*</span>
+          </label>
+          <div className="relative">
+            <span className="absolute inset-y-0 left-0 pl-3.5 flex items-center text-slate-400 text-sm font-semibold pointer-events-none">
+              ₹
+            </span>
+            <input
+              id="prod-price"
+              name="price"
+              type="number"
+              step="any"
+              min="0"
+              required
+              value={formData.price}
+              onChange={handleChange}
+              placeholder="0.00"
+              className={`w-full pl-8 pr-3.5 py-2.5 bg-slate-950/60 border rounded-xl text-slate-100 placeholder-slate-500 text-sm focus:outline-none focus:ring-2 transition-colors ${
+                errors.price
+                  ? "border-red-500/60 focus:ring-red-500"
+                  : "border-slate-750 focus:ring-indigo-500 focus:border-indigo-500"
+              }`}
+            />
+          </div>
+          {errors.price && (
+            <p className="mt-1 text-xs text-red-400">{errors.price}</p>
+          )}
+        </div>
+
+        <div>
+          <label
+            htmlFor="prod-stock"
+            className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1.5"
+          >
+            Stock <span className="text-red-400">*</span>
+          </label>
+          <input
+            id="prod-stock"
+            name="stock"
+            type="number"
+            step="1"
+            min="0"
+            required
+            value={formData.stock}
+            onChange={handleChange}
+            placeholder="e.g. 25"
+            className={`w-full px-3.5 py-2.5 bg-slate-950/60 border rounded-xl text-slate-100 placeholder-slate-500 text-sm focus:outline-none focus:ring-2 transition-colors ${
+              errors.stock
+                ? "border-red-500/60 focus:ring-red-500"
+                : "border-slate-750 focus:ring-indigo-500 focus:border-indigo-500"
+            }`}
+          />
+          {errors.stock && (
+            <p className="mt-1 text-xs text-red-400">{errors.stock}</p>
+          )}
+        </div>
+
+        <div>
+          <label
+            htmlFor="prod-threshold"
+            className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1.5"
+          >
+            Low Stock Alert
+          </label>
+          <input
+            id="prod-threshold"
+            name="lowStockThreshold"
+            type="number"
+            step="1"
+            min="0"
+            value={formData.lowStockThreshold}
+            onChange={handleChange}
+            placeholder="5"
+            className={`w-full px-3.5 py-2.5 bg-slate-950/60 border rounded-xl text-slate-100 placeholder-slate-500 text-sm focus:outline-none focus:ring-2 transition-colors ${
+              errors.lowStockThreshold
+                ? "border-red-500/60 focus:ring-red-500"
+                : "border-slate-750 focus:ring-indigo-500 focus:border-indigo-500"
+            }`}
+          />
+          {errors.lowStockThreshold && (
+            <p className="mt-1 text-xs text-red-400">{errors.lowStockThreshold}</p>
+          )}
+        </div>
+      </div>
+
+      {/* Row 4: Prep Time and Sort Order */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div>
+          <label
+            htmlFor="prod-preptime"
+            className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1.5"
+          >
+            Prep Time (minutes)
+          </label>
+          <div className="relative">
+            <input
+              id="prod-preptime"
+              name="preparationTime"
+              type="number"
+              step="1"
+              min="0"
+              value={formData.preparationTime}
+              onChange={handleChange}
+              placeholder="10"
+              className={`w-full pr-14 pl-3.5 py-2.5 bg-slate-950/60 border rounded-xl text-slate-100 placeholder-slate-500 text-sm focus:outline-none focus:ring-2 transition-colors ${
+                errors.preparationTime
+                  ? "border-red-500/60 focus:ring-red-500"
+                  : "border-slate-750 focus:ring-indigo-500 focus:border-indigo-500"
+              }`}
+            />
+            <span className="absolute inset-y-0 right-0 pr-3.5 flex items-center text-slate-400 text-xs pointer-events-none">
+              min
+            </span>
+          </div>
+          {errors.preparationTime && (
+            <p className="mt-1 text-xs text-red-400">{errors.preparationTime}</p>
+          )}
+        </div>
+
+        <div>
+          <label
+            htmlFor="prod-sortorder"
+            className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1.5"
+          >
+            Sort Order
+          </label>
+          <input
+            id="prod-sortorder"
+            name="sortOrder"
+            type="number"
+            step="1"
+            min="0"
+            value={formData.sortOrder}
+            onChange={handleChange}
+            placeholder="0"
+            className={`w-full px-3.5 py-2.5 bg-slate-950/60 border rounded-xl text-slate-100 placeholder-slate-500 text-sm focus:outline-none focus:ring-2 transition-colors ${
+              errors.sortOrder
+                ? "border-red-500/60 focus:ring-red-500"
+                : "border-slate-750 focus:ring-indigo-500 focus:border-indigo-500"
+            }`}
+          />
+          {errors.sortOrder && (
+            <p className="mt-1 text-xs text-red-400">{errors.sortOrder}</p>
+          )}
+        </div>
+      </div>
+
+      {/* Row 5: Image Upload + Preview */}
+      <ImageUpload
+        value={formData.image}
+        onChange={(url) => {
+          setFormData((prev) => ({ ...prev, image: url }));
+          if (errors.image) {
+            setErrors((prev) => ({ ...prev, image: null }));
+          }
+        }}
+        folder="products"
+        label="Product Image"
+        placeholder="https://images.unsplash.com/... or upload via Cloudinary"
+        error={errors.image}
+        disabled={submitting}
+      />
+
+      {/* Row 6: Description */}
+      <div>
+        <label
+          htmlFor="prod-desc"
+          className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1.5"
+        >
+          Description
+        </label>
+        <textarea
+          id="prod-desc"
+          name="description"
+          rows={3}
+          value={formData.description}
+          onChange={handleChange}
+          placeholder="Brief description of ingredients, allergens, or serving style..."
+          className={`w-full px-3.5 py-2.5 bg-slate-950/60 border rounded-xl text-slate-100 placeholder-slate-500 text-sm focus:outline-none focus:ring-2 transition-colors resize-none ${
+            errors.description
+              ? "border-red-500/60 focus:ring-red-500"
+              : "border-slate-750 focus:ring-indigo-500 focus:border-indigo-500"
+          }`}
+        />
+        {errors.description && (
+          <p className="mt-1 text-xs text-red-400">{errors.description}</p>
+        )}
+      </div>
+
+      {/* Row 7: Available Toggle */}
+      <div className="p-4 rounded-xl bg-slate-950/60 border border-slate-800 flex items-center justify-between">
+        <div>
+          <label htmlFor="prod-avail" className="text-sm font-semibold text-white block cursor-pointer">
+            Student Availability
+          </label>
+          <p className="text-xs text-slate-400 mt-0.5">
+            When enabled, students can see and order this item in the storefront.
+          </p>
+        </div>
+        <input
+          id="prod-avail"
+          name="isAvailable"
+          type="checkbox"
+          checked={formData.isAvailable}
+          onChange={handleChange}
+          className="w-5 h-5 rounded text-indigo-600 bg-slate-900 border-slate-700 focus:ring-indigo-500 focus:ring-offset-slate-950 cursor-pointer"
+        />
+      </div>
+
+      {/* Form Action Buttons */}
+      <div className="flex items-center justify-end gap-3 pt-3 border-t border-slate-800">
+        <button
+          type="button"
+          onClick={onCancel}
+          disabled={submitting}
+          className="px-4 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-750 text-slate-300 hover:text-white text-sm font-medium transition-colors disabled:opacity-50 cursor-pointer"
+        >
+          Cancel
+        </button>
+
+        <button
+          type="submit"
+          disabled={submitting || categories.length === 0}
+          className="px-5 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-sm font-semibold transition-colors disabled:opacity-50 flex items-center gap-2 cursor-pointer shadow-lg shadow-indigo-600/25"
+        >
+          {submitting ? (
+            <>
+              <div className="w-4 h-4 rounded-full border-2 border-white border-t-transparent animate-spin" />
+              <span>Saving...</span>
+            </>
+          ) : (
+            <span>{isEdit ? "Update Product" : "Create Product"}</span>
+          )}
+        </button>
+      </div>
+    </form>
+  );
+};
+
+export default ProductForm;

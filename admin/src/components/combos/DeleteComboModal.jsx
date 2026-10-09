@@ -1,0 +1,118 @@
+import React, { useEffect } from "react";
+
+/**
+ * DeleteComboModal
+ * Confirmation modal for soft-disabling a combo meal.
+ */
+const DeleteComboModal = ({
+  isOpen,
+  combo,
+  onClose,
+  onConfirm,
+  loading = false,
+}) => {
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.key === "Escape" && isOpen && !loading) {
+        onClose();
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [isOpen, loading, onClose]);
+
+  if (!isOpen || !combo) return null;
+
+  return (
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm animate-fadeIn"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="disable-combo-title"
+    >
+      {/* Backdrop click */}
+      <div
+        className="fixed inset-0"
+        onClick={() => {
+          if (!loading) onClose();
+        }}
+      />
+
+      <div className="relative w-full max-w-md bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-2xl z-10">
+        <div className="flex items-center gap-3.5 mb-4">
+          <div className="w-11 h-11 rounded-xl bg-rose-500/15 border border-rose-500/20 text-rose-400 flex items-center justify-center flex-shrink-0">
+            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+            </svg>
+          </div>
+          <div>
+            <h3 id="disable-combo-title" className="text-lg font-bold text-white tracking-tight">
+              Disable this combo?
+            </h3>
+            <p className="text-xs text-slate-400">
+              Soft disable action
+            </p>
+          </div>
+        </div>
+
+        {/* Combo summary card */}
+        <div className="mb-4 p-3 bg-slate-950/60 rounded-xl border border-slate-800/80 flex items-center gap-3">
+          <div className="w-12 h-12 rounded-lg bg-slate-800 flex items-center justify-center overflow-hidden flex-shrink-0 border border-slate-750">
+            {combo.image ? (
+              <img
+                src={combo.image}
+                alt={combo.name}
+                className="w-full h-full object-cover"
+                onError={(e) => {
+                  e.target.style.display = "none";
+                }}
+              />
+            ) : (
+              <svg className="w-6 h-6 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+              </svg>
+            )}
+          </div>
+          <div className="min-w-0 flex-1">
+            <h4 className="text-sm font-semibold text-white truncate">{combo.name}</h4>
+            <p className="text-xs text-slate-400">
+              {combo.items?.length || 0} products • ₹{combo.price}
+            </p>
+          </div>
+        </div>
+
+        <p className="text-sm text-slate-300 mb-6 leading-relaxed">
+          This will hide the combo from students. Existing historical orders will not be changed.
+        </p>
+
+        <div className="flex items-center justify-end gap-3">
+          <button
+            type="button"
+            onClick={onClose}
+            disabled={loading}
+            className="px-4 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-750 text-slate-300 hover:text-white text-sm font-medium transition-colors disabled:opacity-50 cursor-pointer"
+          >
+            Cancel
+          </button>
+          <button
+            type="button"
+            onClick={onConfirm}
+            disabled={loading}
+            className="px-4 py-2.5 rounded-xl bg-rose-600 hover:bg-rose-500 text-white text-sm font-semibold transition-colors disabled:opacity-50 flex items-center gap-2 cursor-pointer shadow-lg shadow-rose-600/20"
+          >
+            {loading ? (
+              <>
+                <div className="w-4 h-4 rounded-full border-2 border-white border-t-transparent animate-spin" />
+                <span>Disabling...</span>
+              </>
+            ) : (
+              <span>Disable Combo</span>
+            )}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default DeleteComboModal;

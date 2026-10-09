@@ -1,0 +1,952 @@
+import React, { useState, useEffect, useCallback } from "react";
+import storeService from "../services/storeService";
+import useStore from "../hooks/useStore";
+
+const DAY_NAMES = [
+  "Sunday",
+  "Monday",
+  "Tuesday",
+  "Wednesday",
+  "Thursday",
+  "Friday",
+  "Saturday",
+];
+
+const StoreSettings = () => {
+  const { refreshStoreStatus } = useStore();
+
+  // Primary Data States
+  const [status, setStatus] = useState(null);
+  const [schedule, setSchedule] = useState([]);
+  const [settings, setSettings] = useState(null);
+
+  const [loading, setLoading] = useState(true);
+  const [fetchError, setFetchError] = useState(null);
+
+  // Form Editing States
+  const [closeReasonInput, setCloseReasonInput] = useState("");
+  const [generalForm, setGeneralForm] = useState({
+    storeName: "",
+    defaultPreparationTime: 10,
+  });
+  const [orderingForm, setOrderingForm] = useState({
+    cancellationWindowSeconds: 30,
+  });
+
+  // Action Loading States
+  const [statusActionLoading, setStatusActionLoading] = useState(false);
+  const [savingSchedule, setSavingSchedule] = useState(false);
+  const [savingGeneral, setSavingGeneral] = useState(false);
+  const [savingOrdering, setSavingOrdering] = useState(false);
+
+  // Errors & Feedback
+  const [scheduleErrors, setScheduleErrors] = useState({});
+  const [toast, setToast] = useState(null);
+
+  // Unsaved changes tracking
+  const [isScheduleDirty, setIsScheduleDirty] = useState(false);
+  const [isGeneralDirty, setIsGeneralDirty] = useState(false);
+  const [isOrderingDirty, setIsOrderingDirty] = useState(false);
+
+  const showToast = (message, type = "success") => {
+    setToast({ message, type });
+  };
+
+  useEffect(() => {
+    if (!toast) return;
+    const timer = setTimeout(() => setToast(null), 3500);
+    return () => clearTimeout(timer);
+  }, [toast]);
+
+  // Load All Authoritative Data
+  const loadAllData = useCallback(async () => {
+    try {
+      setLoading(true);
+      setFetchError(null);
+
+      const [statusData, schedData, settingsData] = await Promise.all([
+        storeService.getStoreStatus(),
+        storeService.getSchedule(),
+        storeService.getSettings(),
+      ]);
+
+      setStatus(statusData);
+      setSchedule(schedData || []);
+      setSettings(settingsData);
+
+      if (settingsData) {
+        setCloseReasonInput(settingsData.temporaryClosedReason || "");
+        setGeneralForm({
+          storeName: settingsData.storeName || "College Canteen",
+          defaultPreparationTime: settingsData.defaultPreparationTime ?? 10,
+        });
+        setOrderingForm({
+          cancellationWindowSeconds: settingsData.cancellationWindowSeconds ?? 30,
+        });
+      }
+
+      setIsScheduleDirty(false);
+      setIsGeneralDirty(false);
+      setIsOrderingDirty(false);
+      refreshStoreStatus();
+    } catch (err) {
+      console.error("Error loading store settings:", err);
+      setFetchError(err.message || "Unable to load store settings from server");
+    } finally {
+      setLoading(false);
+    }
+  }, [refreshStoreStatus]);
+
+  useEffect(() => {
+    loadAllData();
+  }, [loadAllData]);
+
+  // Warn on window unload if there are unsaved changes
+  useEffect(() => {
+    const handleBeforeUnload = (e) => {
+      if (isScheduleDirty || isGeneralDirty || isOrderingDirty) {
+        e.preventDefault();
+        e.returnValue = "";
+      }
+    };
+    window.addEventListener("beforeunload", handleBeforeUnload);
+    return () => window.removeEventListener("beforeunload", handleBeforeUnload);
+  }, [isScheduleDirty, isGeneralDirty, isOrderingDirty]);
+
+  // --- 1. STORE STATUS & MANUAL OVERRIDE ACTIONS ---
+
+  const handleUseSchedule = async () => {
+    try {
+      setStatusActionLoading(true);
+      await storeService.updateSettings({ manualOverride: false });
+      showToast("Store switched to automated weekly schedule mode.");
+      await loadAllData();
+    } catch (err) {
+      showToast(err.message || "Failed to switch to schedule mode", "error");
+    } finally {
+      setStatusActionLoading(false);
+    }
+  };
+
+  const handleManualOpen = async () => {
+    try {
+      setStatusActionLoading(true);
+      await storeService.updateSettings({
+        manualOverride: true,
+        isOpen: true,
+      });
+      showToast("Store manually opened.");
+      await loadAllData();
+    } catch (err) {
+      showToast(err.message || "Failed to open store", "error");
+    } finally {
+      setStatusActionLoading(false);
+    }
+  };
+
+  const handleManualClose = async () => {
+    try {
+      setStatusActionLoading(true);
+      await storeService.updateSettings({
+        manualOverride: true,
+        isOpen: false,
+        temporaryClosedReason: closeReasonInput.trim(),
+      });
+      showToast("Store manually closed.");
+      await loadAllData();
+    } catch (err) {
+      showToast(err.message || "Failed to close store", "error");
+    } finally {
+      setStatusActionLoading(false);
+    }
+  };
+
+  const handleUpdateCloseReasonOnly = async () => {
+    try {
+      setStatusActionLoading(true);
+      await storeService.updateSettings({
+        temporaryClosedReason: closeReasonInput.trim(),
+      });
+      showToast("Closure reason updated.");
+      await loadAllData();
+    } catch (err) {
+      showToast(err.message || "Failed to update closure reason", "error");
+    } finally {
+      setStatusActionLoading(false);
+    }
+  };
+
+  const handleToggleAcceptingOrders = async () => {
+    if (!settings) return;
+    try {
+      setStatusActionLoading(true);
+      const nextVal = !settings.acceptingOrders;
+      await storeService.updateSettings({ acceptingOrders: nextVal });
+      showToast(
+        nextVal ? "Ordering resumed for students." : "Ordering paused for students."
+      );
+      await loadAllData();
+    } catch (err) {
+      showToast(err.message || "Failed to toggle order acceptance", "error");
+    } finally {
+      setStatusActionLoading(false);
+    }
+  };
+
+  // --- 2. WEEKLY SCHEDULE ACTIONS ---
+
+  const handleScheduleEntryChange = (dayIndex, field, value) => {
+    setIsScheduleDirty(true);
+    setSchedule((prev) => {
+      const updated = [...prev];
+      const target = { ...updated[dayIndex] };
+
+      if (field === "isOpen") {
+        target.isOpen = value;
+      } else if (field === "openingTime") {
+        target.openingTime = value;
+      } else if (field === "closingTime") {
+        target.closingTime = value;
+      }
+
+      updated[dayIndex] = target;
+      return updated;
+    });
+
+    // Clear error for this day if any
+    setScheduleErrors((prev) => {
+      const copy = { ...prev };
+      delete copy[dayIndex];
+      return copy;
+    });
+  };
+
+  const validateSchedule = () => {
+    const errors = {};
+    const timeRegex = /^([01]\d|2[0-3]):([0-5]\d)$/;
+
+    schedule.forEach((entry, idx) => {
+      if (entry.isOpen) {
+        if (!entry.openingTime || !timeRegex.test(entry.openingTime)) {
+          errors[idx] = `Opening time is required in HH:mm format for ${entry.dayName || DAY_NAMES[entry.dayOfWeek]}.`;
+        } else if (!entry.closingTime || !timeRegex.test(entry.closingTime)) {
+          errors[idx] = `Closing time is required in HH:mm format for ${entry.dayName || DAY_NAMES[entry.dayOfWeek]}.`;
+        } else if (entry.openingTime >= entry.closingTime) {
+          errors[idx] = `Closing time (${entry.closingTime}) must be later than opening time (${entry.openingTime}).`;
+        }
+      }
+    });
+
+    setScheduleErrors(errors);
+    return Object.keys(errors).length === 0;
+  };
+
+  const handleSaveSchedule = async (e) => {
+    e.preventDefault();
+    if (!validateSchedule()) {
+      showToast("Please fix the schedule errors highlighted in red.", "error");
+      return;
+    }
+
+    try {
+      setSavingSchedule(true);
+      const cleanEntries = schedule.map((e) => ({
+        dayOfWeek: e.dayOfWeek,
+        isOpen: Boolean(e.isOpen),
+        openingTime: e.isOpen ? e.openingTime : "09:00",
+        closingTime: e.isOpen ? e.closingTime : "18:00",
+      }));
+
+      await storeService.updateSchedule(cleanEntries);
+      showToast("Weekly schedule saved successfully!");
+      setIsScheduleDirty(false);
+      await loadAllData();
+    } catch (err) {
+      showToast(err.message || "Failed to save schedule", "error");
+    } finally {
+      setSavingSchedule(false);
+    }
+  };
+
+  // --- 3. GENERAL SETTINGS ACTIONS ---
+
+  const handleSaveGeneral = async (e) => {
+    e.preventDefault();
+    if (!generalForm.storeName.trim()) {
+      showToast("Store name cannot be empty.", "error");
+      return;
+    }
+
+    const prep = parseInt(generalForm.defaultPreparationTime, 10);
+    if (isNaN(prep) || prep < 0) {
+      showToast("Preparation time must be 0 or a positive integer.", "error");
+      return;
+    }
+
+    try {
+      setSavingGeneral(true);
+      await storeService.updateSettings({
+        storeName: generalForm.storeName.trim(),
+        defaultPreparationTime: prep,
+      });
+      showToast("General settings updated!");
+      setIsGeneralDirty(false);
+      await loadAllData();
+    } catch (err) {
+      showToast(err.message || "Failed to update general settings", "error");
+    } finally {
+      setSavingGeneral(false);
+    }
+  };
+
+  // --- 4. ORDERING SETTINGS ACTIONS ---
+
+  const handleSaveOrdering = async (e) => {
+    e.preventDefault();
+    const windowSecs = parseInt(orderingForm.cancellationWindowSeconds, 10);
+    if (isNaN(windowSecs) || windowSecs < 1) {
+      showToast("Cancellation window must be a positive integer (at least 1 second).", "error");
+      return;
+    }
+
+    try {
+      setSavingOrdering(true);
+      await storeService.updateSettings({
+        cancellationWindowSeconds: windowSecs,
+      });
+      showToast("Ordering settings updated!");
+      setIsOrderingDirty(false);
+      await loadAllData();
+    } catch (err) {
+      showToast(err.message || "Failed to update ordering settings", "error");
+    } finally {
+      setSavingOrdering(false);
+    }
+  };
+
+  // --- RENDER LOADING & ERROR SKELETONS ---
+
+  if (loading) {
+    return (
+      <div className="space-y-6 animate-pulse" aria-busy="true">
+        <div className="h-8 w-64 bg-slate-800 rounded-lg" />
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <div className="lg:col-span-2 h-72 bg-slate-900/60 rounded-2xl border border-slate-800" />
+          <div className="h-72 bg-slate-900/60 rounded-2xl border border-slate-800" />
+        </div>
+        <div className="h-96 bg-slate-900/60 rounded-2xl border border-slate-800" />
+      </div>
+    );
+  }
+
+  if (fetchError && !status) {
+    return (
+      <div className="p-12 text-center rounded-2xl bg-slate-900/60 border border-rose-800/40 max-w-xl mx-auto my-12 space-y-4">
+        <div className="w-16 h-16 rounded-2xl bg-rose-500/10 text-rose-400 mx-auto flex items-center justify-center text-3xl">
+          ⚠️
+        </div>
+        <h3 className="text-xl font-bold text-white">Unable to load store settings</h3>
+        <p className="text-sm text-slate-400">{fetchError}</p>
+        <button
+          onClick={loadAllData}
+          className="px-5 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-semibold text-sm transition shadow-md"
+        >
+          Retry Connection
+        </button>
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-8">
+      {/* Toast Notification */}
+      {toast && (
+        <div
+          className={`fixed bottom-6 right-6 z-50 flex items-center gap-3 px-4 py-3 rounded-xl shadow-2xl border text-sm font-semibold transition-all transform animate-bounce-short ${
+            toast.type === "error"
+              ? "bg-rose-950 border-rose-800 text-rose-200"
+              : "bg-emerald-950 border-emerald-800 text-emerald-200"
+          }`}
+          role="status"
+        >
+          <span>{toast.type === "error" ? "✖" : "✔"}</span>
+          <span>{toast.message}</span>
+        </div>
+      )}
+
+      {/* Header */}
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-4 border-b border-slate-800">
+        <div>
+          <h2 className="text-2xl font-bold text-white tracking-tight flex items-center gap-2">
+            <span>⚙️ Store Operations & Settings</span>
+          </h2>
+          <p className="text-sm text-slate-400 mt-0.5">
+            Real-time open/closed state, weekly hours, cancellation window, and ordering rules
+          </p>
+        </div>
+
+        <div className="flex items-center gap-3">
+          <button
+            onClick={loadAllData}
+            disabled={statusActionLoading}
+            className="px-3.5 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-semibold border border-slate-700/80 transition flex items-center gap-1.5"
+            title="Refresh Authoritative Store State"
+          >
+            <span>🔄</span> Refresh Status
+          </button>
+        </div>
+      </div>
+
+      {/* Grid: Status Section (Left) & Controls (Right) */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
+        {/* SECTION 1: STORE STATUS & MANUAL OVERRIDE (Col-span 2) */}
+        <div className="lg:col-span-2 bg-slate-900/70 border border-slate-800 rounded-2xl p-5 sm:p-6 shadow-xs space-y-6">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 border-b border-slate-800/80 pb-4">
+            <div>
+              <h3 className="text-base font-bold text-white flex items-center gap-2">
+                <span>⚡ Live Operating State</span>
+                <span className="text-[10px] font-mono font-medium px-2 py-0.5 rounded bg-slate-800 text-slate-300 border border-slate-700">
+                  {status?.timezone || "Asia/Kolkata"}
+                </span>
+              </h3>
+              <p className="text-xs text-slate-400 mt-0.5">
+                Authoritative single source of truth governing student storefront ordering
+              </p>
+            </div>
+
+            {/* Current Mode Badge */}
+            <div className="self-start sm:self-auto">
+              {status?.manualOverride ? (
+                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-purple-500/15 text-purple-300 border border-purple-500/30">
+                  <span className="w-2 h-2 rounded-full bg-purple-400" />
+                  Manual Override Active
+                </span>
+              ) : (
+                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-blue-500/15 text-blue-300 border border-blue-500/30">
+                  <span className="w-2 h-2 rounded-full bg-blue-400" />
+                  Weekly Schedule Active
+                </span>
+              )}
+            </div>
+          </div>
+
+          {/* Quick Metrics Bar */}
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
+            {/* Store Open/Closed */}
+            <div className="p-3.5 rounded-xl bg-slate-950/70 border border-slate-800/90 space-y-1">
+              <span className="text-slate-500 font-semibold uppercase tracking-wider text-[10px] block">
+                Physical Store
+              </span>
+              <div className="flex items-center gap-1.5">
+                <span
+                  className={`w-2.5 h-2.5 rounded-full ${
+                    status?.isOpen ? "bg-emerald-400 animate-pulse" : "bg-rose-500"
+                  }`}
+                />
+                <span
+                  className={`text-sm font-extrabold ${
+                    status?.isOpen ? "text-emerald-400" : "text-rose-400"
+                  }`}
+                >
+                  {status?.isOpen ? "OPEN" : "CLOSED"}
+                </span>
+              </div>
+            </div>
+
+            {/* Ordering Status */}
+            <div className="p-3.5 rounded-xl bg-slate-950/70 border border-slate-800/90 space-y-1">
+              <span className="text-slate-500 font-semibold uppercase tracking-wider text-[10px] block">
+                Orders Intake
+              </span>
+              <div className="flex items-center gap-1.5">
+                <span
+                  className={`w-2.5 h-2.5 rounded-full ${
+                    status?.acceptingOrders ? "bg-emerald-400" : "bg-amber-400"
+                  }`}
+                />
+                <span
+                  className={`text-sm font-extrabold ${
+                    status?.acceptingOrders ? "text-emerald-400" : "text-amber-400"
+                  }`}
+                >
+                  {status?.acceptingOrders ? "ACCEPTING" : "PAUSED"}
+                </span>
+              </div>
+            </div>
+
+            {/* Student Ordering Authority */}
+            <div className="p-3.5 rounded-xl bg-slate-950/70 border border-slate-800/90 space-y-1">
+              <span className="text-slate-500 font-semibold uppercase tracking-wider text-[10px] block">
+                Can Students Order?
+              </span>
+              <span
+                className={`text-sm font-extrabold block ${
+                  status?.canOrder ? "text-emerald-400" : "text-rose-400"
+                }`}
+              >
+                {status?.canOrder ? "YES (ACTIVE)" : "NO (LOCKED)"}
+              </span>
+            </div>
+
+            {/* Current Schedule Slot */}
+            <div className="p-3.5 rounded-xl bg-slate-950/70 border border-slate-800/90 space-y-1">
+              <span className="text-slate-500 font-semibold uppercase tracking-wider text-[10px] block">
+                Today's Slot ({status?.currentDayName || "Today"})
+              </span>
+              <span className="text-xs font-bold text-slate-300 block">
+                {status?.openingTime && status?.closingTime
+                  ? `${status.openingTime} – ${status.closingTime}`
+                  : "Closed on Schedule"}
+              </span>
+            </div>
+          </div>
+
+          {/* Active Closure Reason Banner */}
+          {status?.reason && (
+            <div className="p-3.5 rounded-xl bg-amber-500/10 border border-amber-500/20 text-xs text-amber-300 flex items-start gap-2.5">
+              <span className="text-base mt-0.5">📢</span>
+              <div>
+                <span className="font-bold text-amber-200 block">Active Status Notice:</span>
+                <span>{status.reason}</span>
+              </div>
+            </div>
+          )}
+
+          {/* Controls: Manual Override Switchers */}
+          <div className="pt-2 space-y-4">
+            <h4 className="text-xs font-bold uppercase tracking-wider text-slate-400">
+              Manual Override Controls
+            </h4>
+
+            <div className="flex flex-wrap items-center gap-3">
+              {/* Button: Use Schedule */}
+              <button
+                type="button"
+                onClick={handleUseSchedule}
+                disabled={statusActionLoading || !status?.manualOverride}
+                className={`px-4 py-2.5 rounded-xl text-xs font-bold transition flex items-center gap-2 border ${
+                  !status?.manualOverride
+                    ? "bg-blue-600/20 border-blue-500/40 text-blue-300 cursor-default"
+                    : "bg-slate-800 hover:bg-slate-700 text-slate-200 border-slate-700 cursor-pointer"
+                }`}
+              >
+                <span>📅</span>
+                <span>Use Schedule</span>
+                {!status?.manualOverride && <span className="text-[10px]">(Active)</span>}
+              </button>
+
+              {/* Button: Manually Open */}
+              <button
+                type="button"
+                onClick={handleManualOpen}
+                disabled={statusActionLoading || (status?.manualOverride && status?.isOpen)}
+                className={`px-4 py-2.5 rounded-xl text-xs font-bold transition flex items-center gap-2 border ${
+                  status?.manualOverride && status?.isOpen
+                    ? "bg-emerald-600/20 border-emerald-500/40 text-emerald-300 cursor-default"
+                    : "bg-slate-800 hover:bg-emerald-600/20 text-slate-200 border-slate-700 hover:border-emerald-500/40 cursor-pointer"
+                }`}
+              >
+                <span>🔓</span>
+                <span>Force Open Store</span>
+                {status?.manualOverride && status?.isOpen && (
+                  <span className="text-[10px]">(Active)</span>
+                )}
+              </button>
+
+              {/* Button: Manually Close */}
+              <button
+                type="button"
+                onClick={handleManualClose}
+                disabled={statusActionLoading || (status?.manualOverride && !status?.isOpen)}
+                className={`px-4 py-2.5 rounded-xl text-xs font-bold transition flex items-center gap-2 border ${
+                  status?.manualOverride && !status?.isOpen
+                    ? "bg-rose-600/20 border-rose-500/40 text-rose-300 cursor-default"
+                    : "bg-slate-800 hover:bg-rose-600/20 text-slate-200 border-slate-700 hover:border-rose-500/40 cursor-pointer"
+                }`}
+              >
+                <span>🔒</span>
+                <span>Force Close Store</span>
+                {status?.manualOverride && !status?.isOpen && (
+                  <span className="text-[10px]">(Active)</span>
+                )}
+              </button>
+            </div>
+
+            {/* Temporary Closure Reason Input */}
+            <div className="pt-2 bg-slate-950/50 p-4 rounded-xl border border-slate-800 space-y-2">
+              <label
+                htmlFor="closeReasonInput"
+                className="text-xs font-bold text-slate-300 block"
+              >
+                Temporary Closure Reason (Shown to Students When Closed)
+              </label>
+              <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
+                <input
+                  id="closeReasonInput"
+                  type="text"
+                  maxLength={500}
+                  value={closeReasonInput}
+                  onChange={(e) => setCloseReasonInput(e.target.value)}
+                  placeholder="e.g. Kitchen deep cleaning, staff break, inventory restock..."
+                  className="flex-1 px-3.5 py-2 rounded-xl bg-slate-900 border border-slate-700/80 text-white placeholder-slate-500 text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                />
+                <button
+                  type="button"
+                  onClick={handleUpdateCloseReasonOnly}
+                  disabled={statusActionLoading}
+                  className="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-bold border border-slate-700 transition"
+                >
+                  Save Reason
+                </button>
+              </div>
+            </div>
+
+            {/* Toggle Accepting Orders */}
+            <div className="flex items-center justify-between p-4 rounded-xl bg-slate-950/50 border border-slate-800">
+              <div>
+                <span className="text-xs font-bold text-white block">
+                  Accept Orders from Students
+                </span>
+                <span className="text-[11px] text-slate-400 block mt-0.5">
+                  Temporarily pause order placement without changing the store's physical open state
+                </span>
+              </div>
+
+              <button
+                type="button"
+                onClick={handleToggleAcceptingOrders}
+                disabled={statusActionLoading}
+                aria-pressed={settings?.acceptingOrders}
+                className={`relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-indigo-500 ${
+                  settings?.acceptingOrders ? "bg-emerald-600" : "bg-slate-700"
+                }`}
+              >
+                <span className="sr-only">Toggle Accepting Orders</span>
+                <span
+                  aria-hidden="true"
+                  className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow-lg ring-0 transition duration-200 ease-in-out ${
+                    settings?.acceptingOrders ? "translate-x-5" : "translate-x-0"
+                  }`}
+                />
+              </button>
+            </div>
+          </div>
+        </div>
+
+        {/* SIDE COLUMN: GENERAL & ORDERING SETTINGS */}
+        <div className="space-y-6">
+          {/* GENERAL SETTINGS */}
+          <div className="bg-slate-900/70 border border-slate-800 rounded-2xl p-5 shadow-xs space-y-4">
+            <div className="flex items-center justify-between border-b border-slate-800/80 pb-3">
+              <h3 className="text-sm font-bold text-white flex items-center gap-1.5">
+                <span>🏷️ General Store Settings</span>
+              </h3>
+              {isGeneralDirty && (
+                <span className="text-[10px] font-bold text-amber-400 bg-amber-500/10 px-2 py-0.5 rounded border border-amber-500/30">
+                  Unsaved Changes
+                </span>
+              )}
+            </div>
+
+            <form onSubmit={handleSaveGeneral} className="space-y-3.5 text-xs">
+              <div>
+                <label htmlFor="storeName" className="font-semibold text-slate-300 block mb-1">
+                  Store Display Name
+                </label>
+                <input
+                  id="storeName"
+                  type="text"
+                  maxLength={100}
+                  value={generalForm.storeName}
+                  onChange={(e) => {
+                    setIsGeneralDirty(true);
+                    setGeneralForm({ ...generalForm, storeName: e.target.value });
+                  }}
+                  className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-700 text-white text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                  required
+                />
+              </div>
+
+              <div>
+                <label
+                  htmlFor="defaultPrepTime"
+                  className="font-semibold text-slate-300 block mb-1"
+                >
+                  Default Preparation Time (Minutes)
+                </label>
+                <input
+                  id="defaultPrepTime"
+                  type="number"
+                  min="0"
+                  max="240"
+                  value={generalForm.defaultPreparationTime}
+                  onChange={(e) => {
+                    setIsGeneralDirty(true);
+                    setGeneralForm({
+                      ...generalForm,
+                      defaultPreparationTime: e.target.value,
+                    });
+                  }}
+                  className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-700 text-white text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                  required
+                />
+                <span className="text-[10px] text-slate-500 block mt-1">
+                  Fallback preparation time when products have no explicit prep time.
+                </span>
+              </div>
+
+              <div>
+                <label htmlFor="currency" className="font-semibold text-slate-400 block mb-1">
+                  Currency
+                </label>
+                <input
+                  id="currency"
+                  type="text"
+                  value="INR (₹)"
+                  disabled
+                  className="w-full px-3 py-2 rounded-xl bg-slate-950/50 border border-slate-800 text-slate-500 text-xs cursor-not-allowed"
+                />
+              </div>
+
+              <button
+                type="submit"
+                disabled={savingGeneral || !isGeneralDirty}
+                className={`w-full py-2.5 px-4 rounded-xl font-bold text-xs transition shadow-sm ${
+                  !isGeneralDirty || savingGeneral
+                    ? "bg-slate-800 text-slate-500 cursor-not-allowed"
+                    : "bg-indigo-600 hover:bg-indigo-500 text-white"
+                }`}
+              >
+                {savingGeneral ? "Saving..." : "Save General Settings"}
+              </button>
+            </form>
+          </div>
+
+          {/* ORDERING SETTINGS */}
+          <div className="bg-slate-900/70 border border-slate-800 rounded-2xl p-5 shadow-xs space-y-4">
+            <div className="flex items-center justify-between border-b border-slate-800/80 pb-3">
+              <h3 className="text-sm font-bold text-white flex items-center gap-1.5">
+                <span>⏱️ Order Cancellation Rules</span>
+              </h3>
+              {isOrderingDirty && (
+                <span className="text-[10px] font-bold text-amber-400 bg-amber-500/10 px-2 py-0.5 rounded border border-amber-500/30">
+                  Unsaved Changes
+                </span>
+              )}
+            </div>
+
+            <form onSubmit={handleSaveOrdering} className="space-y-3.5 text-xs">
+              <div>
+                <label
+                  htmlFor="cancelWindow"
+                  className="font-semibold text-slate-300 block mb-1"
+                >
+                  Cancellation Window (Seconds)
+                </label>
+                <input
+                  id="cancelWindow"
+                  type="number"
+                  min="1"
+                  max="3600"
+                  value={orderingForm.cancellationWindowSeconds}
+                  onChange={(e) => {
+                    setIsOrderingDirty(true);
+                    setOrderingForm({
+                      ...orderingForm,
+                      cancellationWindowSeconds: e.target.value,
+                    });
+                  }}
+                  className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-700 text-white text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                  required
+                />
+                <p className="text-[11px] text-slate-400 font-medium mt-1 leading-relaxed">
+                  Students can cancel orders for{" "}
+                  <span className="text-indigo-400 font-bold">
+                    {orderingForm.cancellationWindowSeconds || 30} seconds
+                  </span>{" "}
+                  after placing them.
+                </p>
+              </div>
+
+              <button
+                type="submit"
+                disabled={savingOrdering || !isOrderingDirty}
+                className={`w-full py-2.5 px-4 rounded-xl font-bold text-xs transition shadow-sm ${
+                  !isOrderingDirty || savingOrdering
+                    ? "bg-slate-800 text-slate-500 cursor-not-allowed"
+                    : "bg-indigo-600 hover:bg-indigo-500 text-white"
+                }`}
+              >
+                {savingOrdering ? "Saving..." : "Save Cancellation Window"}
+              </button>
+            </form>
+          </div>
+        </div>
+      </div>
+
+      {/* SECTION 2: WEEKLY SCHEDULE EDITOR */}
+      <div className="bg-slate-900/70 border border-slate-800 rounded-2xl p-5 sm:p-6 shadow-xs space-y-6">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 border-b border-slate-800/80 pb-4">
+          <div>
+            <h3 className="text-base font-bold text-white flex items-center gap-2">
+              <span>📅 Weekly Operating Schedule</span>
+              {isScheduleDirty && (
+                <span className="text-[10px] font-bold text-amber-400 bg-amber-500/10 px-2 py-0.5 rounded border border-amber-500/30">
+                  Unsaved Changes
+                </span>
+              )}
+            </h3>
+            <p className="text-xs text-slate-400 mt-0.5">
+              Automated opening and closing hours for each day of the week (24h time in Asia/Kolkata)
+            </p>
+          </div>
+
+          <button
+            type="button"
+            onClick={handleSaveSchedule}
+            disabled={savingSchedule}
+            className={`px-5 py-2.5 rounded-xl font-bold text-xs transition shadow-md flex items-center gap-2 self-start sm:self-auto ${
+              savingSchedule
+                ? "bg-slate-800 text-slate-400 cursor-not-allowed"
+                : "bg-indigo-600 hover:bg-indigo-500 text-white shadow-indigo-600/20 active:scale-98"
+            }`}
+          >
+            <span>💾</span>
+            <span>{savingSchedule ? "Saving Schedule..." : "Save Weekly Schedule"}</span>
+          </button>
+        </div>
+
+        {/* 7 Days Table / List */}
+        <div className="space-y-3">
+          {schedule.map((entry, index) => {
+            const dayName = entry.dayName || DAY_NAMES[entry.dayOfWeek];
+            const hasError = scheduleErrors[index];
+            const isOpen = Boolean(entry.isOpen);
+
+            return (
+              <div
+                key={entry.dayOfWeek}
+                className={`p-4 rounded-xl border transition-all ${
+                  hasError
+                    ? "bg-rose-950/20 border-rose-800/80"
+                    : isOpen
+                    ? "bg-slate-950/70 border-slate-800"
+                    : "bg-slate-950/30 border-slate-800/50 opacity-80"
+                }`}
+              >
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                  {/* Day Label & Toggle */}
+                  <div className="flex items-center gap-3 sm:w-48">
+                    <button
+                      type="button"
+                      onClick={() => handleScheduleEntryChange(index, "isOpen", !isOpen)}
+                      className={`px-2.5 py-1 rounded-lg text-xs font-bold border transition ${
+                        isOpen
+                          ? "bg-emerald-500/15 border-emerald-500/30 text-emerald-400"
+                          : "bg-slate-800 border-slate-700 text-slate-400"
+                      }`}
+                    >
+                      {isOpen ? "Open" : "Closed"}
+                    </button>
+                    <span className="font-bold text-sm text-white">{dayName}</span>
+                  </div>
+
+                  {/* Time Inputs */}
+                  <div className="flex flex-wrap items-center gap-4 text-xs">
+                    <div className="flex items-center gap-2">
+                      <label
+                        htmlFor={`openTime_${entry.dayOfWeek}`}
+                        className="text-slate-400 font-medium"
+                      >
+                        Opens:
+                      </label>
+                      <input
+                        id={`openTime_${entry.dayOfWeek}`}
+                        type="time"
+                        value={entry.openingTime || "09:00"}
+                        disabled={!isOpen}
+                        onChange={(e) =>
+                          handleScheduleEntryChange(index, "openingTime", e.target.value)
+                        }
+                        className={`px-3 py-1.5 rounded-lg border text-xs font-mono transition ${
+                          !isOpen
+                            ? "bg-slate-900/50 border-slate-800 text-slate-600 cursor-not-allowed"
+                            : "bg-slate-900 border-slate-700 text-white focus:outline-none focus:ring-1 focus:ring-indigo-500"
+                        }`}
+                      />
+                    </div>
+
+                    <span className="text-slate-600 font-bold hidden sm:inline">→</span>
+
+                    <div className="flex items-center gap-2">
+                      <label
+                        htmlFor={`closeTime_${entry.dayOfWeek}`}
+                        className="text-slate-400 font-medium"
+                      >
+                        Closes:
+                      </label>
+                      <input
+                        id={`closeTime_${entry.dayOfWeek}`}
+                        type="time"
+                        value={entry.closingTime || "18:00"}
+                        disabled={!isOpen}
+                        onChange={(e) =>
+                          handleScheduleEntryChange(index, "closingTime", e.target.value)
+                        }
+                        className={`px-3 py-1.5 rounded-lg border text-xs font-mono transition ${
+                          !isOpen
+                            ? "bg-slate-900/50 border-slate-800 text-slate-600 cursor-not-allowed"
+                            : "bg-slate-900 border-slate-700 text-white focus:outline-none focus:ring-1 focus:ring-indigo-500"
+                        }`}
+                      />
+                    </div>
+                  </div>
+
+                  {/* Status Indicator */}
+                  <div className="text-right text-xs text-slate-500 sm:w-28">
+                    {isOpen ? (
+                      <span className="text-emerald-400/80 font-medium">Operating</span>
+                    ) : (
+                      <span className="text-slate-600 font-medium">Off Duty</span>
+                    )}
+                  </div>
+                </div>
+
+                {/* Inline Error Message */}
+                {hasError && (
+                  <p className="mt-2 text-xs text-rose-400 font-medium flex items-center gap-1">
+                    <span>⚠️</span>
+                    <span>{hasError}</span>
+                  </p>
+                )}
+              </div>
+            );
+          })}
+        </div>
+
+        {/* Bottom Save Action */}
+        <div className="pt-3 border-t border-slate-800 flex items-center justify-between">
+          <p className="text-[11px] text-slate-500">
+            Note: Store schedule changes take effect immediately in Asia/Kolkata timezone unless manual override is active.
+          </p>
+
+          <button
+            type="button"
+            onClick={handleSaveSchedule}
+            disabled={savingSchedule}
+            className={`px-6 py-2.5 rounded-xl font-bold text-xs transition shadow-md flex items-center gap-2 ${
+              savingSchedule
+                ? "bg-slate-800 text-slate-400 cursor-not-allowed"
+                : "bg-indigo-600 hover:bg-indigo-500 text-white shadow-indigo-600/20 active:scale-98"
+            }`}
+          >
+            <span>💾</span>
+            <span>{savingSchedule ? "Saving..." : "Save Schedule"}</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default StoreSettings;
