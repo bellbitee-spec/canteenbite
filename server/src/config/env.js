@@ -6,10 +6,10 @@ const env = {
   PORT: process.env.PORT || 5000,
   NODE_ENV: process.env.NODE_ENV || "development",
   MONGO_URI: process.env.MONGODB_URI || process.env.MONGO_URI,
-  CLIENT_URL: process.env.CLIENT_URL,
-  ADMIN_URL: process.env.ADMIN_URL,
+  CLIENT_URL: process.env.CLIENT_URL || "https://canteenbite.pages.dev",
+  ADMIN_URL: process.env.ADMIN_URL || "https://canteenbite-admin.pages.dev",
   ALLOWED_ORIGINS: process.env.ALLOWED_ORIGINS
-    ? process.env.ALLOWED_ORIGINS.split(",").map((s) => s.trim())
+    ? process.env.ALLOWED_ORIGINS.split(",").map((s) => s.trim().replace(/\/+$/, ""))
     : null,
   JWT_SECRET: process.env.JWT_SECRET,
   JWT_EXPIRES_IN: process.env.JWT_EXPIRES_IN || "7d",

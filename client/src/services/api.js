@@ -1,10 +1,31 @@
-const API_BASE_URL =
-  import.meta.env.VITE_API_URL ||
-  import.meta.env.VITE_API_BASE_URL ||
-  "http://localhost:5000/api";
+const resolveApiBaseUrl = () => {
+  const envUrl =
+    import.meta.env.VITE_API_URL ||
+    import.meta.env.VITE_API_BASE_URL;
+
+  if (envUrl && typeof envUrl === "string" && envUrl.trim()) {
+    const trimmed = envUrl.trim().replace(/\/+$/, "");
+    return trimmed.endsWith("/api") ? trimmed : `${trimmed}/api`;
+  }
+
+  // In production builds, default to the deployed Render backend
+  if (import.meta.env.PROD) {
+    return "https://canteenbite.onrender.com/api";
+  }
+
+  // Local development default
+  return "http://localhost:5000/api";
+};
+
+const API_BASE_URL = resolveApiBaseUrl();
 
 export const request = async (endpoint, options = {}) => {
-  const cleanEndpoint = endpoint.startsWith("/") ? endpoint.slice(1) : endpoint;
+  let cleanEndpoint = endpoint.startsWith("/") ? endpoint.slice(1) : endpoint;
+  // Guard against duplicate /api prefix if passed by caller
+  if (cleanEndpoint.startsWith("api/")) {
+    cleanEndpoint = cleanEndpoint.slice(4);
+  }
+
   const baseUrl = API_BASE_URL.endsWith("/")
     ? API_BASE_URL.slice(0, -1)
     : API_BASE_URL;

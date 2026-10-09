@@ -28,8 +28,13 @@ app.use(
 );
 
 // Cross-Origin Resource Sharing
-const configuredOrigins =
-  env.ALLOWED_ORIGINS || [env.CLIENT_URL, env.ADMIN_URL].filter(Boolean);
+const configuredOrigins = (
+  env.ALLOWED_ORIGINS || [
+    env.CLIENT_URL || "https://canteenbite.pages.dev",
+    env.ADMIN_URL || "https://canteenbite-admin.pages.dev",
+  ].filter(Boolean)
+).map((o) => o.replace(/\/+$/, ""));
+
 const devOrigins =
   env.NODE_ENV !== "production"
     ? [
@@ -41,11 +46,26 @@ const devOrigins =
     : [];
 const allowedOrigins = Array.from(new Set([...configuredOrigins, ...devOrigins]));
 
+const isAllowedOrigin = (origin) => {
+  if (!origin) return true; // Allow requests with no origin (e.g. mobile apps, curl, tests)
+  const cleanOrigin = origin.trim().replace(/\/+$/, "");
+  if (allowedOrigins.includes(cleanOrigin)) {
+    return true;
+  }
+  // Support Cloudflare Pages branch / commit previews for this application
+  if (/^https:\/\/([a-z0-9-]+\.)?canteenbite\.pages\.dev$/.test(cleanOrigin)) {
+    return true;
+  }
+  if (/^https:\/\/([a-z0-9-]+\.)?canteenbite-admin\.pages\.dev$/.test(cleanOrigin)) {
+    return true;
+  }
+  return false;
+};
+
 app.use(
   cors({
     origin: (origin, callback) => {
-      // Allow requests with no origin (e.g. mobile apps, curl, automated test suites)
-      if (!origin || allowedOrigins.includes(origin)) {
+      if (isAllowedOrigin(origin)) {
         return callback(null, true);
       }
       return callback(

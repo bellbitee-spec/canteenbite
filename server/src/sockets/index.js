@@ -55,8 +55,13 @@ const socketAuthMiddleware = async (socket, next) => {
 const initSocket = (httpServer) => {
   if (ioInstance) return ioInstance;
 
-  const configuredOrigins =
-    env.ALLOWED_ORIGINS || [env.CLIENT_URL, env.ADMIN_URL].filter(Boolean);
+  const configuredOrigins = (
+    env.ALLOWED_ORIGINS || [
+      env.CLIENT_URL || "https://canteenbite.pages.dev",
+      env.ADMIN_URL || "https://canteenbite-admin.pages.dev",
+    ].filter(Boolean)
+  ).map((o) => o.replace(/\/+$/, ""));
+
   const devOrigins =
     env.NODE_ENV !== "production"
       ? [
@@ -68,9 +73,24 @@ const initSocket = (httpServer) => {
       : [];
   const allowedOrigins = Array.from(new Set([...configuredOrigins, ...devOrigins]));
 
+  const isAllowedSocketOrigin = (origin) => {
+    if (!origin) return true;
+    const cleanOrigin = origin.trim().replace(/\/+$/, "");
+    if (allowedOrigins.includes(cleanOrigin)) return true;
+    if (/^https:\/\/([a-z0-9-]+\.)?canteenbite\.pages\.dev$/.test(cleanOrigin)) return true;
+    if (/^https:\/\/([a-z0-9-]+\.)?canteenbite-admin\.pages\.dev$/.test(cleanOrigin)) return true;
+    return false;
+  };
+
   const io = new Server(httpServer, {
     cors: {
-      origin: allowedOrigins,
+      origin: (origin, callback) => {
+        if (isAllowedSocketOrigin(origin)) {
+          callback(null, true);
+        } else {
+          callback(new Error("Socket CORS violation"));
+        }
+      },
       credentials: true,
       methods: ["GET", "POST"],
     },

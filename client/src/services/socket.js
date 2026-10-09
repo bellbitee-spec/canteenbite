@@ -1,12 +1,29 @@
 import { io } from "socket.io-client";
 
-const SOCKET_URL =
-  import.meta.env.VITE_SOCKET_URL ||
-  (import.meta.env.VITE_API_URL
-    ? import.meta.env.VITE_API_URL.replace(/\/api\/?$/, "")
-    : import.meta.env.VITE_API_BASE_URL
-    ? import.meta.env.VITE_API_BASE_URL.replace(/\/api\/?$/, "")
-    : "http://localhost:5000");
+const resolveSocketUrl = () => {
+  const envSocketUrl = import.meta.env.VITE_SOCKET_URL;
+  if (envSocketUrl && typeof envSocketUrl === "string" && envSocketUrl.trim()) {
+    return envSocketUrl.trim().replace(/\/+$/, "");
+  }
+
+  const envApiUrl =
+    import.meta.env.VITE_API_URL ||
+    import.meta.env.VITE_API_BASE_URL;
+
+  if (envApiUrl && typeof envApiUrl === "string" && envApiUrl.trim()) {
+    return envApiUrl.trim().replace(/\/+$/, "").replace(/\/api\/?$/, "");
+  }
+
+  // In production builds, default to deployed Render backend root
+  if (import.meta.env.PROD) {
+    return "https://canteenbite.onrender.com";
+  }
+
+  // Local development default
+  return "http://localhost:5000";
+};
+
+const SOCKET_URL = resolveSocketUrl();
 
 let socketInstance = null;
 
