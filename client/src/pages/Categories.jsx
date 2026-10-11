@@ -81,11 +81,11 @@ const Categories = () => {
       <div className="mb-6">
         <div className="flex items-center gap-2 mb-1">
           <span className="text-xl select-none">🥗</span>
-          <h1 className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight">
+          <h1 className="text-2xl sm:text-3xl font-bold text-[#352431] tracking-tight">
             Categories
           </h1>
         </div>
-        <p className="text-xs sm:text-sm text-slate-400 font-medium">
+        <p className="text-xs sm:text-sm text-[#735A67] font-medium">
           Choose a section to browse freshly prepped dishes and drinks.
         </p>
       </div>
@@ -96,7 +96,7 @@ const Categories = () => {
             {[1, 2, 3, 4, 5, 6].map((i) => (
               <div
                 key={i}
-                className="w-20 h-28 rounded-full bg-slate-100 animate-pulse shrink-0"
+                className="w-20 h-28 rounded-3xl bg-[#FBE7EE]/60 border border-[#EBD4DC]/60 animate-pulse shrink-0"
               />
             ))}
           </div>
@@ -117,15 +117,15 @@ const Categories = () => {
               <div
                 className={`w-14 h-14 sm:w-16 sm:h-16 rounded-2xl sm:rounded-3xl flex items-center justify-center transition-all duration-300 shadow-2xs group-hover:scale-105 group-hover:-translate-y-1 border ${
                   !selectedCategoryId
-                    ? "bg-brand-500 text-white shadow-md shadow-brand-500/25 ring-2 ring-brand-500/20"
-                    : "bg-slate-100 hover:bg-slate-200/70 border-slate-200/50 text-slate-800"
+                    ? "bg-[#C94F78] text-white shadow-md shadow-[#C94F78]/25 ring-2 ring-[#C94F78]/20 border-[#C94F78]"
+                    : "bg-[#FBE7EE]/50 hover:bg-[#FBE7EE] border-[#EBD4DC] text-[#352431]"
                 }`}
               >
                 <span className="text-2xl sm:text-3xl select-none">🍱</span>
               </div>
               <span
                 className={`font-bold text-[11px] sm:text-xs truncate tracking-tight text-center w-full block transition-colors leading-tight ${
-                  !selectedCategoryId ? "text-brand-600 font-black" : "text-slate-700 group-hover:text-brand-600"
+                  !selectedCategoryId ? "text-[#C94F78] font-bold" : "text-[#735A67] group-hover:text-[#C94F78]"
                 }`}
               >
                 All
@@ -151,12 +151,12 @@ const Categories = () => {
           <div className="pt-2">
             <div className="mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
               <div>
-                <h2 className="text-lg sm:text-xl font-black text-slate-900 tracking-tight">
+                <h2 className="text-lg sm:text-xl font-bold text-[#352431] tracking-tight">
                   {selectedCategoryObj
                     ? selectedCategoryObj.name
                     : "All Menu Items"}
                 </h2>
-                <p className="text-xs text-slate-400 font-medium mt-0.5">
+                <p className="text-xs text-[#735A67] font-medium mt-0.5">
                   {selectedCategoryObj?.description
                     ? selectedCategoryObj.description
                     : `Showing ${products.length} dish${products.length === 1 ? "" : "es"} available today`}
@@ -167,7 +167,7 @@ const Categories = () => {
                 <button
                   type="button"
                   onClick={() => setSearchParams({})}
-                  className="text-xs font-bold text-brand-600 hover:text-brand-700 hover:underline self-start sm:self-auto cursor-pointer"
+                  className="text-xs font-bold text-[#C94F78] hover:text-[#B33D65] hover:underline self-start sm:self-auto cursor-pointer"
                 >
                   Show all categories
                 </button>

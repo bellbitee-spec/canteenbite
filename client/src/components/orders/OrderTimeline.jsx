@@ -213,20 +213,20 @@ const OrderTimeline = ({ order }) => {
           let subtitleClasses = "text-xs font-medium";
 
           if (step.state === "completed") {
-            badgeClasses += " bg-emerald-500 text-white shadow-emerald-500/20";
-            lineClasses += " bg-emerald-400";
-            titleClasses += " text-slate-900";
-            subtitleClasses += " text-slate-500";
+            badgeClasses += " bg-[#5F9A68] text-white shadow-[#5F9A68]/20";
+            lineClasses += " bg-[#5F9A68]/60";
+            titleClasses += " text-[#352431]";
+            subtitleClasses += " text-[#735A67]";
           } else if (step.state === "current") {
             badgeClasses +=
-              " bg-brand-500 text-white ring-4 ring-brand-100 animate-pulse shadow-brand-500/20";
-            lineClasses += " bg-slate-200";
-            titleClasses += " text-brand-700";
-            subtitleClasses += " text-brand-600/90";
+              " bg-[#C94F78] text-white ring-4 ring-[#FBE7EE] animate-pulse shadow-[#C94F78]/20";
+            lineClasses += " bg-[#EBD4DC]";
+            titleClasses += " text-[#C94F78]";
+            subtitleClasses += " text-[#735A67]";
           } else if (step.state === "active-delayed") {
             badgeClasses +=
               " bg-amber-600 text-white ring-4 ring-amber-200 animate-pulse";
-            lineClasses += " bg-slate-200";
+            lineClasses += " bg-[#EBD4DC]";
             titleClasses += " text-amber-900";
             subtitleClasses += " text-amber-800 font-semibold";
           } else if (step.state === "cancelled") {
@@ -236,10 +236,10 @@ const OrderTimeline = ({ order }) => {
             subtitleClasses += " text-rose-700";
           } else {
             // upcoming
-            badgeClasses += " bg-slate-100 text-slate-400 border border-slate-200";
-            lineClasses += " bg-slate-200";
-            titleClasses += " text-slate-400 font-bold";
-            subtitleClasses += " text-slate-400";
+            badgeClasses += " bg-[#FBE7EE]/50 text-[#927681] border border-[#EBD4DC]";
+            lineClasses += " bg-[#EBD4DC]/60";
+            titleClasses += " text-[#927681] font-bold";
+            subtitleClasses += " text-[#927681]";
           }
 
           return (

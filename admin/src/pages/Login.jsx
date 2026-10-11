@@ -50,26 +50,16 @@ const Login = () => {
       <div className="w-full max-w-md relative z-10">
         {/* Brand header */}
         <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-indigo-600/10 border border-indigo-500/20 text-indigo-400 mb-4 shadow-inner">
-            <svg
-              className="w-7 h-7"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"
-              />
+          <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-gradient-to-tr from-orange-600 via-orange-500 to-amber-400 text-white mb-4 shadow-lg shadow-orange-500/25">
+            <svg className="w-7 h-7 fill-white" viewBox="0 0 24 24">
+              <path d="M12 2C10.34 2 9 3.34 9 5c0 .35.07.69.18 1H7c-1.1 0-2 .9-2 2v2c0 3.07 1.63 5.64 4 6.72V19c0 1.1.9 2 2 2h2c1.1 0 2-.9 2-2v-2.28c2.37-1.08 4-3.65 4-6.72V8c0-1.1-.9-2-2-2h-2.18c.11-.31.18-.65.18-1 0-1.66-1.34-3-3-3zm0 2c.55 0 1 .45 1 1s-.45 1-1 1-1-.45-1-1 .45-1 1-1z"/>
             </svg>
           </div>
-          <h1 className="text-2xl font-bold tracking-tight text-white">
-            My Canteen Admin
+          <h1 className="text-2xl font-black tracking-tight text-white">
+            Bell<span className="text-orange-500">Bite</span> Kitchen Console
           </h1>
           <p className="text-sm text-slate-400 mt-1">
-            Sign in with your staff or administrator account
+            Sign in with your canteen staff or administrator account
           </p>
         </div>
 

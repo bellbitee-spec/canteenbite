@@ -67,27 +67,27 @@ const getStatusBadge = (status) => {
     case "PENDING":
       return {
         label: "Order received",
-        className: "bg-slate-100 text-slate-700 border-slate-200",
+        className: "bg-[#FBE7EE]/50 text-[#735A67] border-[#EBD4DC]",
       };
     case "CONFIRMED":
       return {
         label: "Confirmed",
-        className: "bg-blue-50 text-blue-700 border-blue-200 font-bold",
+        className: "bg-[#FBE7EE] text-[#C94F78] border-[#EBD4DC] font-bold",
       };
     case "PREPARING":
       return {
         label: "Being prepared",
-        className: "bg-amber-50 text-amber-700 border-amber-200 font-bold animate-pulse",
+        className: "bg-[#FBE7EE] text-[#C94F78] border-[#EBD4DC] font-bold animate-pulse",
       };
     case "READY":
       return {
         label: "Ready for pickup",
-        className: "bg-emerald-500 text-white border-emerald-600 font-black shadow-xs",
+        className: "bg-[#5F9A68] text-white border-[#5F9A68] font-bold shadow-xs",
       };
     case "DELAYED":
       return {
         label: "Running late",
-        className: "bg-amber-100 text-amber-900 border-amber-300 font-black",
+        className: "bg-amber-100 text-amber-900 border-amber-300 font-bold",
       };
     case "COMPLETED":
       return {
@@ -250,12 +250,12 @@ const Orders = () => {
     <PageContainer>
       <div className="max-w-4xl mx-auto my-6 sm:my-10 space-y-6 animate-fade-in">
         {/* Header */}
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 border-b border-slate-200/80 pb-4">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 border-b border-[#EBD4DC] pb-4">
           <div>
-            <h1 className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight flex items-center gap-2.5">
+            <h1 className="text-2xl sm:text-3xl font-bold text-[#352431] tracking-tight flex items-center gap-2.5">
               <span>My Orders</span>
             </h1>
-            <p className="text-xs sm:text-sm text-slate-500 mt-0.5">
+            <p className="text-xs sm:text-sm text-[#735A67] mt-0.5">
               Live kitchen tracking and pickup history
             </p>
           </div>
@@ -265,7 +265,7 @@ const Orders = () => {
               type="button"
               onClick={() => fetchOrders(true)}
               disabled={loading || refreshing || !isAuthenticated}
-              className="px-3.5 py-2 rounded-xl border border-slate-200 hover:bg-slate-50 text-slate-700 font-bold text-xs transition active:scale-95 flex items-center gap-1.5 cursor-pointer disabled:opacity-50"
+              className="px-3.5 py-2 rounded-full border border-[#EBD4DC] hover:bg-[#FBE7EE]/60 text-[#352431] font-bold text-xs transition active:scale-95 flex items-center gap-1.5 cursor-pointer disabled:opacity-50"
               title="Refresh Orders"
             >
               <RotateCw className={`w-3.5 h-3.5 ${refreshing ? "animate-spin" : ""}`} />
@@ -274,7 +274,7 @@ const Orders = () => {
 
             <Link
               to="/"
-              className="text-xs font-bold text-brand-600 hover:text-brand-700 px-3 py-2 rounded-xl hover:bg-brand-50 transition"
+              className="text-xs font-bold text-[#C94F78] hover:text-[#B33D65] px-3 py-2 rounded-full hover:bg-[#FBE7EE] transition"
             >
               ← Browse Menu
             </Link>
@@ -283,18 +283,18 @@ const Orders = () => {
 
         {/* 1. Unauthenticated State */}
         {!authLoading && !isAuthenticated ? (
-          <div className="p-8 sm:p-12 bg-white rounded-3xl border border-slate-200 text-center space-y-4 shadow-subtle">
-            <div className="w-14 h-14 rounded-2xl bg-brand-50 text-brand-600 flex items-center justify-center mx-auto">
+          <div className="p-8 sm:p-12 bg-white rounded-3xl border border-[#EBD4DC] text-center space-y-4 shadow-sm">
+            <div className="w-14 h-14 rounded-2xl bg-[#FBE7EE] text-[#C94F78] flex items-center justify-center mx-auto border border-[#EBD4DC]">
               <Lock className="w-7 h-7" />
             </div>
-            <h2 className="text-lg font-black text-slate-900 tracking-tight">Student Account Required</h2>
-            <p className="text-xs sm:text-sm text-slate-500 max-w-sm mx-auto leading-relaxed">
+            <h2 className="text-lg font-bold text-[#352431] tracking-tight">Student Account Required</h2>
+            <p className="text-xs sm:text-sm text-[#735A67] max-w-sm mx-auto leading-relaxed">
               Log in to see live progress on your orders and check counter pickup times.
             </p>
             <div className="pt-2">
               <Link
                 to="/checkout"
-                className="px-6 py-3 rounded-2xl bg-brand-500 hover:bg-brand-600 text-white font-black text-xs inline-block transition shadow-sm shadow-brand-500/25 active:scale-95"
+                className="px-6 py-3 rounded-full bg-[#C94F78] hover:bg-[#B33D65] text-white font-bold text-xs inline-block transition shadow-sm active:scale-95"
               >
                 Log In with Student Account
               </Link>
@@ -309,38 +309,38 @@ const Orders = () => {
           </div>
         ) : error ? (
           /* 3. Error State */
-          <div className="p-6 bg-rose-50 border border-rose-200 text-rose-800 rounded-3xl text-xs space-y-2 animate-fade-in">
-            <p className="font-bold flex items-center gap-2">
-              <AlertCircle className="w-4 h-4 text-rose-600 shrink-0" />
+          <div className="p-6 bg-[#FBE7EE] border border-[#EBD4DC] text-[#352431] rounded-3xl text-xs space-y-2 animate-fade-in">
+            <p className="font-bold flex items-center gap-2 text-[#C94F78]">
+              <AlertCircle className="w-4 h-4 text-[#C94F78] shrink-0" />
               <span>Unable to load your orders</span>
             </p>
-            <p>{error}</p>
+            <p className="text-[#735A67]">{error}</p>
             <button
               type="button"
               onClick={() => fetchOrders(true)}
-              className="mt-2 px-4 py-1.5 bg-rose-600 hover:bg-rose-700 text-white font-bold rounded-xl text-xs"
+              className="mt-2 px-4 py-1.5 bg-[#C94F78] hover:bg-[#B33D65] text-white font-bold rounded-full text-xs"
             >
               Try Again
             </button>
           </div>
         ) : orders.length === 0 ? (
           /* 4. Empty State */
-          <div className="p-12 bg-white rounded-[2rem] border border-slate-100 text-center space-y-4 shadow-card animate-fade-in">
-            <div className="w-16 h-16 rounded-3xl bg-brand-50 text-brand-500 flex items-center justify-center mx-auto border border-brand-100">
+          <div className="p-12 bg-white rounded-3xl border border-[#EBD4DC] text-center space-y-4 shadow-sm animate-fade-in">
+            <div className="w-16 h-16 rounded-3xl bg-[#FBE7EE] text-[#C94F78] flex items-center justify-center mx-auto border border-[#EBD4DC]">
               <Receipt className="w-8 h-8" />
             </div>
             <div className="space-y-1">
-              <h2 className="text-xl font-black text-slate-900 tracking-tight">
+              <h2 className="text-xl font-bold text-[#352431] tracking-tight">
                 No orders yet.
               </h2>
-              <p className="text-xs sm:text-sm text-slate-500 max-w-sm mx-auto leading-relaxed">
+              <p className="text-xs sm:text-sm text-[#735A67] max-w-sm mx-auto leading-relaxed">
                 You haven't placed any canteen orders yet. Discover today's fresh dishes and skip the queue!
               </p>
             </div>
             <div className="pt-2">
               <Link
                 to="/"
-                className="px-6 py-3.5 rounded-2xl bg-brand-500 hover:bg-brand-600 text-white font-black text-xs inline-flex items-center gap-2 shadow-sm shadow-brand-500/25 transition active:scale-95"
+                className="px-6 py-3.5 rounded-full bg-[#C94F78] hover:bg-[#B33D65] text-white font-bold text-xs inline-flex items-center gap-2 shadow-sm transition active:scale-95"
               >
                 <UtensilsCrossed className="w-4 h-4" />
                 <span>Browse Menu</span>
@@ -366,30 +366,30 @@ const Orders = () => {
                 <div
                   key={orderId}
                   onClick={() => navigate(`/orders/${orderId}`)}
-                  className="p-5 sm:p-6 bg-white rounded-[2rem] border border-slate-100 shadow-card space-y-4 hover:shadow-float transition-all cursor-pointer group"
+                  className="p-5 sm:p-6 bg-white rounded-3xl border border-[#EBD4DC] shadow-sm space-y-4 hover:shadow-md hover:border-[#C94F78]/40 transition-all cursor-pointer group"
                 >
                   {/* Top Bar: Order Number, Date, Status */}
-                  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2.5 border-b border-slate-100 pb-3.5">
+                  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2.5 border-b border-[#EBD4DC]/60 pb-3.5">
                     <div>
                       <div className="flex items-center gap-2">
-                        <span className="font-mono font-black text-sm sm:text-base text-slate-900 group-hover:text-brand-600 transition-colors">
+                        <span className="font-mono font-bold text-sm sm:text-base text-[#352431] group-hover:text-[#C94F78] transition-colors">
                           {ord.orderNumber || `#${orderId.slice(-8)}`}
                         </span>
                         {ord.cancellationWindowOpen && (
-                          <span className="text-[10px] font-black uppercase tracking-wider bg-brand-100 text-brand-800 px-2 py-0.5 rounded-md flex items-center gap-1">
-                            <Clock className="w-3 h-3 text-brand-600" />
+                          <span className="text-[10px] font-bold uppercase tracking-wider bg-[#FBE7EE] text-[#C94F78] border border-[#EBD4DC] px-2 py-0.5 rounded-md flex items-center gap-1">
+                            <Clock className="w-3 h-3 text-[#C94F78]" />
                             <span>Can Cancel</span>
                           </span>
                         )}
                       </div>
-                      <span className="text-[11px] text-slate-400 font-semibold block mt-0.5">
+                      <span className="text-[11px] text-[#927681] font-medium block mt-0.5">
                         {formatOrderDate(ord.createdAt)}
                       </span>
                     </div>
 
                     <div className="flex items-center gap-2 self-start sm:self-auto">
                       <span
-                        className={`text-[11px] font-black uppercase tracking-wider px-3 py-1 rounded-full border ${statusBadge.className}`}
+                        className={`text-[11px] font-bold uppercase tracking-wider px-3 py-1 rounded-full border ${statusBadge.className}`}
                       >
                         {statusBadge.label}
                       </span>
@@ -399,10 +399,10 @@ const Orders = () => {
                   {/* Middle: Items Summary & Expected Time */}
                   <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs">
                     <div className="space-y-0.5 max-w-md">
-                      <span className="font-bold text-slate-800">
+                      <span className="font-bold text-[#352431]">
                         {itemsCount} {itemsCount === 1 ? "item" : "items"}:
                       </span>{" "}
-                      <span className="text-slate-500 font-medium truncate">
+                      <span className="text-[#735A67] font-medium truncate">
                         {itemsSummary}
                         {hasMoreItems && ` +${itemsCount - 3} more`}
                       </span>
@@ -411,8 +411,8 @@ const Orders = () => {
                     {expectedTime &&
                       ord.orderStatus !== "CANCELLED" &&
                       ord.orderStatus !== "COMPLETED" && (
-                        <div className="text-[11px] font-semibold text-brand-900 bg-brand-50 px-2.5 py-1 rounded-xl border border-brand-200/60 shrink-0 flex items-center gap-1.5">
-                          <Clock className="w-3 h-3 text-brand-600" />
+                        <div className="text-[11px] font-semibold text-[#C94F78] bg-[#FBE7EE] px-2.5 py-1 rounded-full border border-[#EBD4DC] shrink-0 flex items-center gap-1.5">
+                          <Clock className="w-3 h-3 text-[#C94F78]" />
                           <span>Ready by:</span>
                           <span className="font-bold font-mono">{expectedTime}</span>
                         </div>
@@ -420,9 +420,9 @@ const Orders = () => {
                   </div>
 
                   {/* Bottom: Payment Information, Total, Action Arrow */}
-                  <div className="pt-2.5 border-t border-slate-100 flex items-center justify-between text-xs">
+                  <div className="pt-2.5 border-t border-[#EBD4DC]/60 flex items-center justify-between text-xs">
                     <div className="flex items-center gap-2.5">
-                      <span className="font-black text-slate-800 bg-slate-100 px-2.5 py-0.5 rounded-md text-[11px]">
+                      <span className="font-bold text-[#352431] bg-[#FBE7EE] border border-[#EBD4DC] px-2.5 py-0.5 rounded-md text-[11px]">
                         {paymentBadge.methodLabel}
                       </span>
                       <span className={`font-bold text-[11px] ${paymentBadge.statusColor}`}>
@@ -431,10 +431,10 @@ const Orders = () => {
                     </div>
 
                     <div className="flex items-center gap-3">
-                      <span className="font-black text-base text-slate-900 tracking-tight">
+                      <span className="font-bold text-base text-[#C94F78] tracking-tight">
                         ₹{ord.totalAmount ?? ord.subtotal}
                       </span>
-                      <span className="text-xs font-black text-brand-600 group-hover:translate-x-1 transition-transform inline-flex items-center gap-1">
+                      <span className="text-xs font-bold text-[#C94F78] group-hover:translate-x-1 transition-transform inline-flex items-center gap-1">
                         <span>Details</span>
                         <ArrowRight className="w-3.5 h-3.5" />
                       </span>

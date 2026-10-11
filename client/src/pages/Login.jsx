@@ -60,16 +60,16 @@ const Login = () => {
     <PageContainer>
       <div className="max-w-md mx-auto my-8 sm:my-14 animate-fade-in">
         {/* Auth Box */}
-        <div className="bg-white rounded-[2.5rem] p-6 sm:p-8 shadow-card border border-slate-100">
+        <div className="bg-white rounded-3xl p-6 sm:p-8 shadow-sm border border-[#EBD4DC]">
           {/* Top Logo & Title */}
           <div className="text-center mb-6">
-            <div className="w-14 h-14 rounded-2xl bg-brand-500 text-white flex items-center justify-center mx-auto mb-3 shadow-md shadow-brand-500/25">
-              <UtensilsCrossed className="w-7 h-7 stroke-[2.2]" />
-            </div>
-            <h1 className="text-2xl font-black text-slate-900 tracking-tight">
-              {isRegisterMode ? "Create Student Account" : "Welcome to My Canteen"}
+            <Link to="/" className="text-3xl font-extrabold tracking-[-0.09em] text-[#352431] block mb-2">
+              bell<span className="text-[#C94F78]">bite</span><span className="text-[#C94F78]">.</span>
+            </Link>
+            <h1 className="text-2xl font-extrabold text-[#352431] tracking-tight">
+              {isRegisterMode ? "Create BellBite Account" : "Welcome to BellBite"}
             </h1>
-            <p className="text-xs text-slate-400 font-medium mt-1">
+            <p className="text-xs text-[#927681] font-medium mt-1">
               {isRegisterMode
                 ? "Sign up with your campus email to start ordering"
                 : "Sign in to order ahead and skip counter queues"}
@@ -77,17 +77,17 @@ const Login = () => {
           </div>
 
           {/* Tab Selector */}
-          <div className="flex p-1 bg-slate-100 rounded-2xl mb-6">
+          <div className="flex p-1 bg-[#FBE7EE] rounded-full border border-[#EBD4DC] mb-6">
             <button
               type="button"
               onClick={() => {
                 setIsRegisterMode(false);
                 setError(null);
               }}
-              className={`flex-1 py-2 text-xs font-black rounded-xl transition-all cursor-pointer ${
+              className={`flex-1 py-2 text-xs font-bold rounded-full transition-all cursor-pointer ${
                 !isRegisterMode
-                  ? "bg-white text-slate-900 shadow-2xs"
-                  : "text-slate-500 hover:text-slate-800"
+                  ? "bg-white text-[#352431] shadow-xs"
+                  : "text-[#735A67] hover:text-[#352431]"
               }`}
             >
               Sign In
@@ -98,10 +98,10 @@ const Login = () => {
                 setIsRegisterMode(true);
                 setError(null);
               }}
-              className={`flex-1 py-2 text-xs font-black rounded-xl transition-all cursor-pointer ${
+              className={`flex-1 py-2 text-xs font-bold rounded-full transition-all cursor-pointer ${
                 isRegisterMode
-                  ? "bg-white text-slate-900 shadow-2xs"
-                  : "text-slate-500 hover:text-slate-800"
+                  ? "bg-white text-[#352431] shadow-xs"
+                  : "text-[#735A67] hover:text-[#352431]"
               }`}
             >
               Register
@@ -110,15 +110,15 @@ const Login = () => {
 
           {/* Error / Success Feedback */}
           {error && (
-            <div className="mb-4 p-3 rounded-2xl bg-rose-50 border border-rose-200 text-rose-800 text-xs font-semibold flex items-center gap-2 animate-fade-in">
+            <div className="mb-4 p-3 rounded-2xl bg-[#FBE7EE] border border-[#EBD4DC] text-rose-800 text-xs font-semibold flex items-center gap-2 animate-fade-in">
               <AlertCircle className="w-4 h-4 text-rose-600 shrink-0" />
               <span>{error}</span>
             </div>
           )}
 
           {successMessage && (
-            <div className="mb-4 p-3 rounded-2xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-semibold flex items-center gap-2 animate-fade-in">
-              <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+            <div className="mb-4 p-3 rounded-2xl bg-[#FBE7EE] border border-[#EBD4DC] text-[#5F9A68] text-xs font-semibold flex items-center gap-2 animate-fade-in">
+              <CheckCircle2 className="w-4 h-4 text-[#5F9A68] shrink-0" />
               <span>{successMessage}</span>
             </div>
           )}
@@ -127,53 +127,53 @@ const Login = () => {
           <form onSubmit={handleSubmit} className="space-y-4">
             {isRegisterMode && (
               <div>
-                <label className="text-[11px] font-bold text-slate-700 block mb-1.5 ml-1">
+                <label className="text-[11px] font-bold text-[#352431] block mb-1.5 ml-2">
                   Full Name
                 </label>
                 <div className="relative flex items-center">
-                  <User className="w-4 h-4 text-slate-400 absolute left-3.5 pointer-events-none" />
+                  <User className="w-4 h-4 text-[#927681] absolute left-3.5 pointer-events-none" />
                   <input
                     type="text"
                     required
                     value={name}
                     onChange={(e) => setName(e.target.value)}
                     placeholder="e.g. Alex Morgan"
-                    className="w-full pl-10 pr-4 py-3 rounded-2xl bg-slate-50 focus:bg-white text-slate-900 text-xs font-medium border border-slate-100 focus:border-brand-500 focus:outline-hidden focus:ring-4 focus:ring-brand-500/10 transition-all"
+                    className="w-full pl-10 pr-4 py-3 rounded-full bg-white text-[#352431] text-xs font-medium border border-[#EBD4DC] focus:border-[#C94F78] focus:outline-hidden focus:ring-2 focus:ring-[#C94F78]/15 transition-all"
                   />
                 </div>
               </div>
             )}
 
             <div>
-              <label className="text-[11px] font-bold text-slate-700 block mb-1.5 ml-1">
+              <label className="text-[11px] font-bold text-[#352431] block mb-1.5 ml-2">
                 College Email
               </label>
               <div className="relative flex items-center">
-                <Mail className="w-4 h-4 text-slate-400 absolute left-3.5 pointer-events-none" />
+                <Mail className="w-4 h-4 text-[#927681] absolute left-3.5 pointer-events-none" />
                 <input
                   type="email"
                   required
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="student@college.edu"
-                  className="w-full pl-10 pr-4 py-3 rounded-2xl bg-slate-50 focus:bg-white text-slate-900 text-xs font-medium border border-slate-100 focus:border-brand-500 focus:outline-hidden focus:ring-4 focus:ring-brand-500/10 transition-all"
+                  className="w-full pl-10 pr-4 py-3 rounded-full bg-white text-[#352431] text-xs font-medium border border-[#EBD4DC] focus:border-[#C94F78] focus:outline-hidden focus:ring-2 focus:ring-[#C94F78]/15 transition-all"
                 />
               </div>
             </div>
 
             <div>
-              <label className="text-[11px] font-bold text-slate-700 block mb-1.5 ml-1">
+              <label className="text-[11px] font-bold text-[#352431] block mb-1.5 ml-2">
                 Password
               </label>
               <div className="relative flex items-center">
-                <Lock className="w-4 h-4 text-slate-400 absolute left-3.5 pointer-events-none" />
+                <Lock className="w-4 h-4 text-[#927681] absolute left-3.5 pointer-events-none" />
                 <input
                   type="password"
                   required
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="••••••••"
-                  className="w-full pl-10 pr-4 py-3 rounded-2xl bg-slate-50 focus:bg-white text-slate-900 text-xs font-medium border border-slate-100 focus:border-brand-500 focus:outline-hidden focus:ring-4 focus:ring-brand-500/10 transition-all"
+                  className="w-full pl-10 pr-4 py-3 rounded-full bg-white text-[#352431] text-xs font-medium border border-[#EBD4DC] focus:border-[#C94F78] focus:outline-hidden focus:ring-2 focus:ring-[#C94F78]/15 transition-all"
                 />
               </div>
             </div>
@@ -181,7 +181,7 @@ const Login = () => {
             <button
               type="submit"
               disabled={submitting}
-              className="w-full py-3.5 rounded-2xl bg-brand-500 hover:bg-brand-600 active:scale-98 text-white font-black text-xs transition shadow-md shadow-brand-500/25 flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50 mt-2"
+              className="w-full py-3.5 rounded-full bg-[#C94F78] hover:bg-[#B33D65] active:scale-98 text-white font-bold text-xs transition shadow-md shadow-[#C94F78]/25 flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50 mt-2"
             >
               <span>{isRegisterMode ? "Create Account" : "Sign In to Canteen"}</span>
               <ArrowRight className="w-4 h-4" />
@@ -189,14 +189,14 @@ const Login = () => {
           </form>
 
           {/* Quick toggle helper */}
-          <div className="mt-6 text-center text-xs text-slate-400 font-medium">
+          <div className="mt-6 text-center text-xs text-[#927681] font-medium">
             {isRegisterMode ? (
               <p>
                 Already have an account?{" "}
                 <button
                   type="button"
                   onClick={() => setIsRegisterMode(false)}
-                  className="font-bold text-brand-600 hover:underline cursor-pointer"
+                  className="font-bold text-[#C94F78] hover:underline cursor-pointer"
                 >
                   Sign in
                 </button>
@@ -207,7 +207,7 @@ const Login = () => {
                 <button
                   type="button"
                   onClick={() => setIsRegisterMode(true)}
-                  className="font-bold text-brand-600 hover:underline cursor-pointer"
+                  className="font-bold text-[#C94F78] hover:underline cursor-pointer"
                 >
                   Create an account
                 </button>

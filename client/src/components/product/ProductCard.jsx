@@ -37,49 +37,45 @@ const ProductCard = ({ product }) => {
   const imageUrl = !imageError && product.image ? product.image : getFoodImage(product);
 
   return (
-    <div className="group flex flex-col justify-between h-full bg-white rounded-3xl border border-slate-100/90 shadow-2xs hover:shadow-card hover:-translate-y-1 transition-all duration-300 overflow-hidden select-none">
-      {/* Top Food Image Container (Reference Inspired) */}
+    <article className="group flex flex-col justify-between h-full rounded-2xl border border-[#EBD4DC] bg-white p-2.5 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-lg hover:shadow-[#C94F78]/10 overflow-hidden select-none">
+      {/* Top Food Image Container */}
       <Link
         to={`/product/${product.id}`}
-        className="relative w-full aspect-[4/3] bg-slate-100 overflow-hidden block"
+        className="relative aspect-[1.18] overflow-hidden rounded-xl bg-[#FBE7EE] block"
         aria-label={`View details for ${product.name}`}
       >
         <img
           src={imageUrl}
           alt={product.name}
           loading="lazy"
-          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+          className="size-full object-cover transition duration-500 group-hover:scale-105"
           onError={() => setImageError(true)}
         />
 
-        {/* Veg/Non-Veg Badge (Top Left) */}
-        <div className="absolute top-2.5 left-2.5 z-10">
-          <div
-            className={`w-4 h-4 rounded-xs border bg-white/95 backdrop-blur-xs flex items-center justify-center shadow-2xs ${
-              isVeg ? "border-emerald-600" : "border-rose-600"
-            }`}
-            title={isVeg ? "Pure Vegetarian" : "Non-Vegetarian"}
-          >
-            <div
-              className={`w-1.5 h-1.5 rounded-full ${
-                isVeg ? "bg-emerald-600" : "bg-rose-600"
-              }`}
-            />
-          </div>
+        {/* Tag / Category Badge (Top Left) */}
+        <div className="absolute left-2 top-2 z-10 flex items-center gap-1.5">
+          <span className="rounded-full bg-[#FFF9F2]/90 backdrop-blur-xs px-2 py-0.5 text-[10px] font-bold text-[#C94F78] shadow-xs">
+            {product.category?.name || "Campus Special"}
+          </span>
+          {product.stock > 0 && product.stock <= (product.lowStockThreshold || 5) && !isOutOfStock && (
+            <span className="rounded-full bg-[#C94F78] text-white px-2 py-0.5 text-[9px] font-bold uppercase tracking-wider shadow-xs">
+              Only {product.stock} left
+            </span>
+          )}
         </div>
 
         {/* Prep Time Pill (Top Right) */}
-        <div className="absolute top-2.5 right-2.5 z-10">
-          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-slate-900/80 backdrop-blur-xs text-white text-[10px] font-bold shadow-xs">
-            <Clock className="w-2.5 h-2.5 text-brand-300" />
+        <div className="absolute right-2 top-2 z-10">
+          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-[#352431]/80 backdrop-blur-xs text-[#FFF9F2] text-[10px] font-bold shadow-xs">
+            <Clock className="w-2.5 h-2.5 text-[#F3A6BF]" />
             <span>{product.preparationTime ? `${product.preparationTime}m` : "10m"}</span>
           </span>
         </div>
 
         {/* Out of Stock Overlay */}
         {isOutOfStock && (
-          <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-2xs flex items-center justify-center">
-            <span className="px-3 py-1 rounded-full bg-white text-slate-800 font-black text-xs shadow-xs">
+          <div className="absolute inset-0 bg-[#352431]/70 backdrop-blur-[2px] flex items-center justify-center">
+            <span className="px-3.5 py-1.5 rounded-full bg-[#FFF9F2] text-[#352431] font-bold text-xs shadow-md tracking-wide">
               Sold Out
             </span>
           </div>
@@ -87,58 +83,65 @@ const ProductCard = ({ product }) => {
       </Link>
 
       {/* Card Content Surface */}
-      <div className="p-3.5 sm:p-4 flex flex-col justify-between flex-1">
+      <div className="p-1 pt-3 flex flex-col justify-between flex-1">
         <div>
-          {/* Category Tag */}
-          <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block truncate">
-            {product.category?.name || "Campus Specialty"}
-          </span>
-
-          {/* Dish Name */}
-          <Link
-            to={`/product/${product.id}`}
-            className="font-extrabold text-sm sm:text-base text-slate-900 group-hover:text-brand-600 transition-colors line-clamp-1 tracking-tight mt-0.5 block"
-            title={product.name}
-          >
-            {product.name}
-          </Link>
+          {/* Header Row: Title & Veg Indicator */}
+          <div className="flex items-start justify-between gap-1">
+            <Link
+              to={`/product/${product.id}`}
+              className="text-base sm:text-lg font-extrabold leading-tight text-[#352431] group-hover:text-[#C94F78] transition-colors line-clamp-1"
+              title={product.name}
+            >
+              {product.name}
+            </Link>
+            <span
+              className={`mt-1 flex size-3 shrink-0 items-center justify-center rounded-sm border ${
+                isVeg ? "border-[#5F9A68]" : "border-rose-600"
+              }`}
+              title={isVeg ? "Pure Vegetarian" : "Non-Vegetarian"}
+            >
+              <span
+                className={`size-1.5 rounded-full ${
+                  isVeg ? "bg-[#5F9A68]" : "bg-rose-600"
+                }`}
+              />
+            </span>
+          </div>
 
           {/* Description */}
-          <p className="text-xs text-slate-400 font-normal line-clamp-1 mt-0.5 leading-relaxed">
-            {product.description || "Freshly made made-to-order campus food."}
+          <p className="mt-1 line-clamp-2 text-xs leading-5 text-[#927681]">
+            {product.description || "Freshly prepared made-to-order campus food."}
           </p>
         </div>
 
         {/* Bottom Row: Price & Add Stepper / Button */}
-        <div className="mt-3.5 pt-2.5 flex items-center justify-between border-t border-slate-50 gap-2">
-          <div>
-            <span className="text-base sm:text-lg font-black text-slate-900 tracking-tight block leading-tight">
-              ₹{product.price}
-            </span>
-          </div>
+        <div className="mt-3 pt-2.5 flex items-center justify-between border-t border-[#EBD4DC]/60 gap-2">
+          <strong className="text-base sm:text-lg font-extrabold text-[#352431]">
+            ₹{product.price}
+          </strong>
 
-          {/* Action Button */}
+          {/* Action Button / Stepper */}
           {isOutOfStock ? (
-            <span className="px-2.5 py-1 text-[11px] font-bold rounded-xl bg-slate-100 text-slate-400 cursor-not-allowed">
+            <span className="px-2.5 py-1 text-[11px] font-bold rounded-full bg-[#FBE7EE] text-[#927681] cursor-not-allowed">
               Unavailable
             </span>
           ) : inCart ? (
-            <div className="flex items-center gap-1.5 bg-brand-500 text-white rounded-full px-1.5 py-1 shadow-xs">
+            <div className="flex items-center gap-2 rounded-full bg-[#FBE7EE] px-2.5 py-1 text-[#352431]">
               <button
                 type="button"
                 onClick={handleDecrease}
-                className="w-5 h-5 flex items-center justify-center rounded-full hover:bg-white/20 active:scale-90 transition-all cursor-pointer"
+                className="w-5 h-5 flex items-center justify-center rounded-full hover:bg-white text-[#352431] active:scale-90 transition-all cursor-pointer"
                 aria-label={`Decrease ${product.name} quantity`}
               >
                 <Minus className="w-3 h-3 stroke-[2.5]" />
               </button>
-              <span className="w-4 text-center font-black text-xs">
+              <span className="w-4 text-center font-bold text-xs text-[#352431]">
                 {quantity}
               </span>
               <button
                 type="button"
                 onClick={handleIncrease}
-                className="w-5 h-5 flex items-center justify-center rounded-full hover:bg-white/20 active:scale-90 transition-all cursor-pointer"
+                className="w-5 h-5 flex items-center justify-center rounded-full hover:bg-white text-[#352431] active:scale-90 transition-all cursor-pointer"
                 aria-label={`Increase ${product.name} quantity`}
               >
                 <Plus className="w-3 h-3 stroke-[2.5]" />
@@ -148,15 +151,16 @@ const ProductCard = ({ product }) => {
             <button
               type="button"
               onClick={handleAdd}
-              className="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-brand-500 hover:bg-brand-600 text-white flex items-center justify-center transition-all duration-200 active:scale-90 shadow-sm shadow-brand-500/30 cursor-pointer"
+              className="rounded-full border border-[#C94F78] px-3.5 py-1.5 text-xs font-bold text-[#C94F78] transition hover:bg-[#C94F78] hover:text-white active:scale-95 shadow-2xs flex items-center gap-1 cursor-pointer"
               aria-label={`Add ${product.name} to cart`}
             >
-              <Plus className="w-4 h-4 stroke-[2.5]" />
+              <Plus className="w-3.5 h-3.5 stroke-[2.5]" />
+              <span>Add</span>
             </button>
           )}
         </div>
       </div>
-    </div>
+    </article>
   );
 };
 

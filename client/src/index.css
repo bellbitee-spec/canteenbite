@@ -1,16 +1,27 @@
 @import "tailwindcss";
 
 @theme {
-  --color-brand-50: #FFF7ED;
-  --color-brand-100: #FFEDD5;
-  --color-brand-200: #FED7AA;
-  --color-brand-300: #FDBA74;
-  --color-brand-400: #FB923C;
-  --color-brand-500: #FF5A1F;
-  --color-brand-600: #EA4C10;
-  --color-brand-700: #C23805;
-  --color-brand-800: #9A2D07;
-  --color-brand-900: #7C2408;
+  --color-brand-50: #FDF2F4;
+  --color-brand-100: #FBE7EE;
+  --color-brand-200: #F6C7D7;
+  --color-brand-300: #EE9FB9;
+  --color-brand-400: #DC7296;
+  --color-brand-500: #C94F78;
+  --color-brand-600: #B33D65;
+  --color-brand-700: #962E52;
+  --color-brand-800: #7A2542;
+  --color-brand-900: #652137;
+  --color-brand-950: #352431;
+
+  --color-sakura-cream: #FFF9F2;
+  --color-sakura-petal: #FBE7EE;
+  --color-sakura-border: #EBD4DC;
+  --color-sakura-rose: #C94F78;
+  --color-sakura-rose-dark: #B33D65;
+  --color-sakura-plum: #352431;
+  --color-sakura-taupe: #735A67;
+  --color-sakura-mauve: #927681;
+  --color-sakura-matcha: #5F9A68;
 
   --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
 
@@ -18,13 +29,20 @@
   --animate-fade-in: fadeIn 0.2s cubic-bezier(0.16, 1, 0.3, 1);
   --animate-slide-up: slideUp 0.25s cubic-bezier(0.16, 1, 0.3, 1);
   --animate-scale-in: scaleIn 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  --animate-radar: radarPulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
 
-  --shadow-subtle: 0 1px 2px 0 rgba(0, 0, 0, 0.04), 0 1px 3px 0 rgba(0, 0, 0, 0.03);
-  --shadow-elevated: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
-  --shadow-float: 0 16px 36px -6px rgba(15, 23, 42, 0.07), 0 6px 16px -4px rgba(15, 23, 42, 0.04);
-  --shadow-card: 0 10px 25px -4px rgba(15, 23, 42, 0.05), 0 4px 10px -2px rgba(15, 23, 42, 0.03);
-  --shadow-dish: 0 16px 30px -6px rgba(0, 0, 0, 0.13), 0 6px 12px -3px rgba(0, 0, 0, 0.07);
-  --shadow-glow: 0 0 20px -3px rgba(255, 90, 31, 0.25);
+  --shadow-subtle: 0 1px 2px 0 rgba(53, 36, 49, 0.04), 0 1px 3px 0 rgba(53, 36, 49, 0.03);
+  --shadow-elevated: 0 4px 6px -1px rgba(201, 79, 120, 0.08), 0 2px 4px -2px rgba(53, 36, 49, 0.04);
+  --shadow-float: 0 16px 36px -6px rgba(53, 36, 49, 0.12), 0 6px 16px -4px rgba(201, 79, 120, 0.06);
+  --shadow-card: 0 10px 25px -4px rgba(201, 79, 120, 0.08), 0 4px 10px -2px rgba(53, 36, 49, 0.04);
+  --shadow-dish: 0 16px 30px -6px rgba(201, 79, 120, 0.15), 0 6px 12px -3px rgba(53, 36, 49, 0.06);
+  --shadow-glow: 0 0 20px -3px rgba(201, 79, 120, 0.3);
+}
+
+@keyframes radarPulse {
+  0% { transform: scale(1); opacity: 0.9; }
+  70% { transform: scale(2.4); opacity: 0; }
+  100% { transform: scale(2.4); opacity: 0; }
 }
 
 @keyframes shimmer {
@@ -60,12 +78,22 @@
   }
 
   body {
-    @apply bg-[#F1F4F9] text-slate-900 min-h-screen selection:bg-brand-500 selection:text-white font-sans;
+    @apply bg-[#FFF9F2] text-[#352431] min-h-screen selection:bg-brand-500 selection:text-white font-sans;
     margin: 0;
   }
 }
 
 @layer utilities {
+  /* Category strip horizontal smooth scrolling */
+  .category-strip {
+    overscroll-behavior-x: contain;
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+  }
+  .category-strip::-webkit-scrollbar {
+    display: none;
+  }
+
   /* Hide scrollbar for Chrome, Safari and Opera */
   .no-scrollbar::-webkit-scrollbar {
     display: none;
@@ -79,9 +107,9 @@
   .skeleton-shimmer {
     background: linear-gradient(
       90deg,
-      rgba(241, 245, 249, 1) 0%,
-      rgba(226, 232, 240, 0.8) 50%,
-      rgba(241, 245, 249, 1) 100%
+      rgba(251, 231, 238, 0.6) 0%,
+      rgba(235, 212, 220, 0.8) 50%,
+      rgba(251, 231, 238, 0.6) 100%
     );
     background-size: 200% 100%;
     animation: shimmer 1.5s infinite linear;

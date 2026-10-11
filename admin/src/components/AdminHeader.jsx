@@ -42,38 +42,40 @@ const AdminHeader = ({ onMenuClick }) => {
 
       {/* Right actions */}
       <div className="flex items-center gap-3">
-        {/* Compact Store Status Indicator */}
+        {/* Compact Store Status Indicator with Radar pulse */}
         <Link
           to="/store-settings"
           title="Store Operating Status and Controls"
-          className="flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold border transition-all bg-slate-800/80 hover:bg-slate-800 border-slate-700/60"
+          className="flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-semibold border transition-all bg-slate-900 hover:bg-slate-800 border-slate-750 shadow-sm"
         >
           {loading ? (
             <span className="w-2 h-2 rounded-full bg-slate-500 animate-pulse" />
           ) : storeStatus?.isOpen && storeStatus?.canOrder ? (
             <>
-              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-              <span className="text-emerald-400 text-[11px] font-bold">Open</span>
+              <span className="relative flex h-2 w-2">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500" />
+              </span>
+              <span className="text-emerald-400 text-[11px] font-extrabold uppercase tracking-wide">Canteen Open</span>
             </>
           ) : storeStatus?.isOpen && !storeStatus?.canOrder ? (
             <>
               <span className="w-2 h-2 rounded-full bg-amber-400" />
-              <span className="text-amber-400 text-[11px] font-bold">Paused</span>
+              <span className="text-amber-400 text-[11px] font-extrabold uppercase tracking-wide">Orders Paused</span>
             </>
           ) : (
             <>
               <span className="w-2 h-2 rounded-full bg-rose-400" />
-              <span className="text-rose-400 text-[11px] font-bold">Closed</span>
+              <span className="text-rose-400 text-[11px] font-extrabold uppercase tracking-wide">Canteen Closed</span>
             </>
           )}
         </Link>
 
-        <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-full bg-slate-800/80 border border-slate-700/60">
-          <div className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-          <span className="text-xs font-medium text-slate-300">
-            {user?.name || "Admin"}
+        <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-full bg-slate-900 border border-slate-750 shadow-sm">
+          <span className="text-xs font-semibold text-slate-200">
+            {user?.name || "Kitchen Staff"}
           </span>
-          <span className="text-[10px] font-bold text-indigo-400 bg-indigo-500/10 px-1.5 py-0.5 rounded border border-indigo-500/20 uppercase">
+          <span className="text-[10px] font-black text-orange-400 bg-orange-500/10 px-1.5 py-0.5 rounded border border-orange-500/20 uppercase tracking-wider">
             {user?.role || "ADMIN"}
           </span>
         </div>

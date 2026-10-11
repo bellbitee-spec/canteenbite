@@ -17,23 +17,23 @@ const OrderSummary = ({
   className = "",
 }) => {
   const renderItemsList = () => (
-    <div className="bg-white rounded-[2rem] border border-slate-100 p-5 sm:p-6 shadow-card space-y-4">
-      <div className="flex items-center justify-between border-b border-slate-100 pb-3">
-        <h2 className="text-base font-black text-slate-900 tracking-tight flex items-center gap-2">
-          <UtensilsCrossed className="w-4 h-4 text-brand-500" />
+    <div className="bg-white rounded-3xl border border-[#EBD4DC] p-5 sm:p-6 shadow-sm space-y-4">
+      <div className="flex items-center justify-between border-b border-[#EBD4DC] pb-3">
+        <h2 className="text-base font-bold text-[#352431] tracking-tight flex items-center gap-2">
+          <UtensilsCrossed className="w-4 h-4 text-[#C94F78]" />
           <span>Items in Your Order ({itemCount})</span>
         </h2>
         {showEditLink && (
           <Link
             to="/cart"
-            className="text-xs font-bold text-brand-600 hover:text-brand-700 hover:underline"
+            className="text-xs font-bold text-[#C94F78] hover:text-[#B33D65] hover:underline"
           >
             Edit tray
           </Link>
         )}
       </div>
 
-      <div className="divide-y divide-slate-100">
+      <div className="divide-y divide-[#EBD4DC]/60">
         {items.map((item) => {
           const lineSubtotal = (Number(item.price) || 0) * (Number(item.quantity) || 1);
           const isCombo = item.itemType === "COMBO";
@@ -49,13 +49,13 @@ const OrderSummary = ({
                     src={item.image}
                     alt={item.name}
                     loading="lazy"
-                    className="w-12 h-12 rounded-2xl object-cover bg-slate-100 shrink-0 border border-slate-100"
+                    className="w-12 h-12 rounded-2xl object-cover bg-[#FBE7EE] shrink-0 border border-[#EBD4DC]"
                     onError={(e) => {
                       e.target.style.display = "none";
                     }}
                   />
                 ) : (
-                  <div className="w-12 h-12 rounded-2xl bg-brand-50 text-brand-500 flex items-center justify-center shrink-0 border border-brand-100/50">
+                  <div className="w-12 h-12 rounded-2xl bg-[#FBE7EE] text-[#C94F78] flex items-center justify-center shrink-0 border border-[#EBD4DC]">
                     {isCombo ? (
                       <Layers className="w-5 h-5" />
                     ) : (
@@ -66,23 +66,23 @@ const OrderSummary = ({
 
                 <div className="min-w-0">
                   <div className="flex items-center gap-1.5 flex-wrap">
-                    <span className="font-black text-slate-900 truncate text-xs sm:text-sm">
+                    <span className="font-bold text-[#352431] truncate text-xs sm:text-sm">
                       {item.name}
                     </span>
                     {isCombo && (
-                      <span className="text-[9px] font-black uppercase tracking-wider text-purple-700 bg-purple-50 border border-purple-200/60 px-1.5 py-0.5 rounded-md">
+                      <span className="text-[9px] font-bold uppercase tracking-wider text-[#C94F78] bg-[#FBE7EE] border border-[#EBD4DC] px-1.5 py-0.5 rounded-md">
                         Combo Meal
                       </span>
                     )}
                   </div>
-                  <span className="text-slate-500 text-xs font-medium block mt-0.5">
+                  <span className="text-[#735A67] text-xs font-medium block mt-0.5">
                     ₹{item.price} × {item.quantity}
                   </span>
                 </div>
               </div>
 
               <div className="text-right shrink-0">
-                <span className="font-black text-slate-900 text-sm">
+                <span className="font-bold text-[#352431] text-sm">
                   ₹{lineSubtotal}
                 </span>
               </div>
@@ -95,31 +95,31 @@ const OrderSummary = ({
 
   const renderBreakdown = () => (
     <div className="space-y-2.5 text-xs sm:text-sm">
-      <div className="flex justify-between text-slate-600">
+      <div className="flex justify-between text-[#735A67]">
         <span>Total Items</span>
-        <span className="font-bold text-slate-900">{itemCount} items</span>
+        <span className="font-bold text-[#352431]">{itemCount} items</span>
       </div>
 
-      <div className="flex justify-between text-slate-600">
+      <div className="flex justify-between text-[#735A67]">
         <span>Subtotal</span>
-        <span className="font-bold text-slate-900">₹{subtotal}</span>
+        <span className="font-bold text-[#352431]">₹{subtotal}</span>
       </div>
 
-      <div className="flex justify-between text-slate-600">
+      <div className="flex justify-between text-[#735A67]">
         <span>Counter Pickup</span>
-        <span className="font-black text-emerald-600 uppercase text-xs">FREE</span>
+        <span className="font-bold text-[#5F9A68] uppercase text-xs">FREE</span>
       </div>
 
-      <div className="pt-3 border-t border-slate-100 flex justify-between items-baseline">
+      <div className="pt-3 border-t border-[#EBD4DC] flex justify-between items-baseline">
         <div>
-          <span className="font-black text-base text-slate-900 block">
+          <span className="font-bold text-base text-[#352431] block">
             Total Due
           </span>
-          <span className="text-[10px] text-slate-400 font-medium">
+          <span className="text-[10px] text-[#927681] font-medium">
             Authoritative backend price
           </span>
         </div>
-        <span className="font-black text-2xl text-slate-900">
+        <span className="font-bold text-2xl text-[#C94F78]">
           ₹{subtotal}
         </span>
       </div>
@@ -137,8 +137,8 @@ const OrderSummary = ({
   return (
     <div className={`space-y-4 ${className}`}>
       {renderItemsList()}
-      <div className="bg-white rounded-[2rem] border border-slate-100 p-5 sm:p-6 shadow-card space-y-3">
-        <h3 className="font-black text-sm text-slate-900 tracking-tight">
+      <div className="bg-white rounded-3xl border border-[#EBD4DC] p-5 sm:p-6 shadow-sm space-y-3">
+        <h3 className="font-bold text-sm text-[#352431] tracking-tight">
           Payment Breakdown
         </h3>
         {renderBreakdown()}

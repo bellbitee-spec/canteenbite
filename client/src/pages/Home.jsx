@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from "react";
+import React, { useState, useEffect, useMemo, useRef } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import {
   Search,
@@ -6,8 +6,11 @@ import {
   Sparkles,
   ArrowRight,
   Clock,
+  Clock3,
   Zap,
   Flame,
+  MapPin,
+  Check,
 } from "lucide-react";
 import PageContainer from "../components/layout/PageContainer";
 import ProductGrid from "../components/product/ProductGrid";
@@ -24,6 +27,7 @@ import {
   searchProducts,
 } from "../services/productService";
 import { getCombos } from "../services/comboService";
+import { getFoodImage } from "../utils/foodImages";
 
 const POPULAR_TAGS = [
   "Masala Dosa",
@@ -42,10 +46,35 @@ const Home = () => {
   const [combos, setCombos] = useState([]);
 
   const [searchTerm, setSearchTerm] = useState(queryParam);
+  const [selectedCategory, setSelectedCategory] = useState("ALL");
   const [selectedFilter, setSelectedFilter] = useState("ALL");
   const [loading, setLoading] = useState(true);
   const [searching, setSearching] = useState(false);
   const [error, setError] = useState(null);
+  const [videoError, setVideoError] = useState(false);
+  const videoRef = useRef(null);
+
+  // Pause video if user prefers reduced motion
+  useEffect(() => {
+    if (typeof window !== "undefined" && window.matchMedia) {
+      const mediaQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
+      if (mediaQuery.matches && videoRef.current) {
+        videoRef.current.pause();
+      }
+      const handleChange = (e) => {
+        if (!videoRef.current) return;
+        if (e.matches) {
+          videoRef.current.pause();
+        } else {
+          videoRef.current.play().catch(() => {});
+        }
+      };
+      if (mediaQuery.addEventListener) {
+        mediaQuery.addEventListener("change", handleChange);
+        return () => mediaQuery.removeEventListener("change", handleChange);
+      }
+    }
+  }, []);
 
   // Sync search query param
   useEffect(() => {
@@ -114,27 +143,36 @@ const Home = () => {
     setSearchParams({ q: tag });
   };
 
-  // Filter products by selected pill
+  // Filter products by selected category and filter chip
   const filteredProducts = useMemo(() => {
     if (!products) return [];
+    let list = products;
+    if (selectedCategory !== "ALL") {
+      list = list.filter(
+        (p) =>
+          p.categoryId === selectedCategory ||
+          p.category?.id === selectedCategory ||
+          p.category?.name?.toLowerCase() === selectedCategory.toLowerCase()
+      );
+    }
     if (selectedFilter === "VEG") {
-      return products.filter((p) => p.isVeg !== false);
+      return list.filter((p) => p.isVeg !== false);
     }
     if (selectedFilter === "QUICK") {
-      return products.filter((p) => (p.preparationTime || 10) <= 10);
+      return list.filter((p) => (p.preparationTime || 10) <= 10);
     }
     if (selectedFilter === "BUDGET") {
-      return products.filter((p) => Number(p.price) <= 50);
+      return list.filter((p) => Number(p.price) <= 50);
     }
-    return products;
-  }, [products, selectedFilter]);
+    return list;
+  }, [products, selectedCategory, selectedFilter]);
 
   return (
     <PageContainer>
-      {/* Mobile-Only Search Bar (Matches Reference Screen 2) */}
+      {/* Mobile-Only Search Bar */}
       <div className="lg:hidden mb-5">
         <div className="relative flex items-center">
-          <Search className="w-4 h-4 text-slate-400 absolute left-4 pointer-events-none" />
+          <Search className="w-4 h-4 text-[#927681] absolute left-4 pointer-events-none" />
           <input
             type="text"
             value={searchTerm}
@@ -146,14 +184,14 @@ const Home = () => {
                 setSearchParams({});
               }
             }}
-            placeholder="Search meals, snacks, drinks..."
-            className="w-full pl-11 pr-10 py-3 rounded-2xl bg-white text-slate-900 placeholder-slate-400 font-medium text-xs sm:text-sm border border-slate-200/70 focus:border-brand-500 focus:outline-hidden focus:ring-4 focus:ring-brand-500/10 shadow-2xs transition-all"
+            placeholder="Search dishes, snacks, drinks..."
+            className="w-full pl-11 pr-10 py-3 rounded-full bg-white text-[#352431] placeholder-[#927681] font-semibold text-xs sm:text-sm border border-[#EBD4DC] focus:border-[#C94F78] focus:outline-hidden focus:ring-2 focus:ring-[#C94F78]/15 shadow-2xs transition-all"
           />
           {searchTerm && (
             <button
               type="button"
               onClick={handleClearSearch}
-              className="absolute right-3 p-1.5 text-slate-400 hover:text-slate-700 transition"
+              className="absolute right-3.5 p-1 text-[#927681] hover:text-[#352431] transition"
               aria-label="Clear search"
             >
               <X className="w-4 h-4" />
@@ -162,69 +200,129 @@ const Home = () => {
         </div>
       </div>
 
-      {/* ================= PROMO / TODAY'S SPECIAL BANNER (Reference Screen 2 Inspired) ================= */}
+      {/* ================= SAKURA HERO SECTION ================= */}
       {!searchTerm && (
-        <section className="mb-8 lg:mb-10">
-          <div className="relative rounded-3xl bg-gradient-to-r from-slate-900 via-zinc-900 to-neutral-900 text-white p-6 sm:p-8 md:p-10 shadow-card overflow-hidden">
-            {/* Subtle warm amber radial glow */}
-            <div className="absolute top-0 right-1/4 w-72 h-72 bg-brand-500/15 rounded-full blur-3xl pointer-events-none" />
-
-            <div className="grid grid-cols-1 md:grid-cols-12 gap-6 items-center relative z-10">
-              {/* Left Column: Headline & CTA */}
-              <div className="md:col-span-7 space-y-3.5 sm:space-y-4">
-                <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/10 backdrop-blur-xs text-amber-300 text-xs font-black tracking-wide">
-                  <Flame className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />
-                  <span>Today's Special</span>
-                </div>
-
-                <h1 className="text-2xl sm:text-3xl lg:text-4xl font-black text-white tracking-tight leading-[1.15]">
-                  Big Flavor, <br className="hidden sm:inline" />
-                  Bigger Happiness.
-                </h1>
-
-                <p className="text-xs sm:text-sm text-slate-300 font-medium max-w-md leading-relaxed">
-                  Hot & fresh campus meals prepped to order. Skip the crowd and collect at Counter 1 & 2.
-                </p>
-
-                <div className="pt-1">
-                  <a
-                    href="#menu"
-                    className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-brand-500 hover:bg-brand-600 text-white font-black text-xs sm:text-sm transition-all shadow-md shadow-brand-500/30 active:scale-95"
-                  >
-                    <span>Order Now</span>
-                    <ArrowRight className="w-4 h-4" />
-                  </a>
-                </div>
-              </div>
-
-              {/* Right Column: High-Res Food Cutout */}
-              <div className="hidden md:flex md:col-span-5 justify-end">
-                <div className="relative w-48 h-48 lg:w-56 lg:h-56 rounded-3xl overflow-hidden shadow-2xl ring-4 ring-white/10">
-                  <img
-                    src="https://images.unsplash.com/photo-1568901346375-23c9450c58cd?auto=format&fit=crop&w=600&q=80"
-                    alt="Campus Burger Special"
-                    className="w-full h-full object-cover"
-                  />
-                </div>
-              </div>
+        <section className="sakura-hero relative mx-auto grid max-w-7xl gap-6 pb-8 pt-4 sm:pt-6 sm:pb-12 lg:grid-cols-[1fr_0.9fr] lg:items-center lg:gap-14 lg:pb-16">
+          {/* Left Column: Heading, Subtitle & Action */}
+          <div className="relative z-10 order-2 lg:order-1">
+            <p className="mb-3 text-xs font-bold uppercase tracking-[0.25em] text-[#C94F78]">
+              Made fresh at your campus
+            </p>
+            <h1 className="max-w-xl text-[clamp(2.5rem,5.5vw,4.5rem)] font-extrabold leading-[0.96] tracking-[-0.07em] text-[#352431]">
+              Big Flavor.<br />
+              <span className="text-[#C94F78]">Bigger</span> Happiness.
+            </h1>
+            <p className="mt-5 max-w-md text-base leading-7 text-[#735A67]">
+              Fresh campus meals, made to order. Skip the queue and collect at your counter.
+            </p>
+            <div className="mt-6 flex flex-wrap items-center gap-4">
+              <a
+                href="#menu"
+                className="flex items-center gap-2 rounded-full bg-[#C94F78] hover:bg-[#B33D65] px-6 py-3.5 font-bold text-white shadow-lg shadow-[#C94F78]/25 transition-all active:scale-95"
+              >
+                <span>Explore the menu</span>
+                <ArrowRight className="w-4 h-4" />
+              </a>
+              <span className="flex items-center gap-2 text-sm font-semibold text-[#735A67]">
+                <Clock3 className="w-4 h-4 text-[#C94F78]" />
+                <span>Ready in 10–15 min</span>
+              </span>
             </div>
           </div>
 
-          {/* Quick Search Tags */}
-          <div className="flex items-center gap-1.5 mt-3.5 overflow-x-auto no-scrollbar py-1">
-            <span className="text-[11px] font-bold text-slate-400 shrink-0 mr-1">
-              Popular:
+          {/* Right Column: Hero Video Card with Sakura Glow */}
+          <div className="relative z-10 order-1 aspect-[1.35] overflow-hidden rounded-[28px] bg-[#FBE7EE] shadow-[0_24px_60px_-30px_rgba(201,79,120,0.5)] border border-[#EBD4DC]/60 lg:order-2 lg:aspect-[1.12]">
+            {videoError ? (
+              <img
+                src="/videos/hero-burger-poster.jpg"
+                alt="BellBite fresh campus food"
+                className="size-full object-cover"
+                loading="eager"
+              />
+            ) : (
+              <>
+                <video
+                  ref={videoRef}
+                  autoPlay
+                  muted
+                  loop
+                  playsInline
+                  poster="/videos/hero-burger-poster.jpg"
+                  onError={() => setVideoError(true)}
+                  className="size-full object-cover motion-reduce:hidden"
+                  aria-label="Fresh canteen food being prepared"
+                >
+                  <source src="/videos/hero-burger.webm" type="video/webm" />
+                  <source src="/videos/hero-burger.mp4" type="video/mp4" />
+                  <img
+                    src="/videos/hero-burger-poster.jpg"
+                    alt="Fresh canteen food"
+                    className="size-full object-cover"
+                  />
+                </video>
+                <img
+                  src="/videos/hero-burger-poster.jpg"
+                  alt="Fresh canteen food"
+                  className="hidden motion-reduce:block size-full object-cover"
+                />
+              </>
+            )}
+            <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-[#352431]/40 via-transparent to-transparent" />
+            <div className="absolute bottom-4 left-4 rounded-full bg-[#FFF9F2]/90 backdrop-blur-xs px-3.5 py-2 text-xs font-bold text-[#C94F78] shadow-xs">
+              Today&apos;s kitchen · Hot & Fresh
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* ================= SAKURA CATEGORY STRIP ================= */}
+      {!searchTerm && categories.length > 0 && (
+        <section className="border-y border-[#EBD4DC] bg-[#FBE7EE]/55 py-3.5 -mx-4 sm:-mx-6 lg:-mx-8 px-4 sm:px-6 lg:px-8 mb-8 sm:mb-12">
+          <div className="category-strip max-w-7xl mx-auto flex items-center gap-3 overflow-x-auto">
+            <span className="mr-2 shrink-0 text-xs font-bold uppercase tracking-[0.2em] text-[#927681]">
+              Browse
             </span>
-            {POPULAR_TAGS.map((tag) => (
-              <button
-                key={tag}
-                type="button"
-                onClick={() => handleTagClick(tag)}
-                className="text-[11px] font-semibold text-slate-600 hover:text-brand-600 bg-white hover:bg-brand-50 border border-slate-200/60 px-3 py-1 rounded-full transition-colors cursor-pointer shrink-0 shadow-2xs"
-              >
-                {tag}
-              </button>
-            ))}
+
+            {/* "All" Category Pill */}
+            <button
+              type="button"
+              onClick={() => setSelectedCategory("ALL")}
+              className={`flex shrink-0 items-center gap-2 rounded-full border px-3.5 py-2 text-sm font-bold transition cursor-pointer ${
+                selectedCategory === "ALL"
+                  ? "border-[#C94F78] bg-[#C94F78] text-white shadow-xs"
+                  : "border-[#EBD4DC] bg-[#FFF9F2] text-[#735A67] hover:border-[#C94F78]/60"
+              }`}
+            >
+              <span className="size-7 rounded-full bg-[#FBE7EE] flex items-center justify-center text-sm">
+                🍱
+              </span>
+              <span>All</span>
+            </button>
+
+            {/* Real Categories from API */}
+            {categories.map((cat) => {
+              const catImage = cat.image || getFoodImage(cat);
+              const isCatActive = selectedCategory === cat.id || selectedCategory === cat.name;
+              return (
+                <button
+                  key={cat.id}
+                  type="button"
+                  onClick={() => setSelectedCategory(isCatActive ? "ALL" : cat.id)}
+                  className={`flex shrink-0 items-center gap-2 rounded-full border px-3.5 py-2 text-sm font-bold transition cursor-pointer ${
+                    isCatActive
+                      ? "border-[#C94F78] bg-[#C94F78] text-white shadow-xs"
+                      : "border-[#EBD4DC] bg-[#FFF9F2] text-[#735A67] hover:border-[#C94F78]/60"
+                  }`}
+                >
+                  <img
+                    src={catImage}
+                    alt=""
+                    className="size-7 rounded-full object-cover"
+                  />
+                  <span>{cat.name}</span>
+                </button>
+              );
+            })}
           </div>
         </section>
       )}
@@ -237,189 +335,158 @@ const Home = () => {
             {[1, 2, 3, 4, 5, 6].map((i) => (
               <div
                 key={i}
-                className="w-16 h-20 rounded-2xl bg-slate-100 animate-pulse shrink-0"
+                className="w-24 h-10 rounded-full bg-[#FBE7EE]/60 animate-pulse shrink-0"
               />
             ))}
           </div>
 
           <div className="space-y-4">
-            <div className="h-6 bg-slate-200 rounded-lg w-48 animate-pulse" />
+            <div className="h-6 bg-[#FBE7EE] rounded-lg w-48 animate-pulse" />
             <ProductGrid loading={true} products={[]} />
           </div>
         </div>
       ) : error ? (
         <ErrorState message={error} onRetry={fetchInitialData} />
       ) : (
-        <div className="space-y-10 sm:space-y-12" id="menu">
-          {/* ================= CATEGORIES SECTION (Pastel Soft Squares) ================= */}
-          {!searchTerm && categories.length > 0 && (
-            <section aria-labelledby="categories-heading">
-              <div className="flex items-center justify-between mb-3.5">
-                <h2
-                  id="categories-heading"
-                  className="text-lg sm:text-xl font-black text-slate-900 tracking-tight"
-                >
-                  Categories
-                </h2>
-                <Link
-                  to="/categories"
-                  className="text-xs font-bold text-slate-400 hover:text-brand-600 inline-flex items-center gap-1 transition-colors"
-                >
-                  <span>View all</span>
-                  <ArrowRight className="w-3.5 h-3.5" />
-                </Link>
-              </div>
-
-              {/* Pastel Category Row (Horizontal Scroll Rail on Mobile & Desktop) */}
-              <div className="flex items-center gap-3 sm:gap-4 overflow-x-auto no-scrollbar py-2 px-1 scroll-smooth">
-                {/* "All" Category Pill */}
-                <button
-                  type="button"
-                  onClick={() => {
-                    setSelectedFilter("ALL");
-                    setSearchTerm("");
-                    setSearchParams({});
-                  }}
-                  className="flex flex-col items-center gap-1.5 shrink-0 group cursor-pointer w-[72px] sm:w-[80px] select-none"
-                >
-                  <div
-                    className={`w-14 h-14 sm:w-16 sm:h-16 rounded-2xl sm:rounded-3xl flex items-center justify-center transition-all duration-300 shadow-2xs group-hover:scale-105 group-hover:-translate-y-1 border ${
-                      !searchTerm && selectedFilter === "ALL"
-                        ? "bg-brand-500 text-white shadow-md shadow-brand-500/25 ring-2 ring-brand-500/20"
-                        : "bg-slate-100 hover:bg-slate-200/70 border-slate-200/50 text-slate-800"
-                    }`}
-                  >
-                    <span className="text-2xl sm:text-3xl select-none">🍱</span>
-                  </div>
-                  <span
-                    className={`font-bold text-[11px] sm:text-xs truncate tracking-tight text-center w-full block transition-colors leading-tight ${
-                      !searchTerm && selectedFilter === "ALL"
-                        ? "text-brand-600 font-black"
-                        : "text-slate-700 group-hover:text-brand-600"
-                    }`}
-                  >
-                    All
-                  </span>
-                </button>
-
-                {categories.map((category) => (
-                  <CategoryCard key={category.id} category={category} />
-                ))}
-              </div>
-            </section>
-          )}
-
-          {/* ================= POPULAR TODAY / CAMPUS FAVORITES ================= */}
+        <div className="space-y-12 sm:space-y-16" id="menu">
+          {/* ================= THE CANTEEN EDIT (MENU SECTION) ================= */}
           <section aria-labelledby="products-heading">
-            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-6">
+            <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-end mb-6">
               <div>
+                <p className="text-xs font-bold uppercase tracking-[0.24em] text-[#C94F78]">
+                  The canteen edit
+                </p>
                 <h2
                   id="products-heading"
-                  className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight flex items-center gap-2"
+                  className="mt-1 text-3xl sm:text-4xl font-extrabold tracking-[-0.06em] text-[#352431]"
                 >
-                  <span>{searchTerm ? `Search: "${searchTerm}"` : "Popular today"}</span>
-                  {!searchTerm && <Flame className="w-5 h-5 text-amber-500 fill-amber-500" />}
-                </h2>
-                <p className="text-xs text-slate-400 font-medium mt-0.5">
                   {searchTerm
-                    ? `Found ${filteredProducts.length} item${filteredProducts.length === 1 ? "" : "s"}`
-                    : "Freshly prepped campus favorites made to order"}
-                </p>
+                    ? `Search: "${searchTerm}"`
+                    : selectedCategory !== "ALL"
+                    ? `${categories.find((c) => c.id === selectedCategory)?.name || "Category"} Specials`
+                    : "Good food, no waiting."}
+                </h2>
               </div>
 
-              {/* Filter Chips */}
-              {!searchTerm && (
-                <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar pb-1 sm:pb-0">
-                  <button
-                    type="button"
-                    onClick={() => setSelectedFilter("ALL")}
-                    className={`px-3.5 py-1.5 rounded-full text-xs font-black transition-all cursor-pointer shrink-0 ${
-                      selectedFilter === "ALL"
-                        ? "bg-slate-900 text-white shadow-2xs"
-                        : "bg-white text-slate-600 shadow-2xs hover:bg-slate-50 border border-slate-100"
-                    }`}
-                  >
-                    All
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setSelectedFilter("VEG")}
-                    className={`px-3.5 py-1.5 rounded-full text-xs font-black transition-all cursor-pointer shrink-0 flex items-center gap-1.5 ${
-                      selectedFilter === "VEG"
-                        ? "bg-emerald-700 text-white shadow-2xs"
-                        : "bg-white text-emerald-700 shadow-2xs hover:bg-emerald-50 border border-emerald-100"
-                    }`}
-                  >
-                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
-                    <span>Veg</span>
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setSelectedFilter("QUICK")}
-                    className={`px-3.5 py-1.5 rounded-full text-xs font-black transition-all cursor-pointer shrink-0 flex items-center gap-1 ${
-                      selectedFilter === "QUICK"
-                        ? "bg-brand-500 text-white shadow-2xs"
-                        : "bg-white text-slate-600 shadow-2xs hover:bg-slate-50 border border-slate-100"
-                    }`}
-                  >
-                    <Zap className="w-3 h-3" />
-                    <span>&lt;10m</span>
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setSelectedFilter("BUDGET")}
-                    className={`px-3.5 py-1.5 rounded-full text-xs font-black transition-all cursor-pointer shrink-0 ${
-                      selectedFilter === "BUDGET"
-                        ? "bg-slate-900 text-white shadow-2xs"
-                        : "bg-white text-slate-600 shadow-2xs hover:bg-slate-50 border border-slate-100"
-                    }`}
-                  >
-                    Under ₹50
-                  </button>
+              {/* Search & Filter Controls */}
+              <div className="flex flex-wrap items-center gap-2">
+                <div className="relative flex items-center">
+                  <Search className="w-4 h-4 text-[#927681] absolute left-3.5 pointer-events-none" />
+                  <input
+                    value={searchTerm}
+                    onChange={(e) => {
+                      setSearchTerm(e.target.value);
+                      if (e.target.value) {
+                        setSearchParams({ q: e.target.value });
+                      } else {
+                        setSearchParams({});
+                      }
+                    }}
+                    aria-label="Search dishes"
+                    placeholder="Search dishes..."
+                    className="h-10 w-full sm:w-56 rounded-full border border-[#EBD4DC] bg-white pl-9.5 pr-8 text-sm text-[#352431] outline-none focus:border-[#C94F78] focus:ring-2 focus:ring-[#C94F78]/15 placeholder-[#927681] shadow-2xs"
+                  />
+                  {searchTerm && (
+                    <button
+                      type="button"
+                      onClick={handleClearSearch}
+                      className="absolute right-3 text-[#927681] hover:text-[#352431]"
+                    >
+                      <X className="w-3.5 h-3.5" />
+                    </button>
+                  )}
                 </div>
-              )}
+
+                {/* Filter Chips */}
+                <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar">
+                  {[
+                    { id: "ALL", label: "All" },
+                    { id: "VEG", label: "Veg" },
+                    { id: "QUICK", label: "<10m" },
+                    { id: "BUDGET", label: "Under ₹50" },
+                  ].map(({ id, label }) => (
+                    <button
+                      key={id}
+                      type="button"
+                      onClick={() => setSelectedFilter(id)}
+                      className={`px-3.5 py-2 rounded-full text-xs font-bold transition-all cursor-pointer shrink-0 ${
+                        selectedFilter === id
+                          ? "bg-[#C94F78] text-white shadow-xs"
+                          : "border border-[#EBD4DC] bg-white text-[#735A67] hover:border-[#C94F78]/60 shadow-2xs"
+                      }`}
+                    >
+                      {label}
+                    </button>
+                  ))}
+                </div>
+              </div>
             </div>
 
-            {/* Product Grid with Overlapping Food Cards */}
+            {/* Product Grid */}
             <ProductGrid
               products={filteredProducts}
               emptyTitle={
                 searchTerm
                   ? "No matching food found"
-                  : selectedFilter !== "ALL"
-                  ? "No dishes match this filter"
+                  : selectedFilter !== "ALL" || selectedCategory !== "ALL"
+                  ? "No dishes match this selection"
                   : "No products available"
               }
               emptyMessage={
                 searchTerm
                   ? `We couldn't find any dishes matching "${searchTerm}". Try another search or explore categories.`
-                  : "Try switching back to 'All' to view the entire menu."
+                  : "Try resetting your category or filter to view the entire menu."
               }
               onResetSearch={
                 searchTerm
                   ? handleClearSearch
-                  : selectedFilter !== "ALL"
-                  ? () => setSelectedFilter("ALL")
+                  : selectedFilter !== "ALL" || selectedCategory !== "ALL"
+                  ? () => {
+                      setSelectedFilter("ALL");
+                      setSelectedCategory("ALL");
+                    }
                   : undefined
               }
             />
           </section>
 
+          {/* ================= HOW IT WORKS (PICK UP YOUR WAY) ================= */}
+          <section id="how-it-works" className="grid gap-4 md:grid-cols-2">
+            <div className="rounded-2xl bg-[#FBE7EE] p-6 border border-[#EBD4DC]">
+              <div className="flex items-center gap-2 text-[#C94F78]">
+                <MapPin className="w-5 h-5" />
+                <h3 className="text-xl font-extrabold text-[#352431]">Pick up your way</h3>
+              </div>
+              <p className="mt-2 text-sm leading-6 text-[#735A67]">
+                We&apos;ll have it warm at Counter 1 & 2. Skip the counter rush and collect hot meals right on time.
+              </p>
+            </div>
+            <div className="rounded-2xl bg-[#352431] p-6 text-[#FFF9F2]">
+              <div className="flex items-center gap-2 text-[#F3A6BF]">
+                <Check className="w-5 h-5" />
+                <h3 className="text-xl font-extrabold text-white">Order, then exhale.</h3>
+              </div>
+              <p className="mt-2 text-sm leading-6 text-[#EBD4DC]">
+                Track your order from prep to pickup in real time. No crowded lines, no guesswork.
+              </p>
+            </div>
+          </section>
+
           {/* ================= STUDENT COMBOS SECTION ================= */}
           {!searchTerm && combos.length > 0 && (
-            <section aria-labelledby="combos-heading" className="pt-4">
+            <section aria-labelledby="combos-heading" className="pt-2">
               <div className="flex items-center justify-between mb-5">
                 <div>
+                  <p className="text-xs font-bold uppercase tracking-[0.24em] text-[#C94F78]">
+                    Value Packs
+                  </p>
                   <h2
                     id="combos-heading"
-                    className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight flex items-center gap-2"
+                    className="text-2xl sm:text-3xl font-extrabold text-[#352431] tracking-tight flex items-center gap-2 mt-0.5"
                   >
-                    <Sparkles className="w-5 h-5 text-brand-500" />
+                    <Sparkles className="w-5 h-5 text-[#C94F78]" />
                     <span>Student combos</span>
                   </h2>
-                  <p className="text-xs text-slate-400 font-medium mt-0.5">
-                    Curated student meal packs bundled at best value
-                  </p>
                 </div>
               </div>
 

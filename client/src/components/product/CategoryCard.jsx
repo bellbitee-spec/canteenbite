@@ -26,12 +26,12 @@ const CategoryCard = ({ category, isSelected = false }) => {
       to={`/categories?category=${category.id}`}
       className="flex flex-col items-center gap-1.5 shrink-0 group cursor-pointer w-[72px] sm:w-[80px] select-none"
     >
-      {/* Soft Pastel Square Icon Container (Reference Inspired) */}
+      {/* Soft Sakura Container */}
       <div
         className={`w-14 h-14 sm:w-16 sm:h-16 rounded-2xl sm:rounded-3xl flex items-center justify-center transition-all duration-300 shadow-2xs group-hover:scale-105 group-hover:-translate-y-1 border ${
           isSelected
-            ? "bg-brand-500 text-white shadow-md shadow-brand-500/25 ring-2 ring-brand-500/20"
-            : theme.bg
+            ? "bg-[#C94F78] text-white shadow-md shadow-[#C94F78]/25 border-[#C94F78]"
+            : "bg-[#FBE7EE] border-[#EBD4DC] text-[#352431] group-hover:border-[#C94F78]/60"
         }`}
       >
         {category.image && !imgError ? (
@@ -58,7 +58,7 @@ const CategoryCard = ({ category, isSelected = false }) => {
       {/* Category Label Underneath */}
       <span
         className={`font-bold text-[11px] sm:text-xs truncate tracking-tight text-center w-full block transition-colors leading-tight ${
-          isSelected ? "text-brand-600 font-black" : "text-slate-700 group-hover:text-brand-600"
+          isSelected ? "text-[#C94F78] font-black" : "text-[#735A67] group-hover:text-[#C94F78]"
         }`}
         title={category.name}
       >

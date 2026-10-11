@@ -14,19 +14,19 @@ const Cart = () => {
     return (
       <PageContainer>
         <div className="min-h-[55vh] flex flex-col items-center justify-center text-center p-6 max-w-md mx-auto animate-fade-in">
-          <div className="w-20 h-20 rounded-3xl bg-brand-50 text-brand-500 flex items-center justify-center mb-4 border border-brand-100 shadow-subtle">
+          <div className="w-20 h-20 rounded-full bg-[#FBE7EE] text-[#C94F78] flex items-center justify-center mb-4 border border-[#EBD4DC] shadow-xs">
             <ShoppingBag className="w-9 h-9 stroke-[1.8]" />
           </div>
-          <h1 className="text-2xl font-black text-slate-900 tracking-tight">
+          <h1 className="text-2xl font-extrabold text-[#352431] tracking-tight">
             Your tray is empty
           </h1>
-          <p className="mt-2 text-xs sm:text-sm text-slate-500 leading-relaxed font-medium">
+          <p className="mt-2 text-xs sm:text-sm text-[#735A67] leading-relaxed font-medium">
             Explore freshly cooked dishes, combos, and snacks to start your order.
           </p>
           <div className="mt-6">
             <Link
               to="/"
-              className="px-6 py-3.5 rounded-2xl bg-brand-500 hover:bg-brand-600 text-white font-black text-xs sm:text-sm shadow-sm shadow-brand-500/25 active:scale-95 transition-all inline-flex items-center gap-2"
+              className="px-6 py-3.5 rounded-full bg-[#C94F78] hover:bg-[#B33D65] text-white font-bold text-xs sm:text-sm shadow-md shadow-[#C94F78]/25 active:scale-95 transition-all inline-flex items-center gap-2"
             >
               <UtensilsCrossed className="w-4 h-4" />
               <span>Browse Canteen Menu</span>
@@ -39,12 +39,12 @@ const Cart = () => {
 
   return (
     <PageContainer>
-      <div className="mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 border-b border-slate-100 pb-4">
+      <div className="mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 border-b border-[#EBD4DC] pb-4">
         <div>
-          <h1 className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight flex items-center gap-2">
+          <h1 className="text-2xl sm:text-3xl font-extrabold text-[#352431] tracking-tight flex items-center gap-2">
             <span>Your Food Tray</span>
           </h1>
-          <p className="text-xs sm:text-sm text-slate-500 mt-0.5">
+          <p className="text-xs sm:text-sm text-[#735A67] mt-0.5">
             {itemCount} {itemCount === 1 ? "item" : "items"} selected for canteen pickup
           </p>
         </div>
@@ -52,7 +52,7 @@ const Cart = () => {
         <button
           type="button"
           onClick={clearCart}
-          className="self-start sm:self-auto text-xs font-bold text-slate-400 hover:text-rose-600 transition-colors px-2 py-1 rounded-lg inline-flex items-center gap-1"
+          className="self-start sm:self-auto text-xs font-semibold text-[#927681] hover:text-[#C94F78] transition-colors px-3 py-1.5 rounded-full inline-flex items-center gap-1 hover:bg-[#FBE7EE]"
         >
           <Trash2 className="w-3.5 h-3.5" />
           <span>Clear Tray</span>
@@ -69,7 +69,7 @@ const Cart = () => {
           <div className="pt-3">
             <Link
               to="/"
-              className="inline-flex items-center gap-2 text-xs font-bold text-brand-600 hover:text-brand-700 bg-brand-50 hover:bg-brand-100/70 px-4 py-2.5 rounded-xl transition-all"
+              className="inline-flex items-center gap-2 text-xs font-bold text-[#C94F78] hover:text-[#B33D65] bg-[#FBE7EE] hover:bg-[#FBE7EE]/80 px-4 py-2.5 rounded-full border border-[#EBD4DC] transition-all"
             >
               <Plus className="w-3.5 h-3.5" />
               <span>Add more food from menu</span>

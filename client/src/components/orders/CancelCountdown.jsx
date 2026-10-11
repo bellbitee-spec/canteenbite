@@ -104,27 +104,27 @@ const CancelCountdown = ({
   return (
     <>
       {/* Cancellation Banner Card */}
-      <div className="bg-amber-500/10 border border-amber-500/30 rounded-2xl p-4 sm:p-5 flex flex-col sm:flex-row items-center justify-between gap-4 shadow-subtle">
+      <div className="bg-[#FBE7EE]/60 border border-[#EBD4DC] rounded-2xl p-4 sm:p-5 flex flex-col sm:flex-row items-center justify-between gap-4 shadow-sm">
         <div className="flex items-center gap-3 w-full sm:w-auto">
-          <div className="w-10 h-10 rounded-xl bg-amber-500 text-white flex items-center justify-center font-black text-sm shrink-0 shadow-sm shadow-amber-500/30">
+          <div className="w-10 h-10 rounded-xl bg-[#C94F78] text-white flex items-center justify-center font-bold text-sm shrink-0 shadow-sm">
             <Clock className="w-5 h-5 animate-pulse" />
           </div>
           <div className="min-w-0">
             <div className="flex items-center gap-2">
-              <span className="text-xs font-black text-amber-950 uppercase tracking-wider">
+              <span className="text-xs font-bold text-[#352431] uppercase tracking-wider">
                 Order Cancellation Window
               </span>
-              <span className="font-mono font-black text-amber-800 bg-amber-100/90 border border-amber-300/60 px-2 py-0.5 rounded-md text-xs">
+              <span className="font-mono font-bold text-[#C94F78] bg-white border border-[#EBD4DC] px-2 py-0.5 rounded-md text-xs">
                 {formatTimeDisplay(remainingSeconds)}
               </span>
             </div>
-            <p className="text-xs text-amber-900/80 font-medium mt-0.5">
-              You have <span className="font-bold text-amber-950">{remainingSeconds}s</span> left to cancel this order if placed by mistake.
+            <p className="text-xs text-[#735A67] font-medium mt-0.5">
+              You have <span className="font-bold text-[#352431]">{remainingSeconds}s</span> left to cancel this order if placed by mistake.
             </p>
             {/* Visual countdown progress line */}
-            <div className="w-full bg-amber-200/60 rounded-full h-1.5 mt-2 overflow-hidden">
+            <div className="w-full bg-[#EBD4DC] rounded-full h-1.5 mt-2 overflow-hidden">
               <div
-                className="bg-amber-600 h-1.5 rounded-full transition-all duration-1000 ease-linear"
+                className="bg-[#C94F78] h-1.5 rounded-full transition-all duration-1000 ease-linear"
                 style={{ width: `${percentageRemaining}%` }}
               />
             </div>
@@ -135,7 +135,7 @@ const CancelCountdown = ({
           type="button"
           onClick={handleOpenModal}
           disabled={isCancelling || remainingSeconds <= 0}
-          className="w-full sm:w-auto px-4 py-2.5 rounded-xl bg-rose-600 hover:bg-rose-700 active:scale-95 text-white font-black text-xs transition shadow-sm shadow-rose-600/25 flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed shrink-0"
+          className="w-full sm:w-auto px-4 py-2.5 rounded-full bg-[#C94F78] hover:bg-[#B33D65] active:scale-95 text-white font-bold text-xs transition shadow-sm flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed shrink-0"
           aria-label={`Cancel order. You have ${remainingSeconds} seconds left`}
         >
           {isCancelling ? (
@@ -155,27 +155,27 @@ const CancelCountdown = ({
       {/* Confirmation Dialog */}
       {showConfirmModal && (
         <div
-          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs"
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#352431]/60 backdrop-blur-xs"
           role="dialog"
           aria-modal="true"
           aria-labelledby="cancel-dialog-title"
         >
-          <div className="bg-white rounded-3xl max-w-sm w-full p-6 shadow-2xl border border-slate-100 space-y-4 animate-scale-in">
-            <div className="w-12 h-12 rounded-2xl bg-rose-100 text-rose-600 flex items-center justify-center mx-auto shadow-xs">
+          <div className="bg-white rounded-3xl max-w-sm w-full p-6 shadow-2xl border border-[#EBD4DC] space-y-4 animate-scale-in">
+            <div className="w-12 h-12 rounded-2xl bg-[#FBE7EE] text-[#C94F78] flex items-center justify-center mx-auto border border-[#EBD4DC]">
               <AlertTriangle className="w-6 h-6 stroke-[2.2]" />
             </div>
 
             <div className="text-center space-y-1.5">
               <h3
                 id="cancel-dialog-title"
-                className="text-lg font-black text-slate-900 tracking-tight"
+                className="text-lg font-bold text-[#352431] tracking-tight"
               >
                 Cancel this order?
               </h3>
-              <p className="text-xs text-slate-500 font-medium leading-relaxed">
+              <p className="text-xs text-[#735A67] font-medium leading-relaxed">
                 You can only cancel during the remaining cancellation window. The kitchen has not yet started preparing your meal.
               </p>
-              <div className="pt-1 font-mono font-black text-rose-600 text-sm">
+              <div className="pt-1 font-mono font-bold text-[#C94F78] text-sm">
                 Time remaining: {formatTimeDisplay(remainingSeconds)}
               </div>
             </div>
@@ -185,7 +185,7 @@ const CancelCountdown = ({
                 type="button"
                 onClick={handleCloseModal}
                 disabled={isCancelling}
-                className="py-2.5 px-4 rounded-xl border border-slate-200 text-slate-700 hover:bg-slate-50 font-bold text-xs transition active:scale-95 cursor-pointer"
+                className="py-2.5 px-4 rounded-full border border-[#EBD4DC] text-[#352431] hover:bg-[#FBE7EE]/50 font-bold text-xs transition active:scale-95 cursor-pointer"
               >
                 Keep Order
               </button>
@@ -194,7 +194,7 @@ const CancelCountdown = ({
                 type="button"
                 onClick={handleConfirm}
                 disabled={isCancelling || remainingSeconds <= 0}
-                className="py-2.5 px-4 rounded-xl bg-rose-600 hover:bg-rose-700 active:scale-95 text-white font-black text-xs transition shadow-md shadow-rose-600/25 cursor-pointer disabled:opacity-50"
+                className="py-2.5 px-4 rounded-full bg-[#C94F78] hover:bg-[#B33D65] active:scale-95 text-white font-bold text-xs transition shadow-sm cursor-pointer disabled:opacity-50"
               >
                 {isCancelling ? "Cancelling..." : "Yes, Cancel"}
               </button>

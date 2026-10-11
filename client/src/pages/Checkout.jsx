@@ -309,19 +309,19 @@ const Checkout = () => {
     return (
       <PageContainer>
         <div className="min-h-[55vh] flex flex-col items-center justify-center text-center p-6 max-w-md mx-auto animate-fade-in">
-          <div className="w-20 h-20 rounded-3xl bg-brand-50 text-brand-500 flex items-center justify-center mb-4 border border-brand-100 shadow-subtle">
+          <div className="w-20 h-20 rounded-3xl bg-[#FBE7EE] text-[#C94F78] flex items-center justify-center mb-4 border border-[#EBD4DC]">
             <ShoppingBag className="w-9 h-9 stroke-[1.8]" />
           </div>
-          <h1 className="text-2xl font-black text-slate-900 tracking-tight">
+          <h1 className="text-2xl font-bold text-[#352431] tracking-tight">
             Your tray is empty
           </h1>
-          <p className="mt-2 text-xs sm:text-sm text-slate-500 leading-relaxed font-medium">
+          <p className="mt-2 text-xs sm:text-sm text-[#735A67] leading-relaxed font-medium">
             Add hot meals or drinks from the canteen menu to proceed to checkout.
           </p>
           <div className="mt-6">
             <Link
               to="/"
-              className="px-6 py-3.5 rounded-2xl bg-brand-500 hover:bg-brand-600 text-white font-black text-xs sm:text-sm shadow-sm shadow-brand-500/25 active:scale-95 transition-all inline-flex items-center gap-2"
+              className="px-6 py-3.5 rounded-full bg-[#C94F78] hover:bg-[#B33D65] text-white font-bold text-xs sm:text-sm shadow-sm active:scale-95 transition-all inline-flex items-center gap-2"
             >
               <UtensilsCrossed className="w-4 h-4" />
               <span>Browse Menu</span>
@@ -336,19 +336,19 @@ const Checkout = () => {
     <PageContainer>
       <div className="max-w-5xl mx-auto my-6 sm:my-10 space-y-8 animate-fade-in">
         {/* Header Breadcrumb & Title */}
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 border-b border-slate-100 pb-4">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 border-b border-[#EBD4DC] pb-4">
           <div>
-            <h1 className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight flex items-center gap-2.5">
+            <h1 className="text-2xl sm:text-3xl font-bold text-[#352431] tracking-tight flex items-center gap-2.5">
               <span>Checkout & Payment</span>
             </h1>
-            <p className="text-xs sm:text-sm text-slate-500 mt-0.5">
+            <p className="text-xs sm:text-sm text-[#735A67] mt-0.5">
               Confirm your meal items, kitchen notes, and payment mode
             </p>
           </div>
 
           <Link
             to="/cart"
-            className="self-start sm:self-auto text-xs font-bold text-brand-600 hover:text-brand-700 hover:underline flex items-center gap-1.5"
+            className="self-start sm:self-auto text-xs font-bold text-[#C94F78] hover:text-[#B33D65] hover:underline flex items-center gap-1.5"
           >
             <ArrowLeft className="w-3.5 h-3.5" />
             <span>Edit Tray ({itemCount} items)</span>
@@ -358,18 +358,18 @@ const Checkout = () => {
         {/* Store Closed / Paused Top Notice */}
         {!storeLoading && !canOrder && (
           <div
-            className="p-4 rounded-2xl bg-rose-50 border border-rose-200 text-rose-900 text-xs flex items-start gap-3 shadow-subtle animate-fade-in"
+            className="p-4 rounded-2xl bg-[#FBE7EE]/80 border border-[#EBD4DC] text-[#352431] text-xs flex items-start gap-3 shadow-sm animate-fade-in"
             role="alert"
           >
-            <AlertCircle className="w-5 h-5 text-rose-600 shrink-0 mt-0.5" />
+            <AlertCircle className="w-5 h-5 text-[#C94F78] shrink-0 mt-0.5" />
             <div className="space-y-0.5">
-              <span className="font-extrabold text-rose-900 text-sm block">
+              <span className="font-bold text-[#352431] text-sm block">
                 Orders Are Currently Paused
               </span>
-              <p className="text-rose-700 leading-relaxed font-medium">
+              <p className="text-[#735A67] leading-relaxed font-medium">
                 {store?.reason || "The canteen is currently closed or ordering is temporarily paused."}
               </p>
-              <p className="text-[11px] text-rose-600 pt-1 font-semibold">
+              <p className="text-[11px] text-[#C94F78] pt-1 font-semibold">
                 Your items remain safely saved. You can submit your order once the canteen resumes.
               </p>
             </div>
@@ -379,15 +379,15 @@ const Checkout = () => {
         {/* Global Error Banner */}
         {errorMessage && (
           <div
-            className={`p-4 rounded-2xl border text-xs font-medium flex items-start justify-between gap-3 shadow-subtle animate-fade-in ${
+            className={`p-4 rounded-2xl border text-xs font-medium flex items-start justify-between gap-3 shadow-sm animate-fade-in ${
               errorType === "NETWORK"
                 ? "bg-amber-50 border-amber-300 text-amber-900"
-                : "bg-rose-50 border-rose-300 text-rose-900"
+                : "bg-[#FBE7EE] border-[#EBD4DC] text-[#352431]"
             }`}
             role="alert"
           >
             <div className="flex items-start gap-2.5">
-              <AlertCircle className="w-4 h-4 mt-0.5 shrink-0" />
+              <AlertCircle className="w-4 h-4 mt-0.5 shrink-0 text-[#C94F78]" />
               <div>
                 <span className="font-bold block text-sm mb-0.5">
                   {errorType === "STOCK"
@@ -403,7 +403,7 @@ const Checkout = () => {
                   <div className="pt-2">
                     <Link
                       to="/cart"
-                      className="font-bold underline text-rose-800 hover:text-rose-950"
+                      className="font-bold underline text-[#C94F78] hover:text-[#B33D65]"
                     >
                       Return to Tray to adjust quantities →
                     </Link>
@@ -415,7 +415,7 @@ const Checkout = () => {
             <button
               type="button"
               onClick={() => setErrorMessage(null)}
-              className="text-slate-400 hover:text-slate-700 text-sm font-bold p-1"
+              className="text-[#927681] hover:text-[#352431] text-sm font-bold p-1"
               aria-label="Dismiss error"
             >
               ✕
@@ -444,16 +444,16 @@ const Checkout = () => {
             />
 
             {/* 3. Kitchen Notes Textarea */}
-            <div className="bg-white rounded-[2rem] border border-slate-100 p-5 sm:p-6 shadow-card space-y-3">
+            <div className="bg-white rounded-3xl border border-[#EBD4DC] p-5 sm:p-6 shadow-sm space-y-3">
               <div className="flex items-center justify-between">
                 <label
                   htmlFor="orderNotes"
-                  className="text-base font-black text-slate-900 tracking-tight flex items-center gap-2"
+                  className="text-base font-bold text-[#352431] tracking-tight flex items-center gap-2"
                 >
-                  <MessageSquare className="w-4 h-4 text-brand-500" />
+                  <MessageSquare className="w-4 h-4 text-[#C94F78]" />
                   <span>Kitchen Cooking Notes (Optional)</span>
                 </label>
-                <span className="text-[11px] text-slate-400 font-mono">
+                <span className="text-[11px] text-[#927681] font-mono">
                   {notes.length}/500
                 </span>
               </div>
@@ -465,7 +465,7 @@ const Checkout = () => {
                 value={notes}
                 onChange={(e) => setNotes(e.target.value)}
                 placeholder="Any special instructions for the cooks? (e.g. Less spicy, extra sauce, separate packaging...)"
-                className="w-full p-3.5 rounded-2xl border border-slate-200 text-xs text-slate-900 placeholder-slate-400 focus:outline-hidden focus:ring-2 focus:ring-brand-500 focus:border-brand-500 leading-relaxed resize-none transition-all"
+                className="w-full p-3.5 rounded-2xl border border-[#EBD4DC] bg-[#FFF9F2]/50 text-xs text-[#352431] placeholder-[#927681] focus:outline-hidden focus:ring-2 focus:ring-[#C94F78] focus:border-[#C94F78] leading-relaxed resize-none transition-all"
               />
             </div>
           </div>
@@ -474,26 +474,26 @@ const Checkout = () => {
           <div className="lg:col-span-1 lg:sticky lg:top-24 space-y-6">
             {/* Student Auth Status Card (if unauthenticated) */}
             {!authLoading && !isAuthenticated && (
-              <div className="bg-white rounded-3xl border border-brand-300 p-5 shadow-subtle space-y-3 bg-gradient-to-b from-brand-50/50 to-white">
+              <div className="bg-white rounded-3xl border border-[#EBD4DC] p-5 shadow-sm space-y-3 bg-gradient-to-b from-[#FBE7EE]/40 to-white">
                 <div className="flex items-center gap-2">
-                  <Lock className="w-4 h-4 text-brand-600" />
-                  <h3 className="font-black text-sm text-slate-900">
+                  <Lock className="w-4 h-4 text-[#C94F78]" />
+                  <h3 className="font-bold text-sm text-[#352431]">
                     Student Login Required
                   </h3>
                 </div>
-                <p className="text-xs text-slate-600 leading-relaxed font-medium">
+                <p className="text-xs text-[#735A67] leading-relaxed font-medium">
                   Please log in with your college credentials to place your order.
                 </p>
 
                 {loginError && (
-                  <p className="text-xs font-semibold text-rose-600 bg-rose-50 p-2 rounded-lg">
+                  <p className="text-xs font-semibold text-[#C94F78] bg-[#FBE7EE] p-2 rounded-lg">
                     {loginError}
                   </p>
                 )}
 
                 <form onSubmit={handleQuickLogin} className="space-y-2.5 text-xs">
                   <div>
-                    <label className="text-[11px] font-bold text-slate-700 block mb-1">
+                    <label className="text-[11px] font-bold text-[#352431] block mb-1">
                       Student Email
                     </label>
                     <input
@@ -502,11 +502,11 @@ const Checkout = () => {
                       onChange={(e) => setLoginEmail(e.target.value)}
                       placeholder="student@college.edu"
                       required
-                      className="w-full px-3 py-2 rounded-xl border border-slate-300 text-xs focus:outline-hidden focus:ring-2 focus:ring-brand-500"
+                      className="w-full px-3 py-2 rounded-xl border border-[#EBD4DC] text-xs focus:outline-hidden focus:ring-2 focus:ring-[#C94F78]"
                     />
                   </div>
                   <div>
-                    <label className="text-[11px] font-bold text-slate-700 block mb-1">
+                    <label className="text-[11px] font-bold text-[#352431] block mb-1">
                       Password
                     </label>
                     <input
@@ -515,13 +515,13 @@ const Checkout = () => {
                       onChange={(e) => setLoginPassword(e.target.value)}
                       placeholder="••••••••"
                       required
-                      className="w-full px-3 py-2 rounded-xl border border-slate-300 text-xs focus:outline-hidden focus:ring-2 focus:ring-brand-500"
+                      className="w-full px-3 py-2 rounded-xl border border-[#EBD4DC] text-xs focus:outline-hidden focus:ring-2 focus:ring-[#C94F78]"
                     />
                   </div>
                   <button
                     type="submit"
                     disabled={loginSubmitting}
-                    className="w-full py-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs transition"
+                    className="w-full py-2.5 rounded-full bg-[#352431] hover:bg-[#352431]/90 text-white font-bold text-xs transition"
                   >
                     {loginSubmitting ? "Logging in..." : "Log In & Continue"}
                   </button>
@@ -530,8 +530,8 @@ const Checkout = () => {
             )}
 
             {/* Order Summary & Confirmation Box */}
-            <div className="bg-white rounded-[2rem] border border-slate-100 p-6 shadow-card space-y-5">
-              <h3 className="font-black text-lg text-slate-900 tracking-tight">
+            <div className="bg-white rounded-3xl border border-[#EBD4DC] p-6 shadow-sm space-y-5">
+              <h3 className="font-bold text-lg text-[#352431] tracking-tight">
                 Order Summary
               </h3>
 
@@ -544,11 +544,11 @@ const Checkout = () => {
 
               {/* Status Notice Indicator */}
               {storeLoading ? (
-                <div className="p-3 rounded-2xl bg-slate-100 text-slate-600 text-xs text-center font-medium animate-pulse">
+                <div className="p-3 rounded-2xl bg-[#FBE7EE]/60 text-[#735A67] text-xs text-center font-medium animate-pulse">
                   Checking canteen availability...
                 </div>
               ) : !canOrder ? (
-                <div className="p-3 rounded-2xl bg-rose-50 border border-rose-200 text-rose-800 text-xs text-center font-semibold">
+                <div className="p-3 rounded-2xl bg-[#FBE7EE] border border-[#EBD4DC] text-[#C94F78] text-xs text-center font-semibold">
                   Orders are currently unavailable
                 </div>
               ) : null}
@@ -564,14 +564,14 @@ const Checkout = () => {
                   itemCount === 0 ||
                   !isAuthenticated
                 }
-                className={`w-full py-4 px-6 rounded-2xl font-black text-sm transition-all shadow-sm flex items-center justify-center gap-2 ${
+                className={`w-full py-3.5 px-6 rounded-full font-bold text-sm transition-all shadow-sm flex items-center justify-center gap-2 ${
                   submitting ||
                   storeLoading ||
                   !canOrder ||
                   itemCount === 0 ||
                   !isAuthenticated
-                    ? "bg-slate-100 text-slate-400 cursor-not-allowed border border-slate-200 shadow-none"
-                    : "bg-brand-500 hover:bg-brand-600 text-white shadow-brand-500/25 active:scale-98"
+                    ? "bg-[#FBE7EE] text-[#927681] cursor-not-allowed border border-[#EBD4DC] shadow-none"
+                    : "bg-[#C94F78] hover:bg-[#B33D65] text-white shadow-[#C94F78]/20 active:scale-98"
                 }`}
               >
                 {submitting ? (
@@ -593,12 +593,12 @@ const Checkout = () => {
               </button>
 
               <div className="space-y-1.5 text-center">
-                <p className="text-[11px] text-slate-500 font-medium">
+                <p className="text-[11px] text-[#735A67] font-medium">
                   {isAuthenticated && user?.email
                     ? `Ordering as: ${user.name || user.email}`
                     : "Student account required for token generation."}
                 </p>
-                <p className="text-[10px] text-slate-400">
+                <p className="text-[10px] text-[#927681]">
                   Cancel window: 30 seconds after order submission.
                 </p>
               </div>

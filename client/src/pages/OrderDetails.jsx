@@ -341,11 +341,11 @@ const OrderDetails = () => {
     return (
       <PageContainer>
         <div className="max-w-3xl mx-auto my-8 space-y-6">
-          <div className="h-8 bg-slate-200 rounded-xl w-48 animate-pulse" />
-          <div className="bg-white rounded-3xl p-6 border border-slate-200/80 space-y-4 animate-pulse">
-            <div className="h-6 bg-slate-200 rounded w-1/3" />
-            <div className="h-24 bg-slate-100 rounded-2xl" />
-            <div className="h-32 bg-slate-100 rounded-2xl" />
+          <div className="h-8 bg-[#FBE7EE] rounded-2xl w-48 animate-pulse" />
+          <div className="bg-white rounded-3xl p-6 border border-[#EBD4DC] space-y-4 animate-pulse">
+            <div className="h-6 bg-[#FBE7EE] rounded-xl w-1/3" />
+            <div className="h-24 bg-[#FBE7EE]/50 rounded-2xl" />
+            <div className="h-32 bg-[#FBE7EE]/50 rounded-2xl" />
           </div>
         </div>
       </PageContainer>
@@ -356,8 +356,8 @@ const OrderDetails = () => {
   if (error || !order) {
     return (
       <PageContainer>
-        <div className="max-w-md mx-auto my-12 text-center p-8 bg-white rounded-3xl border border-slate-200 shadow-elevated space-y-4">
-          <div className="w-16 h-16 rounded-2xl bg-brand-50 text-brand-600 flex items-center justify-center mx-auto shadow-xs">
+        <div className="max-w-md mx-auto my-12 text-center p-8 bg-white rounded-3xl border border-[#EBD4DC] shadow-sm space-y-4">
+          <div className="w-16 h-16 rounded-2xl bg-[#FBE7EE] text-[#C94F78] flex items-center justify-center mx-auto border border-[#EBD4DC]">
             {errorCode === 401 ? (
               <Lock className="w-8 h-8 stroke-[2.2]" />
             ) : errorCode === 403 ? (
@@ -367,7 +367,7 @@ const OrderDetails = () => {
             )}
           </div>
 
-          <h2 className="text-xl font-black text-slate-900">
+          <h2 className="text-xl font-bold text-[#352431]">
             {errorCode === 401
               ? "Login Required"
               : errorCode === 403
@@ -377,7 +377,7 @@ const OrderDetails = () => {
               : "Unable to Load Order"}
           </h2>
 
-          <p className="text-xs text-slate-600 leading-relaxed max-w-sm mx-auto">
+          <p className="text-xs text-[#735A67] leading-relaxed max-w-sm mx-auto">
             {error || "An error occurred while retrieving order information."}
           </p>
 
@@ -385,7 +385,7 @@ const OrderDetails = () => {
             {errorCode === 401 ? (
               <Link
                 to="/checkout"
-                className="w-full sm:w-auto px-6 py-2.5 rounded-xl bg-slate-900 text-white font-bold text-xs hover:bg-slate-800 transition"
+                className="w-full sm:w-auto px-6 py-2.5 rounded-full bg-[#352431] text-white font-bold text-xs hover:bg-[#352431]/90 transition"
               >
                 Log In
               </Link>
@@ -393,7 +393,7 @@ const OrderDetails = () => {
               <button
                 type="button"
                 onClick={() => loadOrder(false)}
-                className="w-full sm:w-auto px-5 py-2.5 rounded-xl bg-brand-500 text-white font-bold text-xs hover:bg-brand-600 transition shadow-sm shadow-brand-500/20"
+                className="w-full sm:w-auto px-5 py-2.5 rounded-full bg-[#C94F78] text-white font-bold text-xs hover:bg-[#B33D65] transition shadow-sm"
               >
                 Retry
               </button>
@@ -401,7 +401,7 @@ const OrderDetails = () => {
 
             <Link
               to="/orders"
-              className="w-full sm:w-auto px-5 py-2.5 rounded-xl bg-slate-100 text-slate-700 font-bold text-xs hover:bg-slate-200 transition"
+              className="w-full sm:w-auto px-5 py-2.5 rounded-full bg-[#FBE7EE] text-[#352431] border border-[#EBD4DC] font-bold text-xs hover:bg-[#FBE7EE]/80 transition"
             >
               My Orders
             </Link>
@@ -423,10 +423,10 @@ const OrderDetails = () => {
     <PageContainer>
       <div className="max-w-3xl mx-auto my-6 sm:my-10 space-y-6">
         {/* Navigation Breadcrumb / Top Bar */}
-        <div className="flex items-center justify-between gap-3 border-b border-slate-200/80 pb-4">
+        <div className="flex items-center justify-between gap-3 border-b border-[#EBD4DC] pb-4">
           <Link
             to="/orders"
-            className="text-xs font-bold text-brand-600 hover:text-brand-700 flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl hover:bg-brand-50 transition"
+            className="text-xs font-bold text-[#C94F78] hover:text-[#B33D65] flex items-center gap-1.5 px-3 py-1.5 rounded-full hover:bg-[#FBE7EE] transition"
           >
             <ArrowLeft className="w-4 h-4" />
             <span>Back to My Orders</span>
@@ -436,11 +436,11 @@ const OrderDetails = () => {
             type="button"
             onClick={() => loadOrder(true)}
             disabled={refreshing}
-            className="px-3.5 py-1.5 rounded-xl border border-slate-200 hover:bg-slate-50 text-slate-700 font-bold text-xs transition active:scale-95 flex items-center gap-1.5 cursor-pointer disabled:opacity-50"
+            className="px-3.5 py-1.5 rounded-full border border-[#EBD4DC] hover:bg-[#FBE7EE]/50 text-[#352431] font-bold text-xs transition active:scale-95 flex items-center gap-1.5 cursor-pointer disabled:opacity-50"
             title="Refresh Order Details"
           >
             <RotateCw
-              className={`w-3.5 h-3.5 ${refreshing ? "animate-spin text-brand-500" : ""}`}
+              className={`w-3.5 h-3.5 ${refreshing ? "animate-spin text-[#C94F78]" : ""}`}
             />
             <span>{refreshing ? "Updating..." : "Refresh"}</span>
           </button>
@@ -451,13 +451,13 @@ const OrderDetails = () => {
           <div
             className={`p-4 rounded-2xl text-xs font-bold border flex items-center justify-between gap-3 animate-fade-in ${
               cancelFeedback.type === "success"
-                ? "bg-emerald-50 text-emerald-800 border-emerald-200"
+                ? "bg-[#5F9A68]/10 text-[#5F9A68] border-[#5F9A68]/30"
                 : "bg-rose-50 text-rose-800 border-rose-200"
             }`}
           >
             <div className="flex items-center gap-2">
               {cancelFeedback.type === "success" ? (
-                <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+                <CheckCircle2 className="w-4 h-4 text-[#5F9A68] shrink-0" />
               ) : (
                 <AlertTriangle className="w-4 h-4 text-rose-600 shrink-0" />
               )}
@@ -466,7 +466,7 @@ const OrderDetails = () => {
             <button
               type="button"
               onClick={() => setCancelFeedback(null)}
-              className="text-slate-400 hover:text-slate-700 p-1"
+              className="text-[#927681] hover:text-[#352431] p-1"
               aria-label="Dismiss alert"
             >
               <X className="w-4 h-4" />
@@ -475,32 +475,32 @@ const OrderDetails = () => {
         )}
 
         {/* Top Header Card */}
-        <div className="bg-white rounded-[2rem] border border-slate-100 p-6 sm:p-7 shadow-card space-y-4">
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 border-b border-slate-100 pb-4">
+        <div className="bg-white rounded-3xl border border-[#EBD4DC] p-6 sm:p-7 shadow-sm space-y-4">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 border-b border-[#EBD4DC]/60 pb-4">
             <div>
-              <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 block">
+              <span className="text-[10px] font-bold uppercase tracking-wider text-[#927681] block">
                 Order Identifier
               </span>
-              <h1 className="text-xl sm:text-2xl font-black font-mono text-slate-900 tracking-tight mt-0.5">
+              <h1 className="text-xl sm:text-2xl font-bold font-mono text-[#352431] tracking-tight mt-0.5">
                 {order.orderNumber || `#${(order.id || order._id).slice(-8)}`}
               </h1>
-              <p className="text-xs text-slate-500 font-medium mt-1">
+              <p className="text-xs text-[#735A67] font-medium mt-1">
                 {createdTimeFormatted}
               </p>
             </div>
 
             <div className="self-start sm:self-auto">
               <span
-                className={`text-xs font-black uppercase tracking-wider px-3.5 py-1.5 rounded-full border ${
+                className={`text-xs font-bold uppercase tracking-wider px-3.5 py-1.5 rounded-full border ${
                   orderStatus === "READY"
-                    ? "bg-emerald-100 text-emerald-800 border-emerald-300"
+                    ? "bg-[#5F9A68] text-white border-[#5F9A68]"
                     : orderStatus === "DELAYED"
                     ? "bg-amber-100 text-amber-900 border-amber-300"
                     : orderStatus === "CANCELLED"
                     ? "bg-rose-100 text-rose-800 border-rose-200"
                     : orderStatus === "COMPLETED"
                     ? "bg-slate-100 text-slate-800 border-slate-300"
-                    : "bg-brand-50 text-brand-700 border-brand-200"
+                    : "bg-[#FBE7EE] text-[#C94F78] border-[#EBD4DC]"
                 }`}
               >
                 {orderStatus === "PENDING"
@@ -523,7 +523,7 @@ const OrderDetails = () => {
           {/* Section 7: DELAYED State Alert Banner */}
           {orderStatus === "DELAYED" && (
             <div className="bg-amber-500/15 border border-amber-500/40 rounded-2xl p-4 sm:p-5 text-amber-950 space-y-1">
-              <div className="flex items-center gap-2 font-black text-sm text-amber-950">
+              <div className="flex items-center gap-2 font-bold text-sm text-amber-950">
                 <Clock className="w-5 h-5 text-amber-700 shrink-0 animate-pulse" />
                 <span>Order running late, hold on.</span>
               </div>
@@ -535,14 +535,14 @@ const OrderDetails = () => {
 
           {/* Section 8: READY State Alert Banner */}
           {orderStatus === "READY" && (
-            <div className="bg-emerald-500/15 border border-emerald-500/40 rounded-2xl p-4 sm:p-5 text-emerald-950 space-y-1">
-              <div className="flex items-center gap-2 font-black text-sm text-emerald-950">
-                <PartyPopper className="w-5 h-5 text-emerald-700 shrink-0" />
+            <div className="bg-[#5F9A68]/15 border border-[#5F9A68]/40 rounded-2xl p-4 sm:p-5 text-[#352431] space-y-1">
+              <div className="flex items-center gap-2 font-bold text-sm text-[#5F9A68]">
+                <PartyPopper className="w-5 h-5 text-[#5F9A68] shrink-0" />
                 <span>Your order is ready!</span>
               </div>
-              <p className="text-xs text-emerald-900 font-medium pl-7">
+              <p className="text-xs text-[#735A67] font-medium pl-7">
                 Please proceed to the canteen counter and show your order number{" "}
-                <span className="font-mono font-bold">{order.orderNumber}</span> to collect your meal.
+                <span className="font-mono font-bold text-[#352431]">{order.orderNumber}</span> to collect your meal.
               </p>
             </div>
           )}
@@ -550,7 +550,7 @@ const OrderDetails = () => {
           {/* Section 9: COMPLETED State Banner */}
           {orderStatus === "COMPLETED" && (
             <div className="bg-slate-100 border border-slate-200 rounded-2xl p-4 text-xs font-semibold text-slate-700 flex items-center gap-2">
-              <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+              <CheckCircle2 className="w-4 h-4 text-[#5F9A68] shrink-0" />
               <span>Order completed. Thank you for dining at the college canteen!</span>
             </div>
           )}
@@ -558,7 +558,7 @@ const OrderDetails = () => {
           {/* Section 10: CANCELLED State Banner */}
           {orderStatus === "CANCELLED" && (
             <div className="bg-rose-50 border border-rose-200 rounded-2xl p-4 sm:p-5 space-y-2 text-rose-950">
-              <div className="flex items-center gap-2 font-black text-sm text-rose-900">
+              <div className="flex items-center gap-2 font-bold text-sm text-rose-900">
                 <XCircle className="w-5 h-5 text-rose-600 shrink-0" />
                 <span>Order cancelled</span>
               </div>
@@ -592,22 +592,22 @@ const OrderDetails = () => {
           {/* Section 26: Preparation Estimate & Expected Ready Time */}
           {orderStatus !== "CANCELLED" && orderStatus !== "COMPLETED" && (
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2">
-              <div className="bg-slate-50 p-3.5 rounded-2xl border border-slate-100">
-                <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 block">
+              <div className="bg-[#FBE7EE]/40 p-3.5 rounded-2xl border border-[#EBD4DC]">
+                <span className="text-[10px] font-bold uppercase tracking-wider text-[#927681] block">
                   Estimated Preparation
                 </span>
-                <span className="font-black text-sm text-slate-900 flex items-center gap-1.5 mt-0.5">
-                  <Clock className="w-4 h-4 text-brand-500" />
+                <span className="font-bold text-sm text-[#352431] flex items-center gap-1.5 mt-0.5">
+                  <Clock className="w-4 h-4 text-[#C94F78]" />
                   <span>{order.estimatedPreparationTime ? `${order.estimatedPreparationTime} mins` : "10-15 mins"}</span>
                 </span>
               </div>
 
-              <div className="bg-slate-50 p-3.5 rounded-2xl border border-slate-100">
-                <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 block">
+              <div className="bg-[#FBE7EE]/40 p-3.5 rounded-2xl border border-[#EBD4DC]">
+                <span className="text-[10px] font-bold uppercase tracking-wider text-[#927681] block">
                   Expected Ready By
                 </span>
-                <span className="font-black text-sm text-slate-900 flex items-center gap-1.5 mt-0.5">
-                  <Clock className="w-4 h-4 text-emerald-500" />
+                <span className="font-bold text-sm text-[#352431] flex items-center gap-1.5 mt-0.5">
+                  <Clock className="w-4 h-4 text-[#5F9A68]" />
                   <span>{expectedReadyFormatted || "Calculating estimate..."}</span>
                 </span>
               </div>
@@ -616,26 +616,26 @@ const OrderDetails = () => {
         </div>
 
         {/* Section 5: Order Lifecycle Timeline */}
-        <div className="bg-white rounded-[2rem] border border-slate-100 p-6 sm:p-7 shadow-card space-y-4">
-          <h2 className="text-base font-extrabold text-slate-900 tracking-tight flex items-center gap-2">
-            <Activity className="w-5 h-5 text-brand-500" />
+        <div className="bg-white rounded-3xl border border-[#EBD4DC] p-6 sm:p-7 shadow-sm space-y-4">
+          <h2 className="text-base font-bold text-[#352431] tracking-tight flex items-center gap-2">
+            <Activity className="w-5 h-5 text-[#C94F78]" />
             <span>Live Order Timeline</span>
           </h2>
           <OrderTimeline order={order} />
         </div>
 
         {/* Section 22-23: Payment Status Card & Retry Action */}
-        <div className="bg-white rounded-[2rem] border border-slate-100 p-6 sm:p-7 shadow-card space-y-4">
+        <div className="bg-white rounded-3xl border border-[#EBD4DC] p-6 sm:p-7 shadow-sm space-y-4">
           <div className="flex items-center justify-between">
-            <h2 className="text-base font-extrabold text-slate-900 tracking-tight flex items-center gap-2">
-              <CreditCard className="w-5 h-5 text-brand-500" />
+            <h2 className="text-base font-bold text-[#352431] tracking-tight flex items-center gap-2">
+              <CreditCard className="w-5 h-5 text-[#C94F78]" />
               <span>Payment Details</span>
             </h2>
 
             <span
-              className={`text-xs font-extrabold px-3 py-1 rounded-full border ${
+              className={`text-xs font-bold px-3 py-1 rounded-full border ${
                 isPaid
-                  ? "bg-emerald-50 text-emerald-700 border-emerald-200"
+                  ? "bg-[#5F9A68]/15 text-[#5F9A68] border-[#5F9A68]/30"
                   : isRefunded
                   ? "bg-purple-50 text-purple-700 border-purple-200"
                   : isPaymentFailed
@@ -655,10 +655,10 @@ const OrderDetails = () => {
 
           <div className="grid grid-cols-2 gap-4 text-xs">
             <div>
-              <span className="text-slate-400 font-semibold block text-[10px] uppercase">
+              <span className="text-[#927681] font-semibold block text-[10px] uppercase">
                 Payment Method
               </span>
-              <span className="font-extrabold text-slate-900 block mt-0.5">
+              <span className="font-bold text-[#352431] block mt-0.5">
                 {order.paymentMethod === "CASH"
                   ? "Cash at Counter"
                   : "Online Payment (Razorpay)"}
@@ -666,13 +666,13 @@ const OrderDetails = () => {
             </div>
 
             <div>
-              <span className="text-slate-400 font-semibold block text-[10px] uppercase">
+              <span className="text-[#927681] font-semibold block text-[10px] uppercase">
                 Payment Status
               </span>
               <span
-                className={`font-extrabold block mt-0.5 ${
+                className={`font-bold block mt-0.5 ${
                   isPaid
-                    ? "text-emerald-600"
+                    ? "text-[#5F9A68]"
                     : isRefunded
                     ? "text-purple-600"
                     : isPaymentFailed
@@ -695,15 +695,15 @@ const OrderDetails = () => {
           {order.paymentMethod === "ONLINE" &&
             !isPaid &&
             orderStatus !== "CANCELLED" && (
-              <div className="pt-2 border-t border-slate-100 flex flex-col sm:flex-row items-center justify-between gap-3">
-                <p className="text-xs text-slate-500 font-medium">
+              <div className="pt-2 border-t border-[#EBD4DC]/60 flex flex-col sm:flex-row items-center justify-between gap-3">
+                <p className="text-xs text-[#735A67] font-medium">
                   Payment has not been completed for this order. You can complete it securely online now.
                 </p>
                 <button
                   type="button"
                   onClick={handleRetryPayment}
                   disabled={retryingPayment}
-                  className="w-full sm:w-auto px-5 py-2.5 rounded-xl bg-brand-500 hover:bg-brand-600 active:scale-95 text-white font-black text-xs transition shadow-sm shadow-brand-500/25 shrink-0 flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
+                  className="w-full sm:w-auto px-5 py-2.5 rounded-full bg-[#C94F78] hover:bg-[#B33D65] active:scale-95 text-white font-bold text-xs transition shadow-sm shrink-0 flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
                 >
                   {retryingPayment ? (
                     <>
@@ -719,13 +719,13 @@ const OrderDetails = () => {
         </div>
 
         {/* Section 24-25: Ordered Items with Historical Snapshot Integrity */}
-        <div className="bg-white rounded-[2rem] border border-slate-100 p-6 sm:p-7 shadow-card space-y-4">
-          <h2 className="text-base font-extrabold text-slate-900 tracking-tight flex items-center gap-2">
-            <UtensilsCrossed className="w-5 h-5 text-brand-500" />
+        <div className="bg-white rounded-3xl border border-[#EBD4DC] p-6 sm:p-7 shadow-sm space-y-4">
+          <h2 className="text-base font-bold text-[#352431] tracking-tight flex items-center gap-2">
+            <UtensilsCrossed className="w-5 h-5 text-[#C94F78]" />
             <span>Ordered Items ({(order.items || []).length})</span>
           </h2>
 
-          <div className="divide-y divide-slate-100 border border-slate-100 rounded-2xl p-2 sm:p-3">
+          <div className="divide-y divide-[#EBD4DC]/60 border border-[#EBD4DC] rounded-2xl p-2 sm:p-3">
             {(order.items || []).map((item, idx) => {
               const itemImg = item.image || item.snapshot?.image;
               const isCombo = item.itemType === "COMBO";
@@ -741,15 +741,15 @@ const OrderDetails = () => {
                       <img
                         src={itemImg}
                         alt={item.name}
-                        className="w-12 h-12 rounded-xl object-cover bg-slate-100 shrink-0"
+                        className="w-12 h-12 rounded-xl object-cover bg-[#FBE7EE] shrink-0 border border-[#EBD4DC]"
                         onError={(e) => {
                           e.target.style.display = "none";
                         }}
                       />
                     ) : (
-                      <div className="w-12 h-12 rounded-xl bg-brand-50 text-brand-500 flex items-center justify-center shrink-0">
+                      <div className="w-12 h-12 rounded-xl bg-[#FBE7EE] text-[#C94F78] flex items-center justify-center shrink-0 border border-[#EBD4DC]">
                         {isCombo ? (
-                          <Layers className="w-5 h-5 text-purple-500" />
+                          <Layers className="w-5 h-5 text-[#C94F78]" />
                         ) : (
                           <UtensilsCrossed className="w-5 h-5" />
                         )}
@@ -758,11 +758,11 @@ const OrderDetails = () => {
 
                     <div className="space-y-0.5">
                       <div className="flex items-center gap-2">
-                        <span className="font-extrabold text-slate-900 text-sm">
+                        <span className="font-bold text-[#352431] text-sm">
                           {item.name}
                         </span>
                         {isCombo && (
-                          <span className="text-[10px] font-black uppercase tracking-wider bg-purple-100 text-purple-700 px-2 py-0.5 rounded-md flex items-center gap-1">
+                          <span className="text-[10px] font-bold uppercase tracking-wider bg-[#FBE7EE] text-[#C94F78] border border-[#EBD4DC] px-2 py-0.5 rounded-md flex items-center gap-1">
                             <Sparkles className="w-3 h-3" />
                             <span>COMBO</span>
                           </span>
@@ -770,14 +770,14 @@ const OrderDetails = () => {
                       </div>
 
                       {/* Historical Unit Price Snapshot (Do NOT fetch current product price) */}
-                      <span className="text-slate-500 font-medium block">
+                      <span className="text-[#735A67] font-medium block">
                         ₹{item.unitPrice} × {item.quantity}
                       </span>
 
                       {/* Combo Included Items Breakdown */}
                       {isCombo && comboComponents.length > 0 && (
-                        <div className="pt-1 text-[11px] text-slate-400 space-y-0.5">
-                          <span className="font-semibold block text-slate-500">
+                        <div className="pt-1 text-[11px] text-[#927681] space-y-0.5">
+                          <span className="font-semibold block text-[#735A67]">
                             Includes:
                           </span>
                           <ul className="list-disc list-inside space-y-0.5">
@@ -793,7 +793,7 @@ const OrderDetails = () => {
                   </div>
 
                   {/* Line Total */}
-                  <div className="font-black text-slate-900 text-sm shrink-0">
+                  <div className="font-bold text-[#352431] text-sm shrink-0">
                     ₹{item.subtotal}
                   </div>
                 </div>
@@ -803,27 +803,27 @@ const OrderDetails = () => {
 
           {/* Kitchen Notes */}
           {order.notes && (
-            <div className="bg-slate-50 p-3.5 rounded-2xl border border-slate-100 text-xs">
-              <span className="font-bold text-slate-700 block mb-0.5">
+            <div className="bg-[#FBE7EE]/40 p-3.5 rounded-2xl border border-[#EBD4DC] text-xs">
+              <span className="font-bold text-[#352431] block mb-0.5">
                 Special Kitchen Notes:
               </span>
-              <span className="text-slate-600 font-medium italic">
+              <span className="text-[#735A67] font-medium italic">
                 "{order.notes}"
               </span>
             </div>
           )}
 
           {/* Authoritative Financial Breakdown */}
-          <div className="pt-3 border-t border-slate-100 space-y-2">
-            <div className="flex justify-between text-xs text-slate-500">
+          <div className="pt-3 border-t border-[#EBD4DC] space-y-2">
+            <div className="flex justify-between text-xs text-[#735A67]">
               <span>Subtotal</span>
-              <span className="font-semibold text-slate-800">
+              <span className="font-bold text-[#352431]">
                 ₹{order.subtotal}
               </span>
             </div>
-            <div className="flex justify-between items-baseline pt-1 border-t border-slate-100">
-              <span className="font-black text-sm text-slate-900">Total</span>
-              <span className="text-2xl font-black text-slate-900">
+            <div className="flex justify-between items-baseline pt-1 border-t border-[#EBD4DC]">
+              <span className="font-bold text-sm text-[#352431]">Total</span>
+              <span className="text-2xl font-bold text-[#C94F78]">
                 ₹{order.totalAmount ?? order.subtotal}
               </span>
             </div>

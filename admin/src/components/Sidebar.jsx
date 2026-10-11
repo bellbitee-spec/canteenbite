@@ -81,17 +81,19 @@ const Sidebar = ({ isOpen, onClose }) => {
         }`}
       >
         {/* Brand header */}
-        <div className="h-16 flex items-center justify-between px-5 border-b border-slate-800">
+        <div className="h-16 flex items-center justify-between px-5 border-b border-slate-800 bg-slate-950/40">
           <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-lg bg-indigo-600 flex items-center justify-center text-white font-bold text-base shadow-md shadow-indigo-600/30">
-              C
+            <div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-[#C94F78] to-[#B33D65] flex items-center justify-center text-white font-bold text-sm shadow-md shadow-[#C94F78]/25">
+              <svg className="w-4 h-4 fill-white" viewBox="0 0 24 24">
+                <path d="M12 2C10.34 2 9 3.34 9 5c0 .35.07.69.18 1H7c-1.1 0-2 .9-2 2v2c0 3.07 1.63 5.64 4 6.72V19c0 1.1.9 2 2 2h2c1.1 0 2-.9 2-2v-2.28c2.37-1.08 4-3.65 4-6.72V8c0-1.1-.9-2-2-2h-2.18c.11-.31.18-.65.18-1 0-1.66-1.34-3-3-3zm0 2c.55 0 1 .45 1 1s-.45 1-1 1-1-.45-1-1 .45-1 1-1z"/>
+              </svg>
             </div>
             <div>
               <span className="font-bold text-white text-base tracking-tight block leading-tight">
-                My Canteen
+                bell<span className="text-[#C94F78]">bite</span><span className="text-[#C94F78]">.</span>
               </span>
-              <span className="text-[10px] uppercase font-bold tracking-wider text-indigo-400 block">
-                Admin Console
+              <span className="text-[9px] uppercase font-bold tracking-wider text-[#C94F78] block">
+                Kitchen Console
               </span>
             </div>
           </div>
@@ -120,7 +122,7 @@ const Sidebar = ({ isOpen, onClose }) => {
               className={({ isActive }) =>
                 `flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all ${
                   isActive
-                    ? "bg-indigo-600/15 text-indigo-400 border border-indigo-500/20 shadow-sm"
+                    ? "bg-[#C94F78]/15 text-[#C94F78] border border-[#C94F78]/30 shadow-sm"
                     : "text-slate-400 hover:text-slate-100 hover:bg-slate-800/60"
                 }`
               }

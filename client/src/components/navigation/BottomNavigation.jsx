@@ -26,29 +26,31 @@ const BottomNavigation = () => {
     <>
       {/* Mobile Floating Sticky Cart Bar */}
       {itemCount > 0 && (
-        <div className="fixed bottom-16 inset-x-3.5 z-40 lg:hidden animate-slide-up select-none">
+        <div className="fixed bottom-16 sm:bottom-18 inset-x-3.5 z-40 lg:hidden animate-slide-up select-none">
           <button
             type="button"
             onClick={openDrawer}
-            className="w-full bg-slate-900 hover:bg-slate-800 text-white px-4 py-3 rounded-2xl shadow-float flex items-center justify-between active:scale-[0.99] transition-transform cursor-pointer"
-            aria-label={`View cart with ${itemCount} items totaling ₹${subtotal}`}
+            className="w-full bg-[#352431] text-white px-4 py-3 rounded-full shadow-float border border-[#352431] flex items-center justify-between active:scale-[0.98] transition-all cursor-pointer"
+            aria-label={`View tray with ${itemCount} items totaling ₹${subtotal}`}
           >
-            <div className="flex items-center gap-2.5">
-              <span className="w-6 h-6 rounded-lg bg-brand-500 text-white flex items-center justify-center font-black text-xs shadow-xs">
+            <div className="flex items-center gap-3">
+              <span className="w-7 h-7 rounded-full bg-[#C94F78] text-white flex items-center justify-center font-bold text-xs shadow-xs animate-scale-in">
                 {itemCount}
               </span>
               <div className="text-left">
-                <div className="text-xs font-black tracking-tight leading-tight">
-                  {itemCount} {itemCount === 1 ? "item" : "items"} · ₹{subtotal}
+                <div className="text-xs font-bold tracking-tight leading-tight flex items-center gap-1.5 text-white">
+                  <span>₹{subtotal}</span>
+                  <span className="text-[#927681] font-normal">·</span>
+                  <span className="text-[11px] text-[#EBD4DC] font-medium">{itemCount} {itemCount === 1 ? "item" : "items"}</span>
                 </div>
-                <div className="text-[10px] text-slate-400 font-medium">
-                  Counter pickup
+                <div className="text-[10px] text-[#F3A6BF] font-semibold tracking-wide">
+                  Pickup Counter 1 & 2
                 </div>
               </div>
             </div>
 
-            <div className="flex items-center gap-1.5 text-xs font-black bg-white/10 hover:bg-white/20 px-3 py-1.5 rounded-xl transition-colors">
-              <span>View Cart</span>
+            <div className="flex items-center gap-1.5 text-xs font-bold bg-[#C94F78] hover:bg-[#B33D65] text-white px-3.5 py-1.5 rounded-full transition-colors shadow-xs">
+              <span>View Tray</span>
               <ArrowRight className="w-3.5 h-3.5" />
             </div>
           </button>
@@ -58,15 +60,15 @@ const BottomNavigation = () => {
       {/* Mobile Bottom Navigation Dock */}
       <nav
         aria-label="Mobile navigation"
-        className="lg:hidden fixed bottom-0 inset-x-0 z-40 bg-white/95 backdrop-blur-md border-t border-slate-100 px-2 py-2 flex items-center justify-around shadow-subtle select-none"
+        className="lg:hidden fixed bottom-0 inset-x-0 z-40 bg-[#FFF9F2]/95 backdrop-blur-md border-t border-[#EBD4DC] px-2 py-2 flex items-center justify-around shadow-subtle select-none"
       >
         {/* Home */}
         <Link
           to="/"
           className={`flex flex-col items-center gap-1 transition-all py-1 px-2.5 rounded-xl active:scale-90 ${
             isCurrent("/")
-              ? "text-brand-600 font-extrabold"
-              : "text-slate-400 hover:text-slate-700 font-semibold"
+              ? "text-[#C94F78] font-bold"
+              : "text-[#927681] hover:text-[#352431] font-semibold"
           }`}
         >
           <Home className={`w-5 h-5 ${isCurrent("/") ? "stroke-[2.5]" : "stroke-[1.8]"}`} />
@@ -78,8 +80,8 @@ const BottomNavigation = () => {
           to="/categories"
           className={`flex flex-col items-center gap-1 transition-all py-1 px-2.5 rounded-xl active:scale-90 ${
             isCurrent("/categories")
-              ? "text-brand-600 font-extrabold"
-              : "text-slate-400 hover:text-slate-700 font-semibold"
+              ? "text-[#C94F78] font-bold"
+              : "text-[#927681] hover:text-[#352431] font-semibold"
           }`}
         >
           <LayoutGrid className={`w-5 h-5 ${isCurrent("/categories") ? "stroke-[2.5]" : "stroke-[1.8]"}`} />
@@ -91,8 +93,8 @@ const BottomNavigation = () => {
           to="/orders"
           className={`flex flex-col items-center gap-1 transition-all py-1 px-2.5 rounded-xl active:scale-90 ${
             isCurrent("/orders") || isCurrent("/order-history")
-              ? "text-brand-600 font-extrabold"
-              : "text-slate-400 hover:text-slate-700 font-semibold"
+              ? "text-[#C94F78] font-bold"
+              : "text-[#927681] hover:text-[#352431] font-semibold"
           }`}
         >
           <Receipt className={`w-5 h-5 ${isCurrent("/orders") || isCurrent("/order-history") ? "stroke-[2.5]" : "stroke-[1.8]"}`} />
@@ -105,13 +107,13 @@ const BottomNavigation = () => {
           onClick={openDrawer}
           aria-label={`Open Cart (${itemCount} items)`}
           className={`relative flex flex-col items-center gap-1 transition-all py-1 px-2.5 rounded-xl active:scale-90 cursor-pointer ${
-            itemCount > 0 ? "text-brand-600 font-extrabold" : "text-slate-400 font-semibold"
+            itemCount > 0 ? "text-[#C94F78] font-bold" : "text-[#927681] font-semibold"
           }`}
         >
           <div className="relative">
             <ShoppingBag className="w-5 h-5 stroke-[2]" />
             {itemCount > 0 && (
-              <span className="absolute -top-1.5 -right-2 px-1.5 py-0.2 rounded-full bg-brand-500 text-white font-black text-[9px] leading-tight animate-scale-in shadow-xs">
+              <span className="absolute -top-1.5 -right-2 px-1.5 py-0.2 rounded-full bg-[#C94F78] text-white font-bold text-[9px] leading-tight animate-scale-in shadow-xs">
                 {itemCount}
               </span>
             )}
@@ -124,8 +126,8 @@ const BottomNavigation = () => {
           to={isAuthenticated ? "/profile" : "/login"}
           className={`flex flex-col items-center gap-1 transition-all py-1 px-2.5 rounded-xl active:scale-90 ${
             isCurrent("/profile") || isCurrent("/login")
-              ? "text-brand-600 font-extrabold"
-              : "text-slate-400 hover:text-slate-700 font-semibold"
+              ? "text-[#C94F78] font-bold"
+              : "text-[#927681] hover:text-[#352431] font-semibold"
           }`}
         >
           <User className={`w-5 h-5 ${isCurrent("/profile") || isCurrent("/login") ? "stroke-[2.5]" : "stroke-[1.8]"}`} />

@@ -47,10 +47,10 @@ const StoreClosed = () => {
       <div className="min-h-[60vh] flex flex-col items-center justify-center text-center p-6 max-w-xl mx-auto">
         {/* Status Icon */}
         <div
-          className={`w-20 h-20 rounded-3xl flex items-center justify-center mb-6 shadow-elevated border ${
+          className={`w-20 h-20 rounded-3xl flex items-center justify-center mb-6 border ${
             isPaused
               ? "bg-amber-50 text-amber-600 border-amber-200"
-              : "bg-rose-50 text-rose-600 border-rose-200"
+              : "bg-[#FBE7EE] text-[#C94F78] border-[#EBD4DC]"
           }`}
         >
           {isPaused ? (
@@ -61,49 +61,49 @@ const StoreClosed = () => {
         </div>
 
         {/* Heading */}
-        <h1 className="text-2xl sm:text-4xl font-black text-slate-900 tracking-tight">
+        <h1 className="text-2xl sm:text-4xl font-bold text-[#352431] tracking-tight">
           {isPaused ? "Ordering Temporarily Paused" : "Canteen Currently Closed"}
         </h1>
 
         {/* Dynamic Reason */}
         {reasonText ? (
-          <div className="mt-4 p-4 rounded-2xl bg-slate-100/80 border border-slate-200 text-slate-700 text-xs sm:text-sm font-medium leading-relaxed max-w-md text-left">
-            <div className="flex items-center gap-1.5 font-bold text-slate-900 mb-1">
-              <Info className="w-4 h-4 text-brand-500" />
+          <div className="mt-4 p-4 rounded-2xl bg-[#FBE7EE]/50 border border-[#EBD4DC] text-[#352431] text-xs sm:text-sm font-medium leading-relaxed max-w-md text-left">
+            <div className="flex items-center gap-1.5 font-bold text-[#352431] mb-1">
+              <Info className="w-4 h-4 text-[#C94F78]" />
               <span>Notice from Canteen Staff</span>
             </div>
-            <p className="text-slate-600 pl-5">{reasonText}</p>
+            <p className="text-[#735A67] pl-5">{reasonText}</p>
           </div>
         ) : (
-          <p className="mt-3 text-xs sm:text-sm text-slate-600 leading-relaxed font-medium max-w-md">
+          <p className="mt-3 text-xs sm:text-sm text-[#735A67] leading-relaxed font-medium max-w-md">
             Our campus kitchen is currently closed or preparing for the next meal shift.
           </p>
         )}
 
         {/* Next Opening / Hours Information */}
-        <div className="mt-6 w-full max-w-md bg-white rounded-2xl border border-slate-200/80 p-4 text-xs text-slate-600 space-y-2 shadow-subtle text-left">
+        <div className="mt-6 w-full max-w-md bg-white rounded-3xl border border-[#EBD4DC] p-4 text-xs text-[#735A67] space-y-2 shadow-sm text-left">
           {nextOpeningFormatted && (
-            <div className="flex justify-between items-center py-1.5 border-b border-slate-100">
-              <span className="text-slate-500 font-semibold flex items-center gap-1.5">
-                <Clock className="w-3.5 h-3.5 text-brand-500" />
+            <div className="flex justify-between items-center py-1.5 border-b border-[#EBD4DC]/60">
+              <span className="text-[#735A67] font-semibold flex items-center gap-1.5">
+                <Clock className="w-3.5 h-3.5 text-[#C94F78]" />
                 <span>Next Opening:</span>
               </span>
-              <span className="font-bold text-brand-600 text-xs sm:text-sm">{nextOpeningFormatted}</span>
+              <span className="font-bold text-[#C94F78] text-xs sm:text-sm">{nextOpeningFormatted}</span>
             </div>
           )}
 
           {store?.openingTime && store?.closingTime && (
             <div className="flex justify-between items-center py-1.5">
-              <span className="text-slate-500 font-semibold">Standard Scheduled Hours:</span>
-              <span className="font-semibold text-slate-800">
+              <span className="text-[#735A67] font-semibold">Standard Scheduled Hours:</span>
+              <span className="font-bold text-[#352431]">
                 {store.openingTime} – {store.closingTime}
               </span>
             </div>
           )}
 
-          <div className="flex justify-between items-center py-1.5 border-t border-slate-100">
-            <span className="text-slate-500 font-semibold">Timezone:</span>
-            <span className="font-mono text-slate-500">{store?.timezone || "Asia/Kolkata (IST)"}</span>
+          <div className="flex justify-between items-center py-1.5 border-t border-[#EBD4DC]/60">
+            <span className="text-[#735A67] font-semibold">Timezone:</span>
+            <span className="font-mono text-[#927681]">{store?.timezone || "Asia/Kolkata (IST)"}</span>
           </div>
         </div>
 
@@ -111,7 +111,7 @@ const StoreClosed = () => {
         <div className="mt-8 flex flex-col sm:flex-row items-center gap-3 w-full sm:w-auto">
           <Link
             to="/"
-            className="w-full sm:w-auto px-8 py-3.5 rounded-2xl bg-brand-500 hover:bg-brand-600 text-white font-extrabold text-xs sm:text-sm shadow-elevated shadow-brand-500/20 active:scale-95 transition-all inline-flex items-center justify-center gap-2"
+            className="w-full sm:w-auto px-8 py-3.5 rounded-full bg-[#C94F78] hover:bg-[#B33D65] text-white font-bold text-xs sm:text-sm shadow-sm active:scale-95 transition-all inline-flex items-center justify-center gap-2"
           >
             <UtensilsCrossed className="w-4 h-4" />
             <span>Browse Menu</span>
@@ -120,7 +120,7 @@ const StoreClosed = () => {
           {itemCount > 0 && (
             <Link
               to="/cart"
-              className="w-full sm:w-auto px-6 py-3.5 rounded-2xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs sm:text-sm border border-slate-200 active:scale-95 transition-all inline-flex items-center justify-center gap-2"
+              className="w-full sm:w-auto px-6 py-3.5 rounded-full bg-[#FBE7EE] hover:bg-[#FBE7EE]/80 text-[#352431] font-bold text-xs sm:text-sm border border-[#EBD4DC] active:scale-95 transition-all inline-flex items-center justify-center gap-2"
             >
               <ShoppingBag className="w-4 h-4" />
               <span>View Saved Cart ({itemCount})</span>
@@ -128,7 +128,7 @@ const StoreClosed = () => {
           )}
         </div>
 
-        <p className="mt-6 text-xs text-slate-400 font-medium max-w-sm">
+        <p className="mt-6 text-xs text-[#927681] font-medium max-w-sm">
           You can continue exploring items and saving your cart. Orders will reopen once the canteen resumes operations.
         </p>
       </div>
