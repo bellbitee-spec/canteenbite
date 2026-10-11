@@ -215,10 +215,10 @@ const ProductForm = ({
       {serverError && (
         <div
           role="alert"
-          className="p-3.5 rounded-xl bg-red-500/10 border border-red-500/20 text-red-400 text-sm flex items-start gap-3"
+          className="p-3.5 rounded-2xl bg-rose-50 border border-rose-200 text-rose-700 text-sm flex items-start gap-3"
         >
           <svg
-            className="w-5 h-5 flex-shrink-0 mt-0.5 text-red-400"
+            className="w-5 h-5 flex-shrink-0 mt-0.5 text-rose-600"
             fill="none"
             stroke="currentColor"
             viewBox="0 0 24 24"
@@ -239,9 +239,9 @@ const ProductForm = ({
         <div>
           <label
             htmlFor="prod-name"
-            className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1.5"
+            className="block text-xs font-semibold text-[#735A67] uppercase tracking-wider mb-1.5"
           >
-            Product Name <span className="text-red-400">*</span>
+            Product Name <span className="text-rose-500">*</span>
           </label>
           <input
             id="prod-name"
@@ -251,26 +251,26 @@ const ProductForm = ({
             value={formData.name}
             onChange={handleNameChange}
             placeholder="e.g. Crispy Veg Burger"
-            className={`w-full px-3.5 py-2.5 bg-slate-950/60 border rounded-xl text-slate-100 placeholder-slate-500 text-sm focus:outline-none focus:ring-2 transition-colors ${
+            className={`w-full px-3.5 py-2.5 bg-[#FFF9F2] border rounded-xl text-[#352431] placeholder-[#927681] text-sm focus:outline-none transition-colors ${
               errors.name
-                ? "border-red-500/60 focus:ring-red-500"
-                : "border-slate-750 focus:ring-indigo-500 focus:border-indigo-500"
+                ? "border-rose-400 focus:border-rose-500"
+                : "border-[#EBD4DC] focus:border-[#C94F78]"
             }`}
           />
           {errors.name && (
-            <p className="mt-1 text-xs text-red-400">{errors.name}</p>
+            <p className="mt-1 text-xs text-rose-600">{errors.name}</p>
           )}
         </div>
 
         <div>
           <label
             htmlFor="prod-category"
-            className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1.5"
+            className="block text-xs font-semibold text-[#735A67] uppercase tracking-wider mb-1.5"
           >
-            Category <span className="text-red-400">*</span>
+            Category <span className="text-rose-500">*</span>
           </label>
           {categories.length === 0 ? (
-            <div className="p-2.5 rounded-xl bg-amber-500/10 border border-amber-500/20 text-amber-300 text-xs">
+            <div className="p-2.5 rounded-xl bg-amber-50 border border-amber-200 text-amber-800 text-xs">
               No categories available. Create a category first.
             </div>
           ) : (
@@ -280,24 +280,24 @@ const ProductForm = ({
               required
               value={formData.category}
               onChange={handleChange}
-              className={`w-full px-3.5 py-2.5 bg-slate-950/60 border rounded-xl text-slate-100 text-sm focus:outline-none focus:ring-2 transition-colors ${
+              className={`w-full px-3.5 py-2.5 bg-[#FFF9F2] border rounded-xl text-[#352431] text-sm focus:outline-none transition-colors cursor-pointer ${
                 errors.category
-                  ? "border-red-500/60 focus:ring-red-500"
-                  : "border-slate-750 focus:ring-indigo-500 focus:border-indigo-500"
+                  ? "border-rose-400 focus:border-rose-500"
+                  : "border-[#EBD4DC] focus:border-[#C94F78]"
               }`}
             >
-              <option value="" disabled className="bg-slate-900 text-slate-400">
+              <option value="" disabled className="bg-white text-[#735A67]">
                 Select a category...
               </option>
               {categories.map((cat) => (
-                <option key={cat.id} value={cat.id} className="bg-slate-900 text-white">
+                <option key={cat.id} value={cat.id} className="bg-white text-[#352431]">
                   {cat.name}
                 </option>
               ))}
             </select>
           )}
           {errors.category && (
-            <p className="mt-1 text-xs text-red-400">{errors.category}</p>
+            <p className="mt-1 text-xs text-rose-600">{errors.category}</p>
           )}
         </div>
       </div>
@@ -306,10 +306,10 @@ const ProductForm = ({
       <div>
         <label
           htmlFor="prod-slug"
-          className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1.5"
+          className="block text-xs font-semibold text-[#735A67] uppercase tracking-wider mb-1.5"
         >
-          Product Slug <span className="text-red-400">*</span>
-          <span className="text-slate-400 normal-case ml-1 font-normal">
+          Product Slug <span className="text-rose-500">*</span>
+          <span className="text-[#927681] normal-case ml-1 font-normal">
             (URL identifier, e.g. crispy-veg-burger)
           </span>
         </label>
@@ -321,14 +321,14 @@ const ProductForm = ({
           value={formData.slug}
           onChange={handleSlugChange}
           placeholder="e.g. crispy-veg-burger"
-          className={`w-full px-3.5 py-2.5 bg-slate-950/60 border rounded-xl text-slate-100 placeholder-slate-500 text-sm font-mono focus:outline-none focus:ring-2 transition-colors ${
+          className={`w-full px-3.5 py-2.5 bg-[#FFF9F2] border rounded-xl text-[#352431] placeholder-[#927681] text-sm font-mono focus:outline-none transition-colors ${
             errors.slug
-              ? "border-red-500/60 focus:ring-red-500"
-              : "border-slate-750 focus:ring-indigo-500 focus:border-indigo-500"
+              ? "border-rose-400 focus:border-rose-500"
+              : "border-[#EBD4DC] focus:border-[#C94F78]"
           }`}
         />
         {errors.slug && (
-          <p className="mt-1 text-xs text-red-400">{errors.slug}</p>
+          <p className="mt-1 text-xs text-rose-600">{errors.slug}</p>
         )}
       </div>
 
@@ -337,12 +337,12 @@ const ProductForm = ({
         <div>
           <label
             htmlFor="prod-price"
-            className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1.5"
+            className="block text-xs font-semibold text-[#735A67] uppercase tracking-wider mb-1.5"
           >
-            Price (₹) <span className="text-red-400">*</span>
+            Price (₹) <span className="text-rose-500">*</span>
           </label>
           <div className="relative">
-            <span className="absolute inset-y-0 left-0 pl-3.5 flex items-center text-slate-400 text-sm font-semibold pointer-events-none">
+            <span className="absolute inset-y-0 left-0 pl-3.5 flex items-center text-[#735A67] text-sm font-semibold pointer-events-none">
               ₹
             </span>
             <input
@@ -355,24 +355,24 @@ const ProductForm = ({
               value={formData.price}
               onChange={handleChange}
               placeholder="0.00"
-              className={`w-full pl-8 pr-3.5 py-2.5 bg-slate-950/60 border rounded-xl text-slate-100 placeholder-slate-500 text-sm focus:outline-none focus:ring-2 transition-colors ${
+              className={`w-full pl-8 pr-3.5 py-2.5 bg-[#FFF9F2] border rounded-xl text-[#352431] placeholder-[#927681] text-sm focus:outline-none transition-colors ${
                 errors.price
-                  ? "border-red-500/60 focus:ring-red-500"
-                  : "border-slate-750 focus:ring-indigo-500 focus:border-indigo-500"
+                  ? "border-rose-400 focus:border-rose-500"
+                  : "border-[#EBD4DC] focus:border-[#C94F78]"
               }`}
             />
           </div>
           {errors.price && (
-            <p className="mt-1 text-xs text-red-400">{errors.price}</p>
+            <p className="mt-1 text-xs text-rose-600">{errors.price}</p>
           )}
         </div>
 
         <div>
           <label
             htmlFor="prod-stock"
-            className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1.5"
+            className="block text-xs font-semibold text-[#735A67] uppercase tracking-wider mb-1.5"
           >
-            Stock <span className="text-red-400">*</span>
+            Stock <span className="text-rose-500">*</span>
           </label>
           <input
             id="prod-stock"
@@ -384,21 +384,21 @@ const ProductForm = ({
             value={formData.stock}
             onChange={handleChange}
             placeholder="e.g. 25"
-            className={`w-full px-3.5 py-2.5 bg-slate-950/60 border rounded-xl text-slate-100 placeholder-slate-500 text-sm focus:outline-none focus:ring-2 transition-colors ${
+            className={`w-full px-3.5 py-2.5 bg-[#FFF9F2] border rounded-xl text-[#352431] placeholder-[#927681] text-sm focus:outline-none transition-colors ${
               errors.stock
-                ? "border-red-500/60 focus:ring-red-500"
-                : "border-slate-750 focus:ring-indigo-500 focus:border-indigo-500"
+                ? "border-rose-400 focus:border-rose-500"
+                : "border-[#EBD4DC] focus:border-[#C94F78]"
             }`}
           />
           {errors.stock && (
-            <p className="mt-1 text-xs text-red-400">{errors.stock}</p>
+            <p className="mt-1 text-xs text-rose-600">{errors.stock}</p>
           )}
         </div>
 
         <div>
           <label
             htmlFor="prod-threshold"
-            className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1.5"
+            className="block text-xs font-semibold text-[#735A67] uppercase tracking-wider mb-1.5"
           >
             Low Stock Alert
           </label>
@@ -411,14 +411,14 @@ const ProductForm = ({
             value={formData.lowStockThreshold}
             onChange={handleChange}
             placeholder="5"
-            className={`w-full px-3.5 py-2.5 bg-slate-950/60 border rounded-xl text-slate-100 placeholder-slate-500 text-sm focus:outline-none focus:ring-2 transition-colors ${
+            className={`w-full px-3.5 py-2.5 bg-[#FFF9F2] border rounded-xl text-[#352431] placeholder-[#927681] text-sm focus:outline-none transition-colors ${
               errors.lowStockThreshold
-                ? "border-red-500/60 focus:ring-red-500"
-                : "border-slate-750 focus:ring-indigo-500 focus:border-indigo-500"
+                ? "border-rose-400 focus:border-rose-500"
+                : "border-[#EBD4DC] focus:border-[#C94F78]"
             }`}
           />
           {errors.lowStockThreshold && (
-            <p className="mt-1 text-xs text-red-400">{errors.lowStockThreshold}</p>
+            <p className="mt-1 text-xs text-rose-600">{errors.lowStockThreshold}</p>
           )}
         </div>
       </div>
@@ -428,7 +428,7 @@ const ProductForm = ({
         <div>
           <label
             htmlFor="prod-preptime"
-            className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1.5"
+            className="block text-xs font-semibold text-[#735A67] uppercase tracking-wider mb-1.5"
           >
             Prep Time (minutes)
           </label>
@@ -442,25 +442,25 @@ const ProductForm = ({
               value={formData.preparationTime}
               onChange={handleChange}
               placeholder="10"
-              className={`w-full pr-14 pl-3.5 py-2.5 bg-slate-950/60 border rounded-xl text-slate-100 placeholder-slate-500 text-sm focus:outline-none focus:ring-2 transition-colors ${
+              className={`w-full pr-14 pl-3.5 py-2.5 bg-[#FFF9F2] border rounded-xl text-[#352431] placeholder-[#927681] text-sm focus:outline-none transition-colors ${
                 errors.preparationTime
-                  ? "border-red-500/60 focus:ring-red-500"
-                  : "border-slate-750 focus:ring-indigo-500 focus:border-indigo-500"
+                  ? "border-rose-400 focus:border-rose-500"
+                  : "border-[#EBD4DC] focus:border-[#C94F78]"
               }`}
             />
-            <span className="absolute inset-y-0 right-0 pr-3.5 flex items-center text-slate-400 text-xs pointer-events-none">
+            <span className="absolute inset-y-0 right-0 pr-3.5 flex items-center text-[#735A67] text-xs pointer-events-none">
               min
             </span>
           </div>
           {errors.preparationTime && (
-            <p className="mt-1 text-xs text-red-400">{errors.preparationTime}</p>
+            <p className="mt-1 text-xs text-rose-600">{errors.preparationTime}</p>
           )}
         </div>
 
         <div>
           <label
             htmlFor="prod-sortorder"
-            className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1.5"
+            className="block text-xs font-semibold text-[#735A67] uppercase tracking-wider mb-1.5"
           >
             Sort Order
           </label>
@@ -473,14 +473,14 @@ const ProductForm = ({
             value={formData.sortOrder}
             onChange={handleChange}
             placeholder="0"
-            className={`w-full px-3.5 py-2.5 bg-slate-950/60 border rounded-xl text-slate-100 placeholder-slate-500 text-sm focus:outline-none focus:ring-2 transition-colors ${
+            className={`w-full px-3.5 py-2.5 bg-[#FFF9F2] border rounded-xl text-[#352431] placeholder-[#927681] text-sm focus:outline-none transition-colors ${
               errors.sortOrder
-                ? "border-red-500/60 focus:ring-red-500"
-                : "border-slate-750 focus:ring-indigo-500 focus:border-indigo-500"
+                ? "border-rose-400 focus:border-rose-500"
+                : "border-[#EBD4DC] focus:border-[#C94F78]"
             }`}
           />
           {errors.sortOrder && (
-            <p className="mt-1 text-xs text-red-400">{errors.sortOrder}</p>
+            <p className="mt-1 text-xs text-rose-600">{errors.sortOrder}</p>
           )}
         </div>
       </div>
@@ -505,7 +505,7 @@ const ProductForm = ({
       <div>
         <label
           htmlFor="prod-desc"
-          className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1.5"
+          className="block text-xs font-semibold text-[#735A67] uppercase tracking-wider mb-1.5"
         >
           Description
         </label>
@@ -516,24 +516,24 @@ const ProductForm = ({
           value={formData.description}
           onChange={handleChange}
           placeholder="Brief description of ingredients, allergens, or serving style..."
-          className={`w-full px-3.5 py-2.5 bg-slate-950/60 border rounded-xl text-slate-100 placeholder-slate-500 text-sm focus:outline-none focus:ring-2 transition-colors resize-none ${
+          className={`w-full px-3.5 py-2.5 bg-[#FFF9F2] border rounded-xl text-[#352431] placeholder-[#927681] text-sm focus:outline-none transition-colors resize-none ${
             errors.description
-              ? "border-red-500/60 focus:ring-red-500"
-              : "border-slate-750 focus:ring-indigo-500 focus:border-indigo-500"
+              ? "border-rose-400 focus:border-rose-500"
+              : "border-[#EBD4DC] focus:border-[#C94F78]"
           }`}
         />
         {errors.description && (
-          <p className="mt-1 text-xs text-red-400">{errors.description}</p>
+          <p className="mt-1 text-xs text-rose-600">{errors.description}</p>
         )}
       </div>
 
       {/* Row 7: Available Toggle */}
-      <div className="p-4 rounded-xl bg-slate-950/60 border border-slate-800 flex items-center justify-between">
+      <div className="p-4 rounded-2xl bg-[#FFF9F2] border border-[#EBD4DC] flex items-center justify-between">
         <div>
-          <label htmlFor="prod-avail" className="text-sm font-semibold text-white block cursor-pointer">
+          <label htmlFor="prod-avail" className="text-sm font-semibold text-[#352431] block cursor-pointer">
             Student Availability
           </label>
-          <p className="text-xs text-slate-400 mt-0.5">
+          <p className="text-xs text-[#735A67] mt-0.5">
             When enabled, students can see and order this item in the storefront.
           </p>
         </div>
@@ -543,24 +543,24 @@ const ProductForm = ({
           type="checkbox"
           checked={formData.isAvailable}
           onChange={handleChange}
-          className="w-5 h-5 rounded text-indigo-600 bg-slate-900 border-slate-700 focus:ring-indigo-500 focus:ring-offset-slate-950 cursor-pointer"
+          className="w-5 h-5 rounded text-[#C94F78] border-[#EBD4DC] accent-[#C94F78] cursor-pointer"
         />
       </div>
 
       {/* Row 8: Homepage Hero Banner Showcase Settings */}
-      <div className="p-4 rounded-xl bg-gradient-to-r from-rose-950/20 via-slate-950/60 to-slate-950/60 border border-rose-500/20 space-y-4">
+      <div className="p-5 rounded-2xl bg-gradient-to-r from-[#FBE7EE]/60 via-[#FFF9F2] to-[#FFF9F2] border border-[#EBD4DC] space-y-4">
         <div className="flex items-center justify-between">
           <div>
             <div className="flex items-center gap-2">
-              <span className="text-sm font-bold text-rose-300 flex items-center gap-1.5">
+              <span className="text-sm font-bold text-[#C94F78] flex items-center gap-1.5">
                 <span>🌸</span>
                 <span>Feature in Homepage Hero Banner</span>
               </span>
-              <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-rose-500/20 text-rose-300 border border-rose-500/30">
+              <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-white text-[#C94F78] border border-[#EBD4DC]">
                 Showcase
               </span>
             </div>
-            <p className="text-xs text-slate-400 mt-1">
+            <p className="text-xs text-[#735A67] mt-1">
               Displays this dish on the student homepage floating animated banner with real rating &amp; live badge.
             </p>
           </div>
@@ -570,16 +570,16 @@ const ProductForm = ({
             type="checkbox"
             checked={formData.isFeatured}
             onChange={handleChange}
-            className="w-5 h-5 rounded text-rose-600 bg-slate-900 border-slate-700 focus:ring-rose-500 focus:ring-offset-slate-950 cursor-pointer"
+            className="w-5 h-5 rounded text-[#C94F78] border-[#EBD4DC] accent-[#C94F78] cursor-pointer"
           />
         </div>
 
         {formData.isFeatured && (
-          <div className="pt-3 border-t border-rose-500/15 space-y-3.5">
+          <div className="pt-3 border-t border-[#EBD4DC] space-y-3.5">
             <div>
               <label
                 htmlFor="prod-badge"
-                className="block text-xs font-semibold text-rose-200 uppercase tracking-wider mb-1.5"
+                className="block text-xs font-semibold text-[#735A67] uppercase tracking-wider mb-1.5"
               >
                 Hero Badge / Highlight Tag
               </label>
@@ -590,10 +590,10 @@ const ProductForm = ({
                 value={formData.featuredBadge}
                 onChange={handleChange}
                 placeholder="e.g. Campus Favorite, Chef's Sakura Signature"
-                className="w-full px-3.5 py-2.5 bg-slate-950/80 border border-rose-500/30 rounded-xl text-slate-100 placeholder-slate-500 text-sm focus:outline-none focus:ring-2 focus:ring-rose-500 transition-colors"
+                className="w-full px-3.5 py-2.5 bg-white border border-[#EBD4DC] rounded-xl text-[#352431] placeholder-[#927681] text-sm focus:outline-none focus:border-[#C94F78] transition-colors"
               />
               <div className="flex flex-wrap gap-1.5 mt-2">
-                <span className="text-[11px] text-slate-400 mr-1 self-center">Quick tags:</span>
+                <span className="text-[11px] text-[#735A67] mr-1 self-center">Quick tags:</span>
                 {[
                   "Campus Favorite",
                   "Chef's Sakura Signature",
@@ -605,7 +605,7 @@ const ProductForm = ({
                     key={tag}
                     type="button"
                     onClick={() => setFormData((prev) => ({ ...prev, featuredBadge: tag }))}
-                    className="px-2.5 py-1 rounded-lg text-[11px] font-semibold bg-rose-500/10 hover:bg-rose-500/20 text-rose-300 border border-rose-500/20 transition cursor-pointer"
+                    className="px-2.5 py-1 rounded-lg text-[11px] font-semibold bg-white hover:bg-[#FBE7EE] text-[#C94F78] border border-[#EBD4DC] transition cursor-pointer"
                   >
                     {tag}
                   </button>
@@ -617,7 +617,7 @@ const ProductForm = ({
               <div>
                 <label
                   htmlFor="prod-rating"
-                  className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1.5"
+                  className="block text-xs font-semibold text-[#735A67] uppercase tracking-wider mb-1.5"
                 >
                   Rating (0.0 to 5.0)
                 </label>
@@ -631,14 +631,14 @@ const ProductForm = ({
                   value={formData.rating}
                   onChange={handleChange}
                   placeholder="4.8"
-                  className="w-full px-3.5 py-2.5 bg-slate-950/80 border border-slate-750 rounded-xl text-slate-100 placeholder-slate-500 text-sm focus:outline-none focus:ring-2 focus:ring-rose-500 transition-colors"
+                  className="w-full px-3.5 py-2.5 bg-white border border-[#EBD4DC] rounded-xl text-[#352431] placeholder-[#927681] text-sm focus:outline-none focus:border-[#C94F78] transition-colors"
                 />
               </div>
 
               <div>
                 <label
                   htmlFor="prod-rating-count"
-                  className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1.5"
+                  className="block text-xs font-semibold text-[#735A67] uppercase tracking-wider mb-1.5"
                 >
                   Orders / Rating Count
                 </label>
@@ -650,7 +650,7 @@ const ProductForm = ({
                   value={formData.ratingCount}
                   onChange={handleChange}
                   placeholder="e.g. 1200"
-                  className="w-full px-3.5 py-2.5 bg-slate-950/80 border border-slate-750 rounded-xl text-slate-100 placeholder-slate-500 text-sm focus:outline-none focus:ring-2 focus:ring-rose-500 transition-colors"
+                  className="w-full px-3.5 py-2.5 bg-white border border-[#EBD4DC] rounded-xl text-[#352431] placeholder-[#927681] text-sm focus:outline-none focus:border-[#C94F78] transition-colors"
                 />
               </div>
             </div>
@@ -659,12 +659,12 @@ const ProductForm = ({
       </div>
 
       {/* Form Action Buttons */}
-      <div className="flex items-center justify-end gap-3 pt-3 border-t border-slate-800">
+      <div className="flex items-center justify-end gap-3 pt-3 border-t border-[#EBD4DC]">
         <button
           type="button"
           onClick={onCancel}
           disabled={submitting}
-          className="px-4 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-750 text-slate-300 hover:text-white text-sm font-medium transition-colors disabled:opacity-50 cursor-pointer"
+          className="px-4 py-2.5 rounded-xl border border-[#EBD4DC] hover:bg-[#FBE7EE] text-[#735A67] hover:text-[#352431] text-sm font-medium transition cursor-pointer disabled:opacity-50"
         >
           Cancel
         </button>
@@ -672,7 +672,7 @@ const ProductForm = ({
         <button
           type="submit"
           disabled={submitting || categories.length === 0}
-          className="px-5 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-sm font-semibold transition-colors disabled:opacity-50 flex items-center gap-2 cursor-pointer shadow-lg shadow-indigo-600/25"
+          className="px-5 py-2.5 rounded-xl bg-[#C94F78] hover:bg-[#B33D65] text-white text-sm font-semibold transition disabled:opacity-50 flex items-center gap-2 cursor-pointer shadow-sakura-sm"
         >
           {submitting ? (
             <>

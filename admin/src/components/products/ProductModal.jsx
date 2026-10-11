@@ -43,7 +43,7 @@ const ProductModal = ({
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4 bg-slate-950/80 backdrop-blur-sm overflow-y-auto animate-fadeIn"
+      className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4 bg-black/50 backdrop-blur-xs overflow-y-auto animate-fadeIn"
       role="dialog"
       aria-modal="true"
       aria-labelledby="product-modal-title"
@@ -56,11 +56,11 @@ const ProductModal = ({
         }}
       />
 
-      <div className="relative w-full max-w-2xl bg-slate-900 border border-slate-800 rounded-2xl shadow-2xl z-10 my-4 sm:my-8 overflow-hidden flex flex-col max-h-[92vh]">
+      <div className="relative w-full max-w-2xl bg-white border border-[#EBD4DC] rounded-3xl shadow-2xl z-10 my-4 sm:my-8 overflow-hidden flex flex-col max-h-[92vh]">
         {/* Modal Header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-slate-800 bg-slate-900/90 sticky top-0 z-10 backdrop-blur-md">
+        <div className="flex items-center justify-between px-6 py-5 border-b border-[#EBD4DC] bg-white sticky top-0 z-10">
           <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-xl bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 flex items-center justify-center">
+            <div className="w-10 h-10 rounded-2xl bg-[#FBE7EE] text-[#C94F78] border border-[#EBD4DC] flex items-center justify-center">
               {isEdit ? (
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
@@ -72,10 +72,10 @@ const ProductModal = ({
               )}
             </div>
             <div>
-              <h2 id="product-modal-title" className="text-lg font-bold text-white tracking-tight">
+              <h2 id="product-modal-title" className="text-xl font-bold text-[#352431] tracking-tight">
                 {isEdit ? "Edit Product" : "Add New Product"}
               </h2>
-              <p className="text-xs text-slate-400">
+              <p className="text-xs text-[#735A67]">
                 {isEdit
                   ? `Updating "${initialData.name}"`
                   : "Configure menu details, pricing, and initial stock"}
@@ -87,7 +87,7 @@ const ProductModal = ({
             type="button"
             onClick={onClose}
             disabled={submitting}
-            className="p-1.5 text-slate-400 hover:text-white rounded-lg hover:bg-slate-800 transition-colors focus:outline-none"
+            className="p-2 text-[#735A67] hover:text-[#352431] rounded-xl hover:bg-[#FBE7EE] transition cursor-pointer"
             aria-label="Close modal"
           >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">

@@ -232,18 +232,18 @@ const Combos = () => {
       {toast && (
         <div
           role="status"
-          className={`fixed bottom-5 right-5 z-50 px-4 py-3 rounded-xl shadow-2xl flex items-center gap-3 text-sm font-medium border backdrop-blur-md transition-all animate-bounceIn ${
+          className={`fixed bottom-5 right-5 z-50 px-4 py-3 rounded-2xl shadow-sakura-card flex items-center gap-3 text-sm font-medium border backdrop-blur-md transition-all animate-bounceIn ${
             toast.type === "error"
-              ? "bg-rose-950/90 text-rose-200 border-rose-500/30"
-              : "bg-slate-900/95 text-emerald-300 border-emerald-500/30"
+              ? "bg-rose-50 text-rose-700 border-rose-200"
+              : "bg-white text-[#5F9A68] border-[#EBD4DC]"
           }`}
         >
           {toast.type === "error" ? (
-            <svg className="w-5 h-5 text-rose-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className="w-5 h-5 text-rose-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
           ) : (
-            <svg className="w-5 h-5 text-emerald-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className="w-5 h-5 text-[#5F9A68] flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
             </svg>
           )}
@@ -252,12 +252,12 @@ const Combos = () => {
       )}
 
       {/* Top Banner / Header Area */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-4 border-b border-slate-800/80">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-4 border-b border-[#EBD4DC]">
         <div>
-          <h2 className="text-2xl font-bold text-white tracking-tight">
+          <h2 className="text-2xl font-bold text-[#352431] tracking-tight">
             Combos
           </h2>
-          <p className="text-sm text-slate-400 mt-0.5">
+          <p className="text-sm text-[#735A67] mt-0.5">
             Manage combo meals and their included products.
           </p>
         </div>
@@ -265,7 +265,7 @@ const Combos = () => {
         <button
           type="button"
           onClick={handleOpenCreateModal}
-          className="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-sm font-semibold transition-all shadow-md shadow-indigo-600/25 cursor-pointer self-start sm:self-auto"
+          className="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-[#C94F78] hover:bg-[#B33D65] text-white text-sm font-semibold transition-all shadow-sakura-sm cursor-pointer self-start sm:self-auto"
         >
           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
@@ -275,11 +275,11 @@ const Combos = () => {
       </div>
 
       {/* Search and Filters Bar */}
-      <div className="p-4 rounded-2xl bg-slate-900 border border-slate-800 shadow-sm space-y-3.5">
+      <div className="p-5 rounded-3xl bg-white border border-[#EBD4DC] shadow-sakura-card space-y-3.5">
         <div className="grid grid-cols-1 md:grid-cols-12 gap-3">
           {/* Search Input */}
           <div className="md:col-span-8 relative">
-            <span className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
+            <span className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-[#927681]">
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
               </svg>
@@ -289,13 +289,13 @@ const Combos = () => {
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               placeholder="Search combos by name, item, or description..."
-              className="w-full pl-9 pr-9 py-2 bg-slate-950/70 border border-slate-750 rounded-xl text-slate-100 placeholder-slate-500 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors"
+              className="w-full pl-9 pr-9 py-2.5 bg-[#FFF9F2] border border-[#EBD4DC] rounded-xl text-[#352431] placeholder-[#927681] text-sm focus:outline-none focus:ring-2 focus:ring-[#C94F78]/20 focus:border-[#C94F78] transition-colors"
             />
             {searchTerm && (
               <button
                 type="button"
                 onClick={() => setSearchTerm("")}
-                className="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-white"
+                className="absolute inset-y-0 right-0 pr-3 flex items-center text-[#927681] hover:text-[#352431]"
                 title="Clear search"
               >
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -310,15 +310,15 @@ const Combos = () => {
             <select
               value={selectedAvailability}
               onChange={(e) => setSelectedAvailability(e.target.value)}
-              className="w-full px-3 py-2 bg-slate-950/70 border border-slate-750 rounded-xl text-slate-100 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors cursor-pointer"
+              className="w-full px-3.5 py-2.5 bg-[#FFF9F2] border border-[#EBD4DC] rounded-xl text-[#352431] text-sm focus:outline-none focus:ring-2 focus:ring-[#C94F78]/20 focus:border-[#C94F78] transition-colors cursor-pointer"
             >
-              <option value="all" className="bg-slate-900 text-slate-300">
+              <option value="all">
                 All status
               </option>
-              <option value="true" className="bg-slate-900 text-white">
+              <option value="true">
                 Available
               </option>
-              <option value="false" className="bg-slate-900 text-white">
+              <option value="false">
                 Unavailable
               </option>
             </select>
@@ -326,12 +326,12 @@ const Combos = () => {
         </div>
 
         {/* Filter Summary & Clear Button */}
-        <div className="flex items-center justify-between pt-2 border-t border-slate-800/80 text-xs text-slate-400">
+        <div className="flex items-center justify-between pt-2 border-t border-[#EBD4DC] text-xs text-[#735A67]">
           <div>
-            Showing <span className="font-bold text-white">{filteredCombos.length}</span>{" "}
+            Showing <span className="font-bold text-[#352431]">{filteredCombos.length}</span>{" "}
             {filteredCombos.length === 1 ? "combo" : "combos"}
             {combos.length !== filteredCombos.length && (
-              <span className="text-slate-500 ml-1">
+              <span className="text-[#927681] ml-1">
                 (filtered from {combos.length} total)
               </span>
             )}
@@ -341,7 +341,7 @@ const Combos = () => {
             <button
               type="button"
               onClick={handleClearFilters}
-              className="text-indigo-400 hover:text-indigo-300 font-semibold inline-flex items-center gap-1 transition-colors cursor-pointer"
+              className="text-[#C94F78] hover:text-[#B33D65] font-semibold inline-flex items-center gap-1 transition-colors cursor-pointer"
             >
               <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -354,9 +354,9 @@ const Combos = () => {
 
       {/* Global Error Banner */}
       {error && (
-        <div className="p-4 rounded-xl bg-red-950/40 border border-red-500/30 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 text-red-200">
+        <div className="p-4 rounded-2xl bg-rose-50 border border-rose-200 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 text-rose-700">
           <div className="flex items-center gap-3">
-            <svg className="w-5 h-5 text-red-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className="w-5 h-5 text-rose-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
             <span className="text-sm font-medium">{error}</span>
@@ -364,7 +364,7 @@ const Combos = () => {
           <button
             type="button"
             onClick={fetchCombos}
-            className="self-start sm:self-auto px-3.5 py-1.5 rounded-lg bg-red-600 hover:bg-red-500 text-white text-xs font-semibold transition-colors cursor-pointer"
+            className="self-start sm:self-auto px-3.5 py-1.5 rounded-xl bg-[#C94F78] hover:bg-[#B33D65] text-white text-xs font-semibold transition-colors cursor-pointer"
           >
             Retry
           </button>
@@ -373,27 +373,27 @@ const Combos = () => {
 
       {/* Loading Skeleton */}
       {loading ? (
-        <div className="rounded-2xl border border-slate-800 bg-slate-900/60 p-6 space-y-4 animate-pulse">
-          <div className="h-6 bg-slate-800 rounded w-1/4" />
+        <div className="rounded-3xl border border-[#EBD4DC] bg-white p-6 space-y-4 shadow-sakura-card animate-pulse">
+          <div className="h-6 bg-[#FFF9F2] rounded w-1/4" />
           <div className="space-y-3">
             {[...Array(5)].map((_, i) => (
-              <div key={i} className="h-14 bg-slate-800/60 rounded-xl" />
+              <div key={i} className="h-14 bg-[#FFF9F2] rounded-xl" />
             ))}
           </div>
         </div>
       ) : filteredCombos.length === 0 ? (
         /* Empty State */
-        <div className="p-12 text-center rounded-2xl bg-slate-900/40 border border-dashed border-slate-800 max-w-lg mx-auto my-8">
-          <div className="w-14 h-14 rounded-2xl bg-slate-800 text-slate-400 mx-auto flex items-center justify-center mb-4">
+        <div className="p-12 text-center rounded-3xl bg-white border border-dashed border-[#EBD4DC] shadow-sakura-card max-w-lg mx-auto my-8">
+          <div className="w-14 h-14 rounded-2xl bg-[#FFF9F2] text-[#C94F78] mx-auto flex items-center justify-center mb-4 border border-[#EBD4DC]">
             <svg className="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
             </svg>
           </div>
 
-          <h3 className="text-base font-bold text-white mb-1.5">
+          <h3 className="text-base font-bold text-[#352431] mb-1.5">
             {isFiltered ? "No combos match your filters" : "No combos found"}
           </h3>
-          <p className="text-xs text-slate-400 mb-5 max-w-xs mx-auto">
+          <p className="text-xs text-[#735A67] mb-5 max-w-xs mx-auto">
             {isFiltered
               ? "Try adjusting your search query or availability filter."
               : "No combo meals have been created yet."}
@@ -403,7 +403,7 @@ const Combos = () => {
             <button
               type="button"
               onClick={handleClearFilters}
-              className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-750 text-white text-xs font-semibold transition-colors cursor-pointer border border-slate-700"
+              className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-[#FFF9F2] hover:bg-[#FBE7EE] text-[#352431] text-xs font-semibold transition-colors cursor-pointer border border-[#EBD4DC]"
             >
               Clear filters
             </button>
@@ -411,7 +411,7 @@ const Combos = () => {
             <button
               type="button"
               onClick={handleOpenCreateModal}
-              className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold transition-colors cursor-pointer shadow-md shadow-indigo-600/25"
+              className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-[#C94F78] hover:bg-[#B33D65] text-white text-xs font-semibold transition-colors cursor-pointer shadow-sakura-sm"
             >
               + Add Combo
             </button>

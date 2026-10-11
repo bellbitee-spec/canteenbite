@@ -173,6 +173,29 @@ const createProductValidator = [
     .isInt({ min: 0 })
     .withMessage("Sort order must be a non-negative integer"),
 
+  body("isFeatured")
+    .optional()
+    .isBoolean()
+    .withMessage("isFeatured must be a boolean"),
+
+  body("featuredBadge")
+    .optional()
+    .trim()
+    .isString()
+    .withMessage("featuredBadge must be a string")
+    .isLength({ max: 100 })
+    .withMessage("featuredBadge must not exceed 100 characters"),
+
+  body("rating")
+    .optional()
+    .isFloat({ min: 0, max: 5 })
+    .withMessage("Rating must be a number between 0 and 5"),
+
+  body("ratingCount")
+    .optional()
+    .isInt({ min: 0 })
+    .withMessage("Rating count must be a non-negative integer"),
+
   handleValidationErrors,
 ];
 
@@ -250,6 +273,29 @@ const updateProductValidator = [
     .optional()
     .isInt({ min: 0 })
     .withMessage("Sort order must be a non-negative integer"),
+
+  body("isFeatured")
+    .optional()
+    .isBoolean()
+    .withMessage("isFeatured must be a boolean"),
+
+  body("featuredBadge")
+    .optional()
+    .trim()
+    .isString()
+    .withMessage("featuredBadge must be a string")
+    .isLength({ max: 100 })
+    .withMessage("featuredBadge must not exceed 100 characters"),
+
+  body("rating")
+    .optional()
+    .isFloat({ min: 0, max: 5 })
+    .withMessage("Rating must be a number between 0 and 5"),
+
+  body("ratingCount")
+    .optional()
+    .isInt({ min: 0 })
+    .withMessage("Rating count must be a non-negative integer"),
 
   handleValidationErrors,
 ];

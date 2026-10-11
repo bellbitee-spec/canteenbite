@@ -82,11 +82,11 @@ const ComboItemEditor = ({
     <div className="space-y-3.5">
       <div className="flex items-center justify-between">
         <div>
-          <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider">
-            Included Products <span className="text-red-400">*</span>
+          <label className="block text-xs font-semibold text-[#735A67] uppercase tracking-wider">
+            Included Products <span className="text-rose-500">*</span>
           </label>
-          <p className="text-[11px] text-slate-400 mt-0.5">
-            Select at least one product. Inventory is deducted automatically from these component products.
+          <p className="text-[11px] text-[#927681] mt-0.5">
+            Select at least one product. Inventory is deducted automatically from component products.
           </p>
         </div>
 
@@ -94,7 +94,7 @@ const ComboItemEditor = ({
           type="button"
           onClick={handleAddItem}
           disabled={availableProducts.length === 0}
-          className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-indigo-600/15 hover:bg-indigo-600/25 text-indigo-400 border border-indigo-500/30 text-xs font-semibold transition-colors cursor-pointer disabled:opacity-50"
+          className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[#FBE7EE] hover:bg-[#F5D5E0] text-[#C94F78] border border-[#EBD4DC] text-xs font-semibold transition-colors cursor-pointer disabled:opacity-50"
         >
           <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
@@ -107,10 +107,10 @@ const ComboItemEditor = ({
       {unavailableItems.length > 0 && (
         <div
           role="alert"
-          className="p-3 rounded-xl bg-amber-500/10 border border-amber-500/20 text-amber-300 text-xs flex items-start gap-2.5"
+          className="p-3.5 rounded-2xl bg-amber-50 border border-amber-200 text-amber-700 text-xs flex items-start gap-2.5"
         >
           <svg
-            className="w-4 h-4 flex-shrink-0 mt-0.5 text-amber-400"
+            className="w-4 h-4 flex-shrink-0 mt-0.5 text-amber-600"
             fill="none"
             stroke="currentColor"
             viewBox="0 0 24 24"
@@ -123,14 +123,14 @@ const ComboItemEditor = ({
             />
           </svg>
           <div className="leading-snug">
-            <span className="font-semibold">Notice:</span> One or more products in this combo are currently marked unavailable in the catalog. Students will not be able to order this combo until all component products are active.
+            <span className="font-semibold">Notice:</span> One or more products in this combo are currently marked unavailable. Students cannot order this combo until all component products are active.
           </div>
         </div>
       )}
 
       {/* Item rows */}
       {items.length === 0 ? (
-        <div className="p-6 text-center rounded-xl bg-slate-950/60 border border-dashed border-slate-800 text-slate-400 text-xs">
+        <div className="p-6 text-center rounded-2xl bg-[#FFF9F2] border border-dashed border-[#EBD4DC] text-[#735A67] text-xs">
           No products added yet. Click &quot;+ Add Product&quot; to include items in this combo.
         </div>
       ) : (
@@ -143,10 +143,10 @@ const ComboItemEditor = ({
             return (
               <div
                 key={index}
-                className={`p-3 rounded-xl bg-slate-950/60 border transition-colors flex flex-col sm:flex-row sm:items-center gap-3 ${
+                className={`p-3 rounded-2xl border transition-colors flex flex-col sm:flex-row sm:items-center gap-3 ${
                   isProdUnavailable
-                    ? "border-amber-500/40 bg-amber-500/5"
-                    : "border-slate-800"
+                    ? "border-amber-300 bg-amber-50/50"
+                    : "border-[#EBD4DC] bg-[#FFF9F2]"
                 }`}
               >
                 {/* Product Select Dropdown */}
@@ -161,9 +161,9 @@ const ComboItemEditor = ({
                     id={`combo-product-${index}`}
                     value={item.product || ""}
                     onChange={(e) => handleProductChange(index, e.target.value)}
-                    className="w-full px-3 py-2 bg-slate-900 border border-slate-750 rounded-lg text-slate-100 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-colors"
+                    className="w-full px-3 py-2 bg-white border border-[#EBD4DC] rounded-xl text-[#352431] text-sm focus:outline-none focus:ring-2 focus:ring-[#C94F78]/20 focus:border-[#C94F78] transition-colors"
                   >
-                    <option value="" disabled className="bg-slate-900 text-slate-400">
+                    <option value="" disabled className="text-[#927681]">
                       Select product...
                     </option>
                     {availableProducts.map((p) => {
@@ -174,7 +174,6 @@ const ComboItemEditor = ({
                           key={p.id}
                           value={p.id}
                           disabled={isSelectedElsewhere}
-                          className="bg-slate-900 text-white"
                         >
                           {p.name} (₹{p.price})
                           {p.isAvailable === false ? " — [Unavailable]" : ""}
@@ -186,26 +185,26 @@ const ComboItemEditor = ({
                   </select>
 
                   {/* Informational pricing / warning status */}
-                  <div className="flex items-center gap-2 mt-1.5 text-[11px] text-slate-400">
+                  <div className="flex items-center gap-2 mt-1.5 text-[11px] text-[#735A67]">
                     {currentProd ? (
                       <>
                         <span>Catalog price: ₹{currentProd.price}</span>
                         {isOutOfStock && (
-                          <span className="text-rose-400 font-medium">• 0 in stock</span>
+                          <span className="text-rose-600 font-medium">• 0 in stock</span>
                         )}
                         {isProdUnavailable && (
-                          <span className="text-amber-400 font-semibold">• Currently Unavailable</span>
+                          <span className="text-amber-700 font-semibold">• Currently Unavailable</span>
                         )}
                       </>
                     ) : (
-                      <span className="text-slate-500">Select a product</span>
+                      <span className="text-[#927681]">Select a product</span>
                     )}
                   </div>
                 </div>
 
                 {/* Quantity input */}
                 <div className="w-full sm:w-28 flex-shrink-0">
-                  <div className="flex items-center rounded-lg border border-slate-750 bg-slate-900 overflow-hidden">
+                  <div className="flex items-center rounded-xl border border-[#EBD4DC] bg-white overflow-hidden shadow-2xs">
                     <button
                       type="button"
                       onClick={() =>
@@ -215,7 +214,7 @@ const ComboItemEditor = ({
                         )
                       }
                       disabled={Number(item.quantity) <= 1}
-                      className="px-2.5 py-1.5 text-slate-400 hover:text-white bg-slate-800 disabled:opacity-40 cursor-pointer text-xs"
+                      className="px-2.5 py-1.5 text-[#735A67] hover:text-[#352431] hover:bg-[#FBE7EE] disabled:opacity-40 cursor-pointer text-xs transition-colors"
                       aria-label="Decrease quantity"
                     >
                       -
@@ -232,7 +231,7 @@ const ComboItemEditor = ({
                           e.target.value === "" ? "" : Number(e.target.value)
                         )
                       }
-                      className="w-full py-1 text-center bg-transparent text-slate-100 text-sm font-semibold focus:outline-none"
+                      className="w-full py-1 text-center bg-transparent text-[#352431] text-sm font-semibold focus:outline-none"
                       aria-label={`Quantity for item ${index + 1}`}
                     />
                     <button
@@ -243,7 +242,7 @@ const ComboItemEditor = ({
                           (Number(item.quantity) || 0) + 1
                         )
                       }
-                      className="px-2.5 py-1.5 text-slate-400 hover:text-white bg-slate-800 cursor-pointer text-xs"
+                      className="px-2.5 py-1.5 text-[#735A67] hover:text-[#352431] hover:bg-[#FBE7EE] cursor-pointer text-xs transition-colors"
                       aria-label="Increase quantity"
                     >
                       +
@@ -258,7 +257,7 @@ const ComboItemEditor = ({
                     onClick={() => handleRemoveItem(index)}
                     title="Remove product from combo"
                     aria-label={`Remove ${currentProd?.name || "product"} from combo`}
-                    className="p-2 rounded-lg text-slate-400 hover:text-rose-400 hover:bg-rose-500/10 border border-transparent hover:border-rose-500/20 transition-all cursor-pointer"
+                    className="p-2 rounded-xl text-[#927681] hover:text-[#C94F78] hover:bg-rose-50 border border-transparent hover:border-rose-200 transition-all cursor-pointer"
                   >
                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
@@ -272,7 +271,7 @@ const ComboItemEditor = ({
       )}
 
       {error && (
-        <p className="text-xs text-red-400 font-medium">{error}</p>
+        <p className="text-xs text-rose-600 font-medium">{error}</p>
       )}
     </div>
   );

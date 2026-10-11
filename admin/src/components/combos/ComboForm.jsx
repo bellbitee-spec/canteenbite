@@ -184,10 +184,10 @@ const ComboForm = ({
       {serverError && (
         <div
           role="alert"
-          className="p-3.5 rounded-xl bg-red-500/10 border border-red-500/20 text-red-400 text-sm flex items-start gap-3"
+          className="p-3.5 rounded-2xl bg-rose-50 border border-rose-200 text-rose-700 text-sm flex items-start gap-3"
         >
           <svg
-            className="w-5 h-5 flex-shrink-0 mt-0.5 text-red-400"
+            className="w-5 h-5 flex-shrink-0 mt-0.5 text-rose-500"
             fill="none"
             stroke="currentColor"
             viewBox="0 0 24 24"
@@ -208,9 +208,9 @@ const ComboForm = ({
         <div className="sm:col-span-2">
           <label
             htmlFor="combo-name"
-            className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1.5"
+            className="block text-xs font-semibold text-[#735A67] uppercase tracking-wider mb-1.5"
           >
-            Combo Name <span className="text-red-400">*</span>
+            Combo Name <span className="text-rose-500">*</span>
           </label>
           <input
             id="combo-name"
@@ -219,27 +219,27 @@ const ComboForm = ({
             required
             value={formData.name}
             onChange={handleChange}
-            placeholder="e.g. Student Meal Combo"
-            className={`w-full px-3.5 py-2.5 bg-slate-950/60 border rounded-xl text-slate-100 placeholder-slate-500 text-sm focus:outline-none focus:ring-2 transition-colors ${
+            placeholder="e.g. Sakura Special Combo"
+            className={`w-full px-3.5 py-2.5 bg-[#FFF9F2] border rounded-xl text-[#352431] placeholder-[#927681] text-sm focus:outline-none focus:ring-2 transition-colors ${
               errors.name
-                ? "border-red-500/60 focus:ring-red-500"
-                : "border-slate-750 focus:ring-indigo-500 focus:border-indigo-500"
+                ? "border-rose-300 focus:ring-rose-200"
+                : "border-[#EBD4DC] focus:ring-[#C94F78]/20 focus:border-[#C94F78]"
             }`}
           />
           {errors.name && (
-            <p className="mt-1 text-xs text-red-400">{errors.name}</p>
+            <p className="mt-1 text-xs text-rose-600">{errors.name}</p>
           )}
         </div>
 
         <div>
           <label
             htmlFor="combo-price"
-            className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1.5"
+            className="block text-xs font-semibold text-[#735A67] uppercase tracking-wider mb-1.5"
           >
-            Combo Price (₹) <span className="text-red-400">*</span>
+            Combo Price (₹) <span className="text-rose-500">*</span>
           </label>
           <div className="relative">
-            <span className="absolute inset-y-0 left-0 pl-3.5 flex items-center text-slate-400 text-sm font-semibold pointer-events-none">
+            <span className="absolute inset-y-0 left-0 pl-3.5 flex items-center text-[#927681] text-sm font-semibold pointer-events-none">
               ₹
             </span>
             <input
@@ -252,21 +252,21 @@ const ComboForm = ({
               value={formData.price}
               onChange={handleChange}
               placeholder="0.00"
-              className={`w-full pl-8 pr-3.5 py-2.5 bg-slate-950/60 border rounded-xl text-slate-100 placeholder-slate-500 text-sm focus:outline-none focus:ring-2 transition-colors ${
+              className={`w-full pl-8 pr-3.5 py-2.5 bg-[#FFF9F2] border rounded-xl text-[#352431] placeholder-[#927681] text-sm focus:outline-none focus:ring-2 transition-colors ${
                 errors.price
-                  ? "border-red-500/60 focus:ring-red-500"
-                  : "border-slate-750 focus:ring-indigo-500 focus:border-indigo-500"
+                  ? "border-rose-300 focus:ring-rose-200"
+                  : "border-[#EBD4DC] focus:ring-[#C94F78]/20 focus:border-[#C94F78]"
               }`}
             />
           </div>
           {errors.price && (
-            <p className="mt-1 text-xs text-red-400">{errors.price}</p>
+            <p className="mt-1 text-xs text-rose-600">{errors.price}</p>
           )}
         </div>
       </div>
 
       {/* Row 2: Combo Items Editor */}
-      <div className="p-4 rounded-xl bg-slate-900 border border-slate-800">
+      <div className="p-4 sm:p-5 rounded-2xl bg-white border border-[#EBD4DC] shadow-2xs">
         <ComboItemEditor
           items={formData.items}
           onChange={handleItemsChange}
@@ -280,7 +280,7 @@ const ComboForm = ({
         <div>
           <label
             htmlFor="combo-preptime"
-            className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1.5"
+            className="block text-xs font-semibold text-[#735A67] uppercase tracking-wider mb-1.5"
           >
             Preparation Time (minutes)
           </label>
@@ -294,25 +294,25 @@ const ComboForm = ({
               value={formData.preparationTime}
               onChange={handleChange}
               placeholder="10"
-              className={`w-full pr-14 pl-3.5 py-2.5 bg-slate-950/60 border rounded-xl text-slate-100 placeholder-slate-500 text-sm focus:outline-none focus:ring-2 transition-colors ${
+              className={`w-full pr-14 pl-3.5 py-2.5 bg-[#FFF9F2] border rounded-xl text-[#352431] placeholder-[#927681] text-sm focus:outline-none focus:ring-2 transition-colors ${
                 errors.preparationTime
-                  ? "border-red-500/60 focus:ring-red-500"
-                  : "border-slate-750 focus:ring-indigo-500 focus:border-indigo-500"
+                  ? "border-rose-300 focus:ring-rose-200"
+                  : "border-[#EBD4DC] focus:ring-[#C94F78]/20 focus:border-[#C94F78]"
               }`}
             />
-            <span className="absolute inset-y-0 right-0 pr-3.5 flex items-center text-slate-400 text-xs pointer-events-none">
+            <span className="absolute inset-y-0 right-0 pr-3.5 flex items-center text-[#927681] text-xs pointer-events-none">
               min
             </span>
           </div>
           {errors.preparationTime && (
-            <p className="mt-1 text-xs text-red-400">{errors.preparationTime}</p>
+            <p className="mt-1 text-xs text-rose-600">{errors.preparationTime}</p>
           )}
         </div>
 
         <div>
           <label
             htmlFor="combo-sortorder"
-            className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1.5"
+            className="block text-xs font-semibold text-[#735A67] uppercase tracking-wider mb-1.5"
           >
             Sort Order
           </label>
@@ -325,14 +325,14 @@ const ComboForm = ({
             value={formData.sortOrder}
             onChange={handleChange}
             placeholder="0"
-            className={`w-full px-3.5 py-2.5 bg-slate-950/60 border rounded-xl text-slate-100 placeholder-slate-500 text-sm focus:outline-none focus:ring-2 transition-colors ${
+            className={`w-full px-3.5 py-2.5 bg-[#FFF9F2] border rounded-xl text-[#352431] placeholder-[#927681] text-sm focus:outline-none focus:ring-2 transition-colors ${
               errors.sortOrder
-                ? "border-red-500/60 focus:ring-red-500"
-                : "border-slate-750 focus:ring-indigo-500 focus:border-indigo-500"
+                ? "border-rose-300 focus:ring-rose-200"
+                : "border-[#EBD4DC] focus:ring-[#C94F78]/20 focus:border-[#C94F78]"
             }`}
           />
           {errors.sortOrder && (
-            <p className="mt-1 text-xs text-red-400">{errors.sortOrder}</p>
+            <p className="mt-1 text-xs text-rose-600">{errors.sortOrder}</p>
           )}
         </div>
       </div>
@@ -357,7 +357,7 @@ const ComboForm = ({
       <div>
         <label
           htmlFor="combo-desc"
-          className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1.5"
+          className="block text-xs font-semibold text-[#735A67] uppercase tracking-wider mb-1.5"
         >
           Description
         </label>
@@ -368,24 +368,24 @@ const ComboForm = ({
           value={formData.description}
           onChange={handleChange}
           placeholder="Brief description of meal combination or special student savings..."
-          className={`w-full px-3.5 py-2.5 bg-slate-950/60 border rounded-xl text-slate-100 placeholder-slate-500 text-sm focus:outline-none focus:ring-2 transition-colors resize-none ${
+          className={`w-full px-3.5 py-2.5 bg-[#FFF9F2] border rounded-xl text-[#352431] placeholder-[#927681] text-sm focus:outline-none focus:ring-2 transition-colors resize-none ${
             errors.description
-              ? "border-red-500/60 focus:ring-red-500"
-              : "border-slate-750 focus:ring-indigo-500 focus:border-indigo-500"
+              ? "border-rose-300 focus:ring-rose-200"
+              : "border-[#EBD4DC] focus:ring-[#C94F78]/20 focus:border-[#C94F78]"
           }`}
         />
         {errors.description && (
-          <p className="mt-1 text-xs text-red-400">{errors.description}</p>
+          <p className="mt-1 text-xs text-rose-600">{errors.description}</p>
         )}
       </div>
 
       {/* Row 6: Available Toggle */}
-      <div className="p-4 rounded-xl bg-slate-950/60 border border-slate-800 flex items-center justify-between">
+      <div className="p-4 rounded-2xl bg-[#FFF9F2] border border-[#EBD4DC] flex items-center justify-between">
         <div>
-          <label htmlFor="combo-avail" className="text-sm font-semibold text-white block cursor-pointer">
+          <label htmlFor="combo-avail" className="text-sm font-semibold text-[#352431] block cursor-pointer">
             Student Availability
           </label>
-          <p className="text-xs text-slate-400 mt-0.5">
+          <p className="text-xs text-[#735A67] mt-0.5">
             When enabled, students can see and order this combo deal from the storefront.
           </p>
         </div>
@@ -395,17 +395,17 @@ const ComboForm = ({
           type="checkbox"
           checked={formData.isAvailable}
           onChange={handleChange}
-          className="w-5 h-5 rounded text-indigo-600 bg-slate-900 border-slate-700 focus:ring-indigo-500 focus:ring-offset-slate-950 cursor-pointer"
+          className="w-5 h-5 rounded text-[#C94F78] bg-white border-[#EBD4DC] focus:ring-[#C94F78] focus:ring-offset-white cursor-pointer accent-[#C94F78]"
         />
       </div>
 
       {/* Action Buttons */}
-      <div className="flex items-center justify-end gap-3 pt-3 border-t border-slate-800">
+      <div className="flex items-center justify-end gap-3 pt-3 border-t border-[#EBD4DC]">
         <button
           type="button"
           onClick={onCancel}
           disabled={submitting}
-          className="px-4 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-750 text-slate-300 hover:text-white text-sm font-medium transition-colors disabled:opacity-50 cursor-pointer"
+          className="px-4 py-2.5 rounded-xl bg-[#FFF9F2] hover:bg-[#FBE7EE] text-[#735A67] hover:text-[#352431] border border-[#EBD4DC] text-sm font-semibold transition-colors disabled:opacity-50 cursor-pointer"
         >
           Cancel
         </button>
@@ -413,7 +413,7 @@ const ComboForm = ({
         <button
           type="submit"
           disabled={submitting}
-          className="px-5 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-sm font-semibold transition-colors disabled:opacity-50 flex items-center gap-2 cursor-pointer shadow-lg shadow-indigo-600/25"
+          className="px-5 py-2.5 rounded-xl bg-[#C94F78] hover:bg-[#B33D65] text-white text-sm font-semibold transition-colors disabled:opacity-50 flex items-center gap-2 cursor-pointer shadow-sakura-sm"
         >
           {submitting ? (
             <>

@@ -111,7 +111,7 @@ const ImageUpload = ({
   return (
     <div className="space-y-2">
       <div className="flex items-center justify-between">
-        <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider">
+        <label className="block text-xs font-semibold text-[#735A67] uppercase tracking-wider">
           {label}
         </label>
         {value && (
@@ -119,7 +119,7 @@ const ImageUpload = ({
             type="button"
             onClick={handleClear}
             disabled={disabled || uploading}
-            className="text-xs text-slate-400 hover:text-red-400 transition-colors disabled:opacity-50"
+            className="text-xs text-[#927681] hover:text-[#C94F78] transition-colors disabled:opacity-50 cursor-pointer"
           >
             Remove Image
           </button>
@@ -131,15 +131,15 @@ const ImageUpload = ({
         onDrop={handleDrop}
         onDragOver={handleDragOver}
         onDragLeave={handleDragLeave}
-        className={`relative p-3.5 border-2 border-dashed rounded-xl transition-all ${
+        className={`relative p-3.5 border-2 border-dashed rounded-2xl transition-all ${
           isDragOver
-            ? "border-indigo-500 bg-indigo-500/10"
-            : "border-slate-800 hover:border-slate-700 bg-slate-950/40"
+            ? "border-[#C94F78] bg-[#FBE7EE]"
+            : "border-[#EBD4DC] hover:border-[#C94F78]/50 bg-[#FFF9F2]"
         } ${disabled ? "opacity-60 cursor-not-allowed" : ""}`}
       >
         <div className="flex flex-col sm:flex-row items-center gap-3">
           {/* Preview Thumbnail */}
-          <div className="w-16 h-16 rounded-xl bg-slate-900 border border-slate-800 flex items-center justify-center overflow-hidden flex-shrink-0 relative">
+          <div className="w-16 h-16 rounded-xl bg-white border border-[#EBD4DC] flex items-center justify-center overflow-hidden flex-shrink-0 relative shadow-2xs">
             {value && !previewError ? (
               <img
                 src={value}
@@ -149,7 +149,7 @@ const ImageUpload = ({
               />
             ) : (
               <svg
-                className="w-6 h-6 text-slate-600"
+                className="w-6 h-6 text-[#927681]"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -165,9 +165,9 @@ const ImageUpload = ({
 
             {/* Uploading Spinner Overlay */}
             {uploading && (
-              <div className="absolute inset-0 bg-slate-950/80 backdrop-blur-xs flex items-center justify-center">
+              <div className="absolute inset-0 bg-white/80 backdrop-blur-xs flex items-center justify-center">
                 <svg
-                  className="animate-spin w-5 h-5 text-indigo-400"
+                  className="animate-spin w-5 h-5 text-[#C94F78]"
                   fill="none"
                   viewBox="0 0 24 24"
                 >
@@ -205,7 +205,7 @@ const ImageUpload = ({
                 type="button"
                 onClick={() => fileInputRef.current?.click()}
                 disabled={disabled || uploading}
-                className="px-3.5 py-1.5 rounded-lg text-xs font-semibold bg-indigo-600 hover:bg-indigo-500 text-white transition-colors disabled:opacity-50 inline-flex items-center gap-1.5 cursor-pointer shadow-xs"
+                className="px-3.5 py-1.5 rounded-xl text-xs font-semibold bg-[#C94F78] hover:bg-[#B33D65] text-white transition-colors disabled:opacity-50 inline-flex items-center gap-1.5 cursor-pointer shadow-sakura-sm"
               >
                 {uploading ? (
                   <>
@@ -228,7 +228,7 @@ const ImageUpload = ({
                         d="M4 12a8 8 0 018-8v8H4z"
                       />
                     </svg>
-                    <span>Uploading to Cloudinary...</span>
+                    <span>Uploading...</span>
                   </>
                 ) : (
                   <>
@@ -249,11 +249,11 @@ const ImageUpload = ({
                   </>
                 )}
               </button>
-              <span className="text-xs text-slate-400">
+              <span className="text-xs text-[#735A67]">
                 or drag & drop here
               </span>
             </div>
-            <p className="text-[11px] text-slate-500">
+            <p className="text-[11px] text-[#927681]">
               Supports JPEG, PNG, WebP up to 5 MB.
             </p>
           </div>
@@ -268,17 +268,17 @@ const ImageUpload = ({
           onChange={handleUrlChange}
           disabled={disabled || uploading}
           placeholder={placeholder}
-          className={`w-full px-3.5 py-2 bg-slate-950/60 border rounded-xl text-slate-100 placeholder-slate-500 text-xs focus:outline-none focus:ring-2 transition-colors ${
+          className={`w-full px-3.5 py-2.5 bg-[#FFF9F2] border rounded-xl text-[#352431] placeholder-[#927681] text-xs focus:outline-none focus:ring-2 transition-colors ${
             error || uploadError
-              ? "border-red-500/60 focus:ring-red-500"
-              : "border-slate-800 focus:ring-indigo-500 focus:border-indigo-500"
+              ? "border-rose-300 focus:ring-rose-200"
+              : "border-[#EBD4DC] focus:ring-[#C94F78]/20 focus:border-[#C94F78]"
           }`}
         />
       </div>
 
       {/* Error message */}
       {(uploadError || error) && (
-        <p className="text-xs text-red-400 flex items-center gap-1">
+        <p className="text-xs text-rose-600 flex items-center gap-1">
           <svg className="w-3.5 h-3.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
           </svg>

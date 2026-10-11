@@ -70,6 +70,32 @@ const productSchema = new mongoose.Schema(
       type: Number,
       default: 0,
     },
+
+    isFeatured: {
+      type: Boolean,
+      default: false,
+      index: true,
+    },
+
+    featuredBadge: {
+      type: String,
+      trim: true,
+      maxlength: 100,
+      default: "",
+    },
+
+    rating: {
+      type: Number,
+      min: 0,
+      max: 5,
+      default: 4.8,
+    },
+
+    ratingCount: {
+      type: Number,
+      min: 0,
+      default: 0,
+    },
   },
   {
     timestamps: true,

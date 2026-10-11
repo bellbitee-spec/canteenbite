@@ -33,6 +33,10 @@ const formatProduct = (prod) => {
     isAvailable: prod.isAvailable,
     preparationTime: prod.preparationTime,
     sortOrder: prod.sortOrder,
+    isFeatured: Boolean(prod.isFeatured),
+    featuredBadge: prod.featuredBadge || "",
+    rating: prod.rating !== undefined ? prod.rating : 4.8,
+    ratingCount: prod.ratingCount !== undefined ? prod.ratingCount : 0,
     createdAt: prod.createdAt,
     updatedAt: prod.updatedAt,
   };
@@ -214,6 +218,10 @@ const createProduct = async (req, res) => {
       lowStockThreshold,
       preparationTime,
       sortOrder,
+      isFeatured,
+      featuredBadge,
+      rating,
+      ratingCount,
     } = req.body;
 
     const categoryExists = await Category.findById(category);
@@ -246,6 +254,10 @@ const createProduct = async (req, res) => {
       preparationTime:
         preparationTime !== undefined ? Number(preparationTime) : 10,
       sortOrder: sortOrder !== undefined ? Number(sortOrder) : 0,
+      isFeatured: isFeatured !== undefined ? Boolean(isFeatured) : false,
+      featuredBadge: featuredBadge ? String(featuredBadge).trim() : "",
+      rating: rating !== undefined ? Number(rating) : 4.8,
+      ratingCount: ratingCount !== undefined ? Number(ratingCount) : 0,
       isAvailable: true,
     });
 
@@ -300,6 +312,10 @@ const updateProduct = async (req, res) => {
       preparationTime,
       isAvailable,
       sortOrder,
+      isFeatured,
+      featuredBadge,
+      rating,
+      ratingCount,
     } = req.body;
 
     if (category !== undefined) {
@@ -340,6 +356,11 @@ const updateProduct = async (req, res) => {
       product.preparationTime = Number(preparationTime);
     if (isAvailable !== undefined) product.isAvailable = Boolean(isAvailable);
     if (sortOrder !== undefined) product.sortOrder = Number(sortOrder);
+    if (isFeatured !== undefined) product.isFeatured = Boolean(isFeatured);
+    if (featuredBadge !== undefined)
+      product.featuredBadge = String(featuredBadge).trim();
+    if (rating !== undefined) product.rating = Number(rating);
+    if (ratingCount !== undefined) product.ratingCount = Number(ratingCount);
 
     await product.save();
 

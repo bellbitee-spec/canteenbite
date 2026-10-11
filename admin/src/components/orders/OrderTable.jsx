@@ -28,19 +28,19 @@ const OrderTable = ({
 }) => {
   if (loading) {
     return (
-      <div className="p-12 text-center rounded-2xl bg-slate-900 border border-slate-800">
-        <div className="w-8 h-8 border-2 border-indigo-500 border-t-transparent rounded-full animate-spin mx-auto mb-3" />
-        <p className="text-xs text-slate-400">Loading orders...</p>
+      <div className="p-12 text-center rounded-2xl bg-white border border-[#EBD4DC] shadow-xs">
+        <div className="size-8 border-2 border-[#C94F78] border-t-transparent rounded-full animate-spin mx-auto mb-3" />
+        <p className="text-xs font-semibold text-[#735A67]">Loading orders...</p>
       </div>
     );
   }
 
   if (orders.length === 0) {
     return (
-      <div className="p-12 text-center rounded-2xl bg-slate-900 border border-slate-800">
+      <div className="p-12 text-center rounded-2xl bg-white border border-[#EBD4DC] shadow-xs">
         <span className="text-3xl block mb-2">📜</span>
-        <h4 className="text-sm font-bold text-white mb-1">No orders found</h4>
-        <p className="text-xs text-slate-400 max-w-sm mx-auto">
+        <h4 className="text-sm font-bold text-[#352431] mb-1">No orders found</h4>
+        <p className="text-xs font-medium text-[#735A67] max-w-sm mx-auto">
           No orders match the current filter criteria.
         </p>
       </div>
@@ -49,9 +49,9 @@ const OrderTable = ({
 
   return (
     <div className="space-y-4">
-      <div className="rounded-2xl border border-slate-800 bg-slate-900 overflow-hidden shadow-xs overflow-x-auto">
+      <div className="rounded-2xl border border-[#EBD4DC] bg-white overflow-hidden shadow-xs overflow-x-auto">
         <table className="w-full text-left text-xs">
-          <thead className="bg-slate-950/80 text-slate-400 uppercase tracking-wider font-semibold border-b border-slate-800">
+          <thead className="bg-[#FFF9F2] text-[#735A67] uppercase tracking-wider font-bold border-b border-[#EBD4DC]">
             <tr>
               <th className="px-4 py-3.5">Order</th>
               <th className="px-4 py-3.5">Customer</th>
@@ -63,7 +63,7 @@ const OrderTable = ({
               <th className="px-4 py-3.5 text-right">Actions</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-slate-800/80 text-slate-200">
+          <tbody className="divide-y divide-[#EBD4DC]/80 text-[#352431]">
             {orders.map((order) => {
               const orderId = order.id || order._id;
               const status = (order.orderStatus || "PENDING").toUpperCase();
@@ -75,31 +75,31 @@ const OrderTable = ({
                 <tr
                   key={orderId}
                   onClick={() => onViewDetails(order)}
-                  className="hover:bg-slate-800/40 cursor-pointer transition"
+                  className="hover:bg-[#FBE7EE]/30 cursor-pointer transition"
                 >
                   {/* Order Number */}
-                  <td className="px-4 py-3 font-mono font-bold text-white">
+                  <td className="px-4 py-3.5 font-mono font-black text-[#352431]">
                     #{order.orderNumber || orderId.slice(-6)}
                   </td>
 
                   {/* Customer */}
-                  <td className="px-4 py-3">
-                    <p className="font-medium text-white truncate max-w-[130px]">
+                  <td className="px-4 py-3.5">
+                    <p className="font-bold text-[#352431] truncate max-w-[130px]">
                       {order.user?.name || "Student"}
                     </p>
-                    <p className="text-[11px] text-slate-400 truncate max-w-[130px]">
+                    <p className="text-[11px] text-[#927681] truncate max-w-[130px]">
                       {order.user?.email || ""}
                     </p>
                   </td>
 
                   {/* Date */}
-                  <td className="px-4 py-3 text-slate-400 whitespace-nowrap">
+                  <td className="px-4 py-3.5 text-[#735A67] whitespace-nowrap font-medium">
                     {formatDate(order.createdAt)}
                   </td>
 
                   {/* Items summary */}
-                  <td className="px-4 py-3">
-                    <div className="max-w-[180px] truncate">
+                  <td className="px-4 py-3.5">
+                    <div className="max-w-[180px] truncate text-[#735A67] font-medium">
                       {(order.items || [])
                         .map((i) => `${i.quantity}x ${i.name}`)
                         .join(", ")}
@@ -107,17 +107,17 @@ const OrderTable = ({
                   </td>
 
                   {/* Total */}
-                  <td className="px-4 py-3 font-mono font-bold text-white whitespace-nowrap">
+                  <td className="px-4 py-3.5 font-mono font-bold text-[#352431] whitespace-nowrap">
                     ₹{order.totalAmount}
                   </td>
 
                   {/* Payment */}
-                  <td className="px-4 py-3 whitespace-nowrap">
+                  <td className="px-4 py-3.5 whitespace-nowrap">
                     <span
-                      className={`inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold border ${
+                      className={`inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold border ${
                         isPaid
-                          ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/20"
-                          : "bg-amber-500/10 text-amber-400 border-amber-500/20"
+                          ? "bg-emerald-50 text-emerald-800 border-emerald-200"
+                          : "bg-amber-50 text-amber-800 border-amber-200"
                       }`}
                     >
                       {paymentMethod}: {paymentStatus}
@@ -125,20 +125,20 @@ const OrderTable = ({
                   </td>
 
                   {/* Status */}
-                  <td className="px-4 py-3 whitespace-nowrap">
+                  <td className="px-4 py-3.5 whitespace-nowrap">
                     <OrderStatusBadge status={status} size="sm" />
                   </td>
 
                   {/* Actions */}
                   <td
-                    className="px-4 py-3 text-right whitespace-nowrap"
+                    className="px-4 py-3.5 text-right whitespace-nowrap"
                     onClick={(e) => e.stopPropagation()}
                   >
                     <div className="flex items-center justify-end gap-1.5">
                       <button
                         type="button"
                         onClick={() => onViewDetails(order)}
-                        className="px-2.5 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white font-medium transition"
+                        className="px-3 py-1 rounded-lg bg-[#FFF9F2] hover:bg-[#FBE7EE] text-[#735A67] hover:text-[#352431] font-bold border border-[#EBD4DC] transition cursor-pointer"
                       >
                         Details
                       </button>
@@ -147,7 +147,7 @@ const OrderTable = ({
                         <button
                           type="button"
                           onClick={() => onCancelClick(order)}
-                          className="px-2 py-1 rounded-lg border border-slate-800 hover:border-rose-500/40 text-slate-400 hover:text-rose-400 hover:bg-rose-500/10 transition"
+                          className="px-2 py-1 rounded-lg border border-[#EBD4DC] hover:border-rose-300 text-[#927681] hover:text-rose-600 hover:bg-rose-50 transition cursor-pointer"
                           title="Cancel Order"
                         >
                           ✕
@@ -164,8 +164,8 @@ const OrderTable = ({
 
       {/* Pagination controls */}
       {pagination && pagination.totalPages > 1 && (
-        <div className="flex items-center justify-between text-xs text-slate-400 pt-2">
-          <span>
+        <div className="flex items-center justify-between text-xs text-[#735A67] pt-2">
+          <span className="font-medium">
             Page {pagination.page} of {pagination.totalPages} ({pagination.total} total)
           </span>
 
@@ -174,7 +174,7 @@ const OrderTable = ({
               type="button"
               disabled={pagination.page <= 1}
               onClick={() => onPageChange(pagination.page - 1)}
-              className="px-3 py-1.5 rounded-xl border border-slate-800 hover:bg-slate-800 text-slate-300 disabled:opacity-40 disabled:cursor-not-allowed transition"
+              className="px-3 py-1.5 rounded-xl border border-[#EBD4DC] bg-white hover:bg-[#FBE7EE]/50 text-[#735A67] disabled:opacity-40 disabled:cursor-not-allowed transition font-bold"
             >
               Previous
             </button>
@@ -182,7 +182,7 @@ const OrderTable = ({
               type="button"
               disabled={pagination.page >= pagination.totalPages}
               onClick={() => onPageChange(pagination.page + 1)}
-              className="px-3 py-1.5 rounded-xl border border-slate-800 hover:bg-slate-800 text-slate-300 disabled:opacity-40 disabled:cursor-not-allowed transition"
+              className="px-3 py-1.5 rounded-xl border border-[#EBD4DC] bg-white hover:bg-[#FBE7EE]/50 text-[#735A67] disabled:opacity-40 disabled:cursor-not-allowed transition font-bold"
             >
               Next
             </button>

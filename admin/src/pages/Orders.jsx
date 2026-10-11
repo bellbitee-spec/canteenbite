@@ -13,36 +13,36 @@ const KITCHEN_COLUMNS = [
     key: "PENDING",
     title: "NEW",
     desc: "Awaiting acceptance",
-    badgeBg: "bg-amber-500/10 text-amber-400 border-amber-500/20",
-    headerBg: "border-t-2 border-t-amber-500",
+    badgeBg: "bg-amber-50 text-amber-700 border-amber-200",
+    headerBg: "border-t-2 border-t-amber-400",
   },
   {
     key: "CONFIRMED",
     title: "CONFIRMED",
     desc: "Queued for kitchen",
-    badgeBg: "bg-sky-500/10 text-sky-400 border-sky-500/20",
-    headerBg: "border-t-2 border-t-sky-500",
+    badgeBg: "bg-sky-50 text-sky-700 border-sky-200",
+    headerBg: "border-t-2 border-t-sky-400",
   },
   {
     key: "PREPARING",
     title: "PREPARING",
     desc: "Currently cooking",
-    badgeBg: "bg-indigo-500/10 text-indigo-400 border-indigo-500/20",
-    headerBg: "border-t-2 border-t-indigo-500",
+    badgeBg: "bg-[#FBE7EE] text-[#C94F78] border-[#EBD4DC]",
+    headerBg: "border-t-2 border-t-[#C94F78]",
   },
   {
     key: "DELAYED",
     title: "DELAYED",
     desc: "Urgent: behind schedule",
-    badgeBg: "bg-rose-500/15 text-rose-300 border-rose-500/30",
-    headerBg: "border-t-2 border-t-rose-500",
+    badgeBg: "bg-rose-50 text-rose-700 border-rose-200",
+    headerBg: "border-t-2 border-t-rose-400",
   },
   {
     key: "READY",
     title: "READY",
     desc: "Pickup at counter",
-    badgeBg: "bg-emerald-500/15 text-emerald-300 border-emerald-500/30",
-    headerBg: "border-t-2 border-t-emerald-500",
+    badgeBg: "bg-[#5F9A68]/15 text-[#5F9A68] border-[#5F9A68]/30",
+    headerBg: "border-t-2 border-t-[#5F9A68]",
   },
 ];
 
@@ -399,8 +399,8 @@ const Orders = () => {
         <div
           className={`fixed top-6 right-6 z-50 px-4 py-3 rounded-2xl shadow-xl border text-xs font-semibold flex items-center gap-2 animate-bounce ${
             toast.type === "error"
-              ? "bg-rose-950 border-rose-500/50 text-rose-200"
-              : "bg-emerald-950 border-emerald-500/50 text-emerald-200"
+              ? "bg-rose-50 border-rose-200 text-rose-700"
+              : "bg-emerald-50 border-emerald-200 text-emerald-700"
           }`}
         >
           <span>{toast.type === "error" ? "⚠️" : "✓"}</span>
@@ -409,30 +409,30 @@ const Orders = () => {
       )}
 
       {/* Header Bar */}
-      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 pb-4 border-b border-slate-800">
+      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 pb-5 border-b border-[#EBD4DC]">
         <div>
           <div className="flex items-center gap-3">
-            <h2 className="text-2xl font-bold text-white tracking-tight">
+            <h2 className="text-2xl font-bold text-[#352431] tracking-tight">
               Order Operations
             </h2>
             {/* Live Socket Status Indicator */}
             <span
-              className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-bold border ${
+              className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold border ${
                 connected
-                  ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/20"
-                  : "bg-amber-500/10 text-amber-400 border-amber-500/20 animate-pulse"
+                  ? "bg-[#5F9A68]/10 text-[#5F9A68] border-[#5F9A68]/20"
+                  : "bg-amber-50 text-amber-700 border-amber-200 animate-pulse"
               }`}
               title={connected ? "Socket connected to live canteen updates" : "Connecting..."}
             >
               <span
                 className={`w-1.5 h-1.5 rounded-full ${
-                  connected ? "bg-emerald-400" : "bg-amber-400"
+                  connected ? "bg-[#5F9A68]" : "bg-amber-500"
                 }`}
               />
               <span>{connected ? "Live Kitchen" : "Connecting"}</span>
             </span>
           </div>
-          <p className="text-sm text-slate-400 mt-0.5">
+          <p className="text-sm text-[#735A67] mt-0.5">
             Realtime canteen preparation pipeline and order management
           </p>
         </div>
@@ -440,22 +440,28 @@ const Orders = () => {
         {/* View Switcher & Action Controls */}
         <div className="flex items-center gap-2.5 flex-wrap">
           {/* Board vs Table Toggle */}
-          <div className="p-1 rounded-xl bg-slate-900 border border-slate-800 flex items-center">
+          <div className="p-1 rounded-2xl bg-white border border-[#EBD4DC] flex items-center shadow-sakura-sm">
             <button
               type="button"
               onClick={() => {
                 setViewMode("board");
                 setSearchParams({ view: "board" });
               }}
-              className={`px-3 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1.5 ${
+              className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition flex items-center gap-2 cursor-pointer ${
                 viewMode === "board"
-                  ? "bg-indigo-600 text-white shadow-xs"
-                  : "text-slate-400 hover:text-white"
+                  ? "bg-[#C94F78] text-white shadow-sakura-sm"
+                  : "text-[#735A67] hover:text-[#352431]"
               }`}
             >
               <span>🍳</span>
               <span>Kitchen Board</span>
-              <span className="px-1.5 py-0.2 rounded-full text-[10px] bg-slate-800 text-slate-300">
+              <span
+                className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${
+                  viewMode === "board"
+                    ? "bg-white/20 text-white"
+                    : "bg-[#FFF9F2] text-[#735A67]"
+                }`}
+              >
                 {activeTotalCount}
               </span>
             </button>
@@ -466,10 +472,10 @@ const Orders = () => {
                 setViewMode("table");
                 setSearchParams({ view: "table" });
               }}
-              className={`px-3 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1.5 ${
+              className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition flex items-center gap-2 cursor-pointer ${
                 viewMode === "table"
-                  ? "bg-indigo-600 text-white shadow-xs"
-                  : "text-slate-400 hover:text-white"
+                  ? "bg-[#C94F78] text-white shadow-sakura-sm"
+                  : "text-[#735A67] hover:text-[#352431]"
               }`}
             >
               <span>📋</span>
@@ -482,11 +488,11 @@ const Orders = () => {
             type="button"
             onClick={() => loadOrders(true)}
             disabled={loading || refreshing}
-            className="p-2 rounded-xl bg-slate-900 border border-slate-800 hover:border-slate-700 text-slate-400 hover:text-white transition disabled:opacity-50"
+            className="p-2.5 rounded-2xl bg-white border border-[#EBD4DC] hover:border-[#C94F78] text-[#735A67] hover:text-[#C94F78] shadow-sakura-sm transition disabled:opacity-50 cursor-pointer"
             title="Refresh Orders"
           >
             <svg
-              className={`w-4 h-4 ${refreshing ? "animate-spin text-indigo-400" : ""}`}
+              className={`w-4 h-4 ${refreshing ? "animate-spin text-[#C94F78]" : ""}`}
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
@@ -501,35 +507,35 @@ const Orders = () => {
           VIEW 1: KITCHEN BOARD (LIVE OPERATIONAL VIEW)
          ----------------------------------------------------------- */}
       {viewMode === "board" && (
-        <div className="space-y-4">
+        <div className="space-y-5">
           {/* Quick Active Kitchen Stats Bar */}
-          <div className="flex flex-wrap items-center justify-between gap-3 p-3 rounded-2xl bg-slate-900/60 border border-slate-800 text-xs">
+          <div className="flex flex-wrap items-center justify-between gap-3 p-4 rounded-3xl bg-white border border-[#EBD4DC] shadow-sakura-card text-xs">
             <div className="flex items-center gap-4 flex-wrap">
-              <span className="text-slate-400 font-semibold">Active Pipeline:</span>
-              <span className="text-amber-400 font-medium">
+              <span className="text-[#735A67] font-semibold">Active Pipeline:</span>
+              <span className="text-amber-700 font-medium">
                 {columnOrders.PENDING.length} New
               </span>
-              <span className="text-sky-400 font-medium">
+              <span className="text-sky-700 font-medium">
                 {columnOrders.CONFIRMED.length} Confirmed
               </span>
-              <span className="text-indigo-400 font-medium">
+              <span className="text-[#C94F78] font-medium">
                 {columnOrders.PREPARING.length} In Prep
               </span>
-              <span className="text-rose-400 font-bold">
+              <span className="text-rose-600 font-bold">
                 {columnOrders.DELAYED.length} Delayed
               </span>
-              <span className="text-emerald-400 font-bold">
+              <span className="text-[#5F9A68] font-bold">
                 {columnOrders.READY.length} Ready for Pickup
               </span>
             </div>
 
             <div className="flex items-center gap-2">
-              <span className="text-slate-500">History:</span>
-              <span className="text-slate-400">
+              <span className="text-[#735A67]">History:</span>
+              <span className="text-[#352431] font-medium">
                 {columnOrders.COMPLETED.length} Completed today
               </span>
-              <span>•</span>
-              <span className="text-slate-400">
+              <span className="text-[#EBD4DC]">•</span>
+              <span className="text-[#735A67]">
                 {columnOrders.CANCELLED.length} Cancelled
               </span>
             </div>
@@ -540,10 +546,10 @@ const Orders = () => {
             <button
               type="button"
               onClick={() => setMobileColumnTab("ALL")}
-              className={`px-3 py-1.5 rounded-xl text-xs font-bold whitespace-nowrap transition ${
+              className={`px-3.5 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition cursor-pointer ${
                 mobileColumnTab === "ALL"
-                  ? "bg-indigo-600 text-white"
-                  : "bg-slate-900 border border-slate-800 text-slate-400"
+                  ? "bg-[#C94F78] text-white shadow-sakura-sm"
+                  : "bg-white border border-[#EBD4DC] text-[#735A67]"
               }`}
             >
               All Stages ({activeTotalCount})
@@ -553,14 +559,14 @@ const Orders = () => {
                 key={col.key}
                 type="button"
                 onClick={() => setMobileColumnTab(col.key)}
-                className={`px-3 py-1.5 rounded-xl text-xs font-bold whitespace-nowrap transition flex items-center gap-1.5 ${
+                className={`px-3.5 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition flex items-center gap-1.5 cursor-pointer ${
                   mobileColumnTab === col.key
-                    ? "bg-indigo-600 text-white"
-                    : "bg-slate-900 border border-slate-800 text-slate-400"
+                    ? "bg-[#C94F78] text-white shadow-sakura-sm"
+                    : "bg-white border border-[#EBD4DC] text-[#735A67]"
                 }`}
               >
                 <span>{col.title}</span>
-                <span className="px-1.5 py-0.2 rounded-full text-[10px] bg-slate-800 text-slate-300">
+                <span className="px-2 py-0.5 rounded-full text-[10px] bg-[#FFF9F2] text-[#735A67]">
                   {columnOrders[col.key]?.length || 0}
                 </span>
               </button>
@@ -577,15 +583,15 @@ const Orders = () => {
               return (
                 <div
                   key={col.key}
-                  className={`flex flex-col rounded-3xl bg-slate-950/40 border border-slate-800/80 p-3.5 space-y-3 min-h-[500px] ${
+                  className={`flex flex-col rounded-3xl bg-white border border-[#EBD4DC] shadow-sakura-card p-4 space-y-3.5 min-h-[500px] ${
                     isColHiddenOnMobile ? "hidden lg:flex" : "flex"
                   } ${col.headerBg}`}
                 >
                   {/* Column Header */}
-                  <div className="flex items-center justify-between pb-2 border-b border-slate-800">
+                  <div className="flex items-center justify-between pb-3 border-b border-[#EBD4DC]">
                     <div>
                       <div className="flex items-center gap-2">
-                        <h3 className="font-bold text-xs uppercase tracking-wider text-white">
+                        <h3 className="font-bold text-xs uppercase tracking-wider text-[#352431]">
                           {col.title}
                         </h3>
                         <span
@@ -594,17 +600,17 @@ const Orders = () => {
                           {colItems.length}
                         </span>
                       </div>
-                      <p className="text-[11px] text-slate-500 mt-0.5">
+                      <p className="text-[11px] text-[#735A67] mt-0.5">
                         {col.desc}
                       </p>
                     </div>
                   </div>
 
                   {/* Cards Lane */}
-                  <div className="space-y-3 flex-1 overflow-y-auto">
+                  <div className="space-y-3.5 flex-1 overflow-y-auto">
                     {colItems.length === 0 ? (
-                      <div className="py-12 text-center text-slate-600 border border-dashed border-slate-800/80 rounded-2xl">
-                        <p className="text-xs">No orders</p>
+                      <div className="py-14 text-center text-[#927681] border border-dashed border-[#EBD4DC] rounded-2xl bg-[#FFF9F2]/50">
+                        <p className="text-xs">No orders in this stage</p>
                       </div>
                     ) : (
                       colItems.map((ord) => (
@@ -632,11 +638,11 @@ const Orders = () => {
       {viewMode === "table" && (
         <div className="space-y-4">
           {/* Filter Bar */}
-          <div className="p-4 rounded-2xl bg-slate-900 border border-slate-800 space-y-4 shadow-xs">
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3 text-xs">
+          <div className="p-5 rounded-3xl bg-white border border-[#EBD4DC] shadow-sakura-card space-y-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3.5 text-xs">
               {/* Search */}
               <div>
-                <label className="block text-slate-400 font-semibold mb-1">
+                <label className="block text-[#735A67] font-semibold mb-1">
                   Search
                 </label>
                 <input
@@ -644,13 +650,13 @@ const Orders = () => {
                   placeholder="Order # or Student Name..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-800 text-white placeholder:text-slate-600 focus:outline-hidden focus:border-indigo-500"
+                  className="w-full px-3.5 py-2.5 rounded-xl bg-[#FFF9F2] border border-[#EBD4DC] text-[#352431] placeholder:text-[#927681] focus:outline-hidden focus:border-[#C94F78]"
                 />
               </div>
 
               {/* Status Filter */}
               <div>
-                <label className="block text-slate-400 font-semibold mb-1">
+                <label className="block text-[#735A67] font-semibold mb-1">
                   Status
                 </label>
                 <select
@@ -659,7 +665,7 @@ const Orders = () => {
                     setStatusFilter(e.target.value);
                     setPage(1);
                   }}
-                  className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-800 text-white focus:outline-hidden focus:border-indigo-500 cursor-pointer"
+                  className="w-full px-3.5 py-2.5 rounded-xl bg-[#FFF9F2] border border-[#EBD4DC] text-[#352431] focus:outline-hidden focus:border-[#C94F78] cursor-pointer"
                 >
                   <option value="all">All Statuses</option>
                   <option value="PENDING">PENDING (New)</option>
@@ -674,7 +680,7 @@ const Orders = () => {
 
               {/* Payment Status Filter */}
               <div>
-                <label className="block text-slate-400 font-semibold mb-1">
+                <label className="block text-[#735A67] font-semibold mb-1">
                   Payment Status
                 </label>
                 <select
@@ -683,7 +689,7 @@ const Orders = () => {
                     setPaymentStatusFilter(e.target.value);
                     setPage(1);
                   }}
-                  className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-800 text-white focus:outline-hidden focus:border-indigo-500 cursor-pointer"
+                  className="w-full px-3.5 py-2.5 rounded-xl bg-[#FFF9F2] border border-[#EBD4DC] text-[#352431] focus:outline-hidden focus:border-[#C94F78] cursor-pointer"
                 >
                   <option value="all">All Payment Statuses</option>
                   <option value="PAID">PAID</option>
@@ -695,7 +701,7 @@ const Orders = () => {
 
               {/* Payment Method */}
               <div>
-                <label className="block text-slate-400 font-semibold mb-1">
+                <label className="block text-[#735A67] font-semibold mb-1">
                   Payment Method
                 </label>
                 <select
@@ -704,7 +710,7 @@ const Orders = () => {
                     setPaymentMethodFilter(e.target.value);
                     setPage(1);
                   }}
-                  className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-800 text-white focus:outline-hidden focus:border-indigo-500 cursor-pointer"
+                  className="w-full px-3.5 py-2.5 rounded-xl bg-[#FFF9F2] border border-[#EBD4DC] text-[#352431] focus:outline-hidden focus:border-[#C94F78] cursor-pointer"
                 >
                   <option value="all">All Payment Methods</option>
                   <option value="CASH">CASH</option>
@@ -714,21 +720,21 @@ const Orders = () => {
             </div>
 
             {/* Date Range & Clear Filters */}
-            <div className="flex flex-wrap items-center justify-between gap-3 pt-2 border-t border-slate-800/80 text-xs">
+            <div className="flex flex-wrap items-center justify-between gap-3 pt-3 border-t border-[#EBD4DC] text-xs">
               <div className="flex items-center gap-2 flex-wrap">
-                <span className="text-slate-400 font-semibold">Date Range:</span>
+                <span className="text-[#735A67] font-semibold">Date Range:</span>
                 <input
                   type="date"
                   value={dateFrom}
                   onChange={(e) => setDateFrom(e.target.value)}
-                  className="px-2.5 py-1 rounded-xl bg-slate-950 border border-slate-800 text-white"
+                  className="px-3 py-1.5 rounded-xl bg-[#FFF9F2] border border-[#EBD4DC] text-[#352431]"
                 />
-                <span className="text-slate-600">to</span>
+                <span className="text-[#735A67]">to</span>
                 <input
                   type="date"
                   value={dateTo}
                   onChange={(e) => setDateTo(e.target.value)}
-                  className="px-2.5 py-1 rounded-xl bg-slate-950 border border-slate-800 text-white"
+                  className="px-3 py-1.5 rounded-xl bg-[#FFF9F2] border border-[#EBD4DC] text-[#352431]"
                 />
               </div>
 
@@ -743,7 +749,7 @@ const Orders = () => {
                   setDateTo("");
                   setPage(1);
                 }}
-                className="px-3 py-1 rounded-xl border border-slate-800 hover:bg-slate-800 text-slate-400 hover:text-white transition"
+                className="px-3.5 py-1.5 rounded-xl border border-[#EBD4DC] hover:bg-[#FBE7EE] text-[#735A67] hover:text-[#352431] transition cursor-pointer"
               >
                 Reset Filters
               </button>

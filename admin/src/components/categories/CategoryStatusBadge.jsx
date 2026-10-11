@@ -21,10 +21,10 @@ const CategoryStatusBadge = ({
         }}
         disabled={loading || disabled}
         title={isActive ? "Click to deactivate category" : "Click to activate category"}
-        className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold transition-all cursor-pointer select-none border focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-slate-900 ${
+        className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold transition-all cursor-pointer select-none border ${
           isActive
-            ? "bg-emerald-500/15 text-emerald-400 border-emerald-500/30 hover:bg-emerald-500/25 focus:ring-emerald-500"
-            : "bg-slate-800 text-slate-400 border-slate-750 hover:bg-slate-750 hover:text-slate-300 focus:ring-slate-500"
+            ? "bg-emerald-50 text-emerald-700 border-emerald-200 hover:bg-emerald-100"
+            : "bg-[#FFF9F2] text-[#735A67] border-[#EBD4DC] hover:bg-[#FBE7EE]"
         } ${disabled ? "opacity-60 cursor-not-allowed" : ""}`}
       >
         {loading ? (
@@ -32,7 +32,7 @@ const CategoryStatusBadge = ({
         ) : (
           <span
             className={`w-1.5 h-1.5 rounded-full ${
-              isActive ? "bg-emerald-400 animate-pulse" : "bg-slate-500"
+              isActive ? "bg-[#5F9A68]" : "bg-[#927681]"
             }`}
           />
         )}
@@ -43,15 +43,15 @@ const CategoryStatusBadge = ({
 
   return (
     <span
-      className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold border ${
+      className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold border ${
         isActive
-          ? "bg-emerald-500/15 text-emerald-400 border-emerald-500/30"
-          : "bg-slate-800 text-slate-400 border-slate-750"
+          ? "bg-emerald-50 text-emerald-700 border-emerald-200"
+          : "bg-[#FFF9F2] text-[#735A67] border-[#EBD4DC]"
       }`}
     >
       <span
         className={`w-1.5 h-1.5 rounded-full ${
-          isActive ? "bg-emerald-400" : "bg-slate-500"
+          isActive ? "bg-[#5F9A68]" : "bg-[#927681]"
         }`}
       />
       <span>{isActive ? "Active" : "Inactive"}</span>
