@@ -16,6 +16,7 @@ import PageContainer from "../components/layout/PageContainer";
 import ProductGrid from "../components/product/ProductGrid";
 import CategoryCard from "../components/product/CategoryCard";
 import ComboCard from "../components/product/ComboCard";
+import SakuraHeroShowcase from "../components/home/SakuraHeroShowcase";
 import Loader, {
   ProductCardSkeleton,
   CategoryPillSkeleton,
@@ -51,30 +52,7 @@ const Home = () => {
   const [loading, setLoading] = useState(true);
   const [searching, setSearching] = useState(false);
   const [error, setError] = useState(null);
-  const [videoError, setVideoError] = useState(false);
-  const videoRef = useRef(null);
 
-  // Pause video if user prefers reduced motion
-  useEffect(() => {
-    if (typeof window !== "undefined" && window.matchMedia) {
-      const mediaQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
-      if (mediaQuery.matches && videoRef.current) {
-        videoRef.current.pause();
-      }
-      const handleChange = (e) => {
-        if (!videoRef.current) return;
-        if (e.matches) {
-          videoRef.current.pause();
-        } else {
-          videoRef.current.play().catch(() => {});
-        }
-      };
-      if (mediaQuery.addEventListener) {
-        mediaQuery.addEventListener("change", handleChange);
-        return () => mediaQuery.removeEventListener("change", handleChange);
-      }
-    }
-  }, []);
 
   // Sync search query param
   useEffect(() => {
@@ -230,47 +208,9 @@ const Home = () => {
             </div>
           </div>
 
-          {/* Right Column: Hero Video Card with Sakura Glow */}
-          <div className="relative z-10 order-1 aspect-[1.35] overflow-hidden rounded-[28px] bg-[#FBE7EE] shadow-[0_24px_60px_-30px_rgba(201,79,120,0.5)] border border-[#EBD4DC]/60 lg:order-2 lg:aspect-[1.12]">
-            {videoError ? (
-              <img
-                src="/videos/hero-burger-poster.jpg"
-                alt="BellBite fresh campus food"
-                className="size-full object-cover"
-                loading="eager"
-              />
-            ) : (
-              <>
-                <video
-                  ref={videoRef}
-                  autoPlay
-                  muted
-                  loop
-                  playsInline
-                  poster="/videos/hero-burger-poster.jpg"
-                  onError={() => setVideoError(true)}
-                  className="size-full object-cover motion-reduce:hidden"
-                  aria-label="Fresh canteen food being prepared"
-                >
-                  <source src="/videos/hero-burger.webm" type="video/webm" />
-                  <source src="/videos/hero-burger.mp4" type="video/mp4" />
-                  <img
-                    src="/videos/hero-burger-poster.jpg"
-                    alt="Fresh canteen food"
-                    className="size-full object-cover"
-                  />
-                </video>
-                <img
-                  src="/videos/hero-burger-poster.jpg"
-                  alt="Fresh canteen food"
-                  className="hidden motion-reduce:block size-full object-cover"
-                />
-              </>
-            )}
-            <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-[#352431]/40 via-transparent to-transparent" />
-            <div className="absolute bottom-4 left-4 rounded-full bg-[#FFF9F2]/90 backdrop-blur-xs px-3.5 py-2 text-xs font-bold text-[#C94F78] shadow-xs">
-              Today&apos;s kitchen · Hot & Fresh
-            </div>
+          {/* Right Column: Zomato-Style Animated Sakura Hero Showcase */}
+          <div className="order-1 lg:order-2">
+            <SakuraHeroShowcase />
           </div>
         </section>
       )}
