@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback } from "react";
 import storeService from "../services/storeService";
+import productService from "../services/productService";
 import useStore from "../hooks/useStore";
 
 const DAY_NAMES = [
@@ -19,6 +20,12 @@ const StoreSettings = () => {
   const [status, setStatus] = useState(null);
   const [schedule, setSchedule] = useState([]);
   const [settings, setSettings] = useState(null);
+  const [products, setProducts] = useState([]);
+
+  // Hero Banner Management States
+  const [selectedNewBannerProductId, setSelectedNewBannerProductId] = useState("");
+  const [savingBannerProductId, setSavingBannerProductId] = useState(null);
+  const [bannerPreviewIndex, setBannerPreviewIndex] = useState(0);
 
   const [loading, setLoading] = useState(true);
   const [fetchError, setFetchError] = useState(null);
@@ -64,15 +71,17 @@ const StoreSettings = () => {
       setLoading(true);
       setFetchError(null);
 
-      const [statusData, schedData, settingsData] = await Promise.all([
+      const [statusData, schedData, settingsData, productsData] = await Promise.all([
         storeService.getStoreStatus(),
         storeService.getSchedule(),
         storeService.getSettings(),
+        productService.getProducts({ includeUnavailable: "true" }).catch(() => []),
       ]);
 
       setStatus(statusData);
       setSchedule(schedData || []);
       setSettings(settingsData);
+      setProducts(productsData || []);
 
       if (settingsData) {
         setCloseReasonInput(settingsData.temporaryClosedReason || "");
@@ -321,6 +330,58 @@ const StoreSettings = () => {
       showToast(err.message || "Failed to update ordering settings", "error");
     } finally {
       setSavingOrdering(false);
+    }
+  };
+
+  // --- 5. HOMEPAGE HERO BANNER ACTIONS ---
+
+  const handleAddToBanner = async () => {
+    if (!selectedNewBannerProductId) return;
+    const prod = products.find((p) => p.id === selectedNewBannerProductId);
+    if (!prod) return;
+
+    setSavingBannerProductId(selectedNewBannerProductId);
+    try {
+      await productService.updateProduct(selectedNewBannerProductId, {
+        isFeatured: true,
+        featuredBadge: prod.featuredBadge || "Campus Favorite",
+        rating: prod.rating || 4.9,
+        ratingCount: prod.ratingCount || 1200,
+      });
+      showToast(`"${prod.name}" added to Homepage Hero Banner!`);
+      setSelectedNewBannerProductId("");
+      await loadAllData();
+    } catch (err) {
+      showToast(err.message || "Failed to add dish to banner.", "error");
+    } finally {
+      setSavingBannerProductId(null);
+    }
+  };
+
+  const handleRemoveFromBanner = async (productId) => {
+    const prod = products.find((p) => p.id === productId);
+    setSavingBannerProductId(productId);
+    try {
+      await productService.updateProduct(productId, { isFeatured: false });
+      showToast(`"${prod ? prod.name : 'Dish'}" removed from Hero Banner.`);
+      await loadAllData();
+    } catch (err) {
+      showToast(err.message || "Failed to remove dish from banner.", "error");
+    } finally {
+      setSavingBannerProductId(null);
+    }
+  };
+
+  const handleUpdateBannerItem = async (productId, updates) => {
+    setSavingBannerProductId(productId);
+    try {
+      await productService.updateProduct(productId, updates);
+      showToast("Hero banner item updated!");
+      await loadAllData();
+    } catch (err) {
+      showToast(err.message || "Failed to update banner item.", "error");
+    } finally {
+      setSavingBannerProductId(null);
     }
   };
 
@@ -782,6 +843,222 @@ const StoreSettings = () => {
             </form>
           </div>
         </div>
+      </div>
+
+      {/* SECTION: HOMEPAGE HERO BANNER SHOWCASE */}
+      <div className="bg-slate-900/80 border border-rose-500/30 rounded-2xl p-5 sm:p-6 shadow-md space-y-6">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 border-b border-rose-500/20 pb-4">
+          <div>
+            <div className="flex items-center gap-2">
+              <span className="text-xl">🌸</span>
+              <h3 className="text-base font-bold text-white tracking-tight">
+                Homepage Hero Banner Showcase
+              </h3>
+              <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-rose-500/20 text-rose-300 border border-rose-500/40">
+                Live 3D Carousel
+              </span>
+            </div>
+            <p className="text-xs text-slate-400 mt-1 max-w-2xl leading-relaxed">
+              Curate the featured dishes rotating in the animated platter showcase on the student homepage. Customize dish photos, live culinary badges (Chef's Signature, Campus Favorite, Steaming Hot), and verified ratings.
+            </p>
+          </div>
+
+          {/* Quick Add Selector */}
+          <div className="flex items-center gap-2 self-start sm:self-auto w-full sm:w-auto">
+            <select
+              value={selectedNewBannerProductId}
+              onChange={(e) => setSelectedNewBannerProductId(e.target.value)}
+              className="px-3 py-2 rounded-xl bg-slate-950 border border-rose-500/30 text-white text-xs focus:outline-none focus:ring-2 focus:ring-rose-500 flex-1 sm:w-56 cursor-pointer"
+            >
+              <option value="">-- Add dish to banner --</option>
+              {products
+                .filter((p) => !p.isFeatured)
+                .map((p) => (
+                  <option key={p.id} value={p.id}>
+                    {p.name} (₹{p.price})
+                  </option>
+                ))}
+            </select>
+            <button
+              type="button"
+              onClick={handleAddToBanner}
+              disabled={!selectedNewBannerProductId || savingBannerProductId}
+              className="px-4 py-2 rounded-xl bg-rose-600 hover:bg-rose-500 text-white font-bold text-xs transition shadow-md shadow-rose-600/20 disabled:opacity-50 cursor-pointer shrink-0"
+            >
+              {savingBannerProductId === selectedNewBannerProductId ? "Adding..." : "+ Add"}
+            </button>
+          </div>
+        </div>
+
+        {/* Featured Dishes List / Grid */}
+        {products.filter((p) => Boolean(p.isFeatured)).length === 0 ? (
+          <div className="p-8 rounded-xl bg-slate-950/60 border border-dashed border-rose-500/30 text-center space-y-3">
+            <div className="w-12 h-12 rounded-full bg-rose-500/10 text-rose-300 mx-auto flex items-center justify-center text-xl">
+              🌸
+            </div>
+            <div>
+              <p className="text-sm font-bold text-white">No custom banner dishes pinned yet</p>
+              <p className="text-xs text-slate-400 max-w-md mx-auto mt-1">
+                The student storefront is currently rotating the top-rated dishes automatically. Use the dropdown above or edit any product in the Products page to pin specific dishes here.
+              </p>
+            </div>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+            {products
+              .filter((p) => Boolean(p.isFeatured))
+              .map((prod) => (
+                <div
+                  key={prod.id}
+                  className="p-4 rounded-xl bg-slate-950/70 border border-rose-500/20 hover:border-rose-500/40 transition-all space-y-3.5"
+                >
+                  {/* Top Bar: Dish Header + Remove */}
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="flex items-center gap-3 min-w-0">
+                      <div className="w-14 h-14 rounded-xl bg-slate-900 border border-slate-800 overflow-hidden shrink-0">
+                        {prod.image ? (
+                          <img
+                            src={prod.image}
+                            alt={prod.name}
+                            className="w-full h-full object-cover"
+                            onError={(e) => {
+                              e.currentTarget.src = "/images/sakura-katsu-bowl.jpg";
+                            }}
+                          />
+                        ) : (
+                          <div className="w-full h-full flex items-center justify-center text-xl">🍱</div>
+                        )}
+                      </div>
+                      <div className="min-w-0">
+                        <h4 className="text-sm font-bold text-white truncate">{prod.name}</h4>
+                        <div className="flex items-center gap-2 mt-0.5 text-xs text-slate-400">
+                          <span className="font-bold text-white">₹{prod.price}</span>
+                          <span>·</span>
+                          <span>{prod.category?.name || "Dish"}</span>
+                          <span>·</span>
+                          <span>⏱ {prod.preparationTime || 10} min</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    <button
+                      type="button"
+                      onClick={() => handleRemoveFromBanner(prod.id)}
+                      disabled={savingBannerProductId === prod.id}
+                      title="Remove from banner"
+                      className="p-1.5 rounded-lg text-slate-400 hover:text-rose-400 hover:bg-rose-500/10 transition cursor-pointer"
+                    >
+                      <span className="text-xs">✕</span>
+                    </button>
+                  </div>
+
+                  {/* Editable Banner Fields */}
+                  <div className="space-y-2.5 pt-2 border-t border-slate-800/80 text-xs">
+                    <div>
+                      <div className="flex items-center justify-between mb-1">
+                        <label className="font-semibold text-rose-200">
+                          Culinary Badge / Highlight Tag:
+                        </label>
+                        <span className="text-[10px] text-slate-400">Shown at top-right of plate</span>
+                      </div>
+                      <input
+                        type="text"
+                        defaultValue={prod.featuredBadge || "Campus Favorite"}
+                        onBlur={(e) => {
+                          if (e.target.value !== prod.featuredBadge) {
+                            handleUpdateBannerItem(prod.id, { featuredBadge: e.target.value });
+                          }
+                        }}
+                        placeholder="e.g. Campus Favorite, Chef's Sakura Signature"
+                        className="w-full px-3 py-1.5 rounded-lg bg-slate-900 border border-slate-750 text-white text-xs focus:outline-none focus:ring-1 focus:ring-rose-500"
+                      />
+                      <div className="flex flex-wrap gap-1 mt-1.5">
+                        {[
+                          "Campus Favorite",
+                          "Chef's Sakura Signature",
+                          "Steaming Hot & Fresh",
+                          "Today's Special",
+                          "Student Top Pick",
+                        ].map((tag) => (
+                          <button
+                            key={tag}
+                            type="button"
+                            onClick={() =>
+                              handleUpdateBannerItem(prod.id, { featuredBadge: tag })
+                            }
+                            className={`px-2 py-0.5 rounded text-[10px] font-semibold transition cursor-pointer ${
+                              prod.featuredBadge === tag
+                                ? "bg-rose-500 text-white"
+                                : "bg-slate-800 text-rose-300 hover:bg-slate-750 border border-rose-500/30"
+                            }`}
+                          >
+                            {tag}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-2.5">
+                      <div>
+                        <label className="font-semibold text-slate-300 block mb-1">
+                          Rating (0-5.0):
+                        </label>
+                        <input
+                          type="number"
+                          step="0.1"
+                          min="0"
+                          max="5"
+                          defaultValue={prod.rating !== undefined ? prod.rating : 4.8}
+                          onBlur={(e) => {
+                            const val = parseFloat(e.target.value);
+                            if (!isNaN(val) && val !== prod.rating) {
+                              handleUpdateBannerItem(prod.id, { rating: val });
+                            }
+                          }}
+                          className="w-full px-3 py-1.5 rounded-lg bg-slate-900 border border-slate-750 text-white text-xs focus:outline-none focus:ring-1 focus:ring-rose-500"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="font-semibold text-slate-300 block mb-1">
+                          Orders / Count:
+                        </label>
+                        <input
+                          type="number"
+                          min="0"
+                          defaultValue={prod.ratingCount || 1200}
+                          onBlur={(e) => {
+                            const val = parseInt(e.target.value, 10);
+                            if (!isNaN(val) && val !== prod.ratingCount) {
+                              handleUpdateBannerItem(prod.id, { ratingCount: val });
+                            }
+                          }}
+                          className="w-full px-3 py-1.5 rounded-lg bg-slate-900 border border-slate-750 text-white text-xs focus:outline-none focus:ring-1 focus:ring-rose-500"
+                        />
+                      </div>
+                    </div>
+
+                    <div>
+                      <label className="font-semibold text-slate-300 block mb-1">
+                        Plate Image URL:
+                      </label>
+                      <input
+                        type="url"
+                        defaultValue={prod.image || ""}
+                        onBlur={(e) => {
+                          if (e.target.value !== prod.image) {
+                            handleUpdateBannerItem(prod.id, { image: e.target.value.trim() });
+                          }
+                        }}
+                        placeholder="https://... or /images/sakura-katsu-bowl.jpg"
+                        className="w-full px-3 py-1.5 rounded-lg bg-slate-900 border border-slate-750 text-white text-xs focus:outline-none focus:ring-1 focus:ring-rose-500 truncate"
+                      />
+                    </div>
+                  </div>
+                </div>
+              ))}
+          </div>
+        )}
       </div>
 
       {/* SECTION 2: WEEKLY SCHEDULE EDITOR */}

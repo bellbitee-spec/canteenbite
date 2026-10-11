@@ -42,6 +42,12 @@ const ProductForm = ({
       initialData?.sortOrder !== undefined ? initialData.sortOrder : 0,
     isAvailable:
       initialData?.isAvailable !== undefined ? initialData.isAvailable : true,
+    isFeatured:
+      initialData?.isFeatured !== undefined ? Boolean(initialData.isFeatured) : false,
+    featuredBadge: initialData?.featuredBadge || "",
+    rating: initialData?.rating !== undefined ? initialData.rating : 4.8,
+    ratingCount:
+      initialData?.ratingCount !== undefined ? initialData.ratingCount : 0,
   });
 
   const [slugManuallyEdited, setSlugManuallyEdited] = useState(isEdit);
@@ -194,6 +200,10 @@ const ProductForm = ({
       sortOrder:
         formData.sortOrder !== "" ? Number(formData.sortOrder) : 0,
       isAvailable: Boolean(formData.isAvailable),
+      isFeatured: Boolean(formData.isFeatured),
+      featuredBadge: formData.featuredBadge.trim(),
+      rating: formData.rating !== "" ? Number(formData.rating) : 4.8,
+      ratingCount: formData.ratingCount !== "" ? Number(formData.ratingCount) : 0,
     };
 
     onSubmit(payload);
@@ -535,6 +545,117 @@ const ProductForm = ({
           onChange={handleChange}
           className="w-5 h-5 rounded text-indigo-600 bg-slate-900 border-slate-700 focus:ring-indigo-500 focus:ring-offset-slate-950 cursor-pointer"
         />
+      </div>
+
+      {/* Row 8: Homepage Hero Banner Showcase Settings */}
+      <div className="p-4 rounded-xl bg-gradient-to-r from-rose-950/20 via-slate-950/60 to-slate-950/60 border border-rose-500/20 space-y-4">
+        <div className="flex items-center justify-between">
+          <div>
+            <div className="flex items-center gap-2">
+              <span className="text-sm font-bold text-rose-300 flex items-center gap-1.5">
+                <span>🌸</span>
+                <span>Feature in Homepage Hero Banner</span>
+              </span>
+              <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-rose-500/20 text-rose-300 border border-rose-500/30">
+                Showcase
+              </span>
+            </div>
+            <p className="text-xs text-slate-400 mt-1">
+              Displays this dish on the student homepage floating animated banner with real rating &amp; live badge.
+            </p>
+          </div>
+          <input
+            id="prod-featured"
+            name="isFeatured"
+            type="checkbox"
+            checked={formData.isFeatured}
+            onChange={handleChange}
+            className="w-5 h-5 rounded text-rose-600 bg-slate-900 border-slate-700 focus:ring-rose-500 focus:ring-offset-slate-950 cursor-pointer"
+          />
+        </div>
+
+        {formData.isFeatured && (
+          <div className="pt-3 border-t border-rose-500/15 space-y-3.5">
+            <div>
+              <label
+                htmlFor="prod-badge"
+                className="block text-xs font-semibold text-rose-200 uppercase tracking-wider mb-1.5"
+              >
+                Hero Badge / Highlight Tag
+              </label>
+              <input
+                id="prod-badge"
+                name="featuredBadge"
+                type="text"
+                value={formData.featuredBadge}
+                onChange={handleChange}
+                placeholder="e.g. Campus Favorite, Chef's Sakura Signature"
+                className="w-full px-3.5 py-2.5 bg-slate-950/80 border border-rose-500/30 rounded-xl text-slate-100 placeholder-slate-500 text-sm focus:outline-none focus:ring-2 focus:ring-rose-500 transition-colors"
+              />
+              <div className="flex flex-wrap gap-1.5 mt-2">
+                <span className="text-[11px] text-slate-400 mr-1 self-center">Quick tags:</span>
+                {[
+                  "Campus Favorite",
+                  "Chef's Sakura Signature",
+                  "Steaming Hot & Fresh",
+                  "Today's Special",
+                  "Student Top Pick",
+                ].map((tag) => (
+                  <button
+                    key={tag}
+                    type="button"
+                    onClick={() => setFormData((prev) => ({ ...prev, featuredBadge: tag }))}
+                    className="px-2.5 py-1 rounded-lg text-[11px] font-semibold bg-rose-500/10 hover:bg-rose-500/20 text-rose-300 border border-rose-500/20 transition cursor-pointer"
+                  >
+                    {tag}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+              <div>
+                <label
+                  htmlFor="prod-rating"
+                  className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1.5"
+                >
+                  Rating (0.0 to 5.0)
+                </label>
+                <input
+                  id="prod-rating"
+                  name="rating"
+                  type="number"
+                  step="0.1"
+                  min="0"
+                  max="5"
+                  value={formData.rating}
+                  onChange={handleChange}
+                  placeholder="4.8"
+                  className="w-full px-3.5 py-2.5 bg-slate-950/80 border border-slate-750 rounded-xl text-slate-100 placeholder-slate-500 text-sm focus:outline-none focus:ring-2 focus:ring-rose-500 transition-colors"
+                />
+              </div>
+
+              <div>
+                <label
+                  htmlFor="prod-rating-count"
+                  className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1.5"
+                >
+                  Orders / Rating Count
+                </label>
+                <input
+                  id="prod-rating-count"
+                  name="ratingCount"
+                  type="number"
+                  min="0"
+                  value={formData.ratingCount}
+                  onChange={handleChange}
+                  placeholder="e.g. 1200"
+                  className="w-full px-3.5 py-2.5 bg-slate-950/80 border border-slate-750 rounded-xl text-slate-100 placeholder-slate-500 text-sm focus:outline-none focus:ring-2 focus:ring-rose-500 transition-colors"
+                />
+              </div>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Form Action Buttons */}

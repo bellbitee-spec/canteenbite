@@ -3,7 +3,6 @@ import { Link, useSearchParams } from "react-router-dom";
 import {
   Search,
   X,
-  Sparkles,
   ArrowRight,
   Clock,
   Clock3,
@@ -11,6 +10,7 @@ import {
   Flame,
   MapPin,
   Check,
+  Award,
 } from "lucide-react";
 import PageContainer from "../components/layout/PageContainer";
 import ProductGrid from "../components/product/ProductGrid";
@@ -210,7 +210,7 @@ const Home = () => {
 
           {/* Right Column: Zomato-Style Animated Sakura Hero Showcase */}
           <div className="order-1 lg:order-2">
-            <SakuraHeroShowcase />
+            <SakuraHeroShowcase products={products} />
           </div>
         </section>
       )}
@@ -424,7 +424,7 @@ const Home = () => {
                     id="combos-heading"
                     className="text-2xl sm:text-3xl font-extrabold text-[#352431] tracking-tight flex items-center gap-2 mt-0.5"
                   >
-                    <Sparkles className="w-5 h-5 text-[#C94F78]" />
+                    <Flame className="w-5 h-5 text-[#C94F78]" />
                     <span>Student combos</span>
                   </h2>
                 </div>

@@ -11,6 +11,7 @@ const ProductTable = ({
   onEdit,
   onDelete,
   onToggleAvailability,
+  onToggleHeroFeatured,
   togglingIds = new Set(),
 }) => {
   if (products.length === 0) {
@@ -29,7 +30,8 @@ const ProductTable = ({
                 <th scope="col" className="px-3 py-3.5">Category</th>
                 <th scope="col" className="px-3 py-3.5">Price</th>
                 <th scope="col" className="px-3 py-3.5">Stock</th>
-                <th scope="col" className="px-3 py-3.5">Preparation</th>
+                <th scope="col" className="px-3 py-3.5">Prep</th>
+                <th scope="col" className="px-3 py-3.5 text-center">Hero Banner</th>
                 <th scope="col" className="px-3 py-3.5">Availability</th>
                 <th scope="col" className="py-3.5 pl-3 pr-5 text-right">Actions</th>
               </tr>
@@ -61,7 +63,7 @@ const ProductTable = ({
                             </svg>
                           )}
                         </div>
-                        <div className="min-w-0 max-w-[220px]">
+                        <div className="min-w-0 max-w-[200px]">
                           <p className="font-semibold text-white truncate text-sm">
                             {product.name}
                           </p>
@@ -95,6 +97,31 @@ const ProductTable = ({
                     {/* Preparation Time */}
                     <td className="px-3 py-3.5 whitespace-nowrap text-xs text-slate-300">
                       {product.preparationTime !== undefined ? `${product.preparationTime} min` : "10 min"}
+                    </td>
+
+                    {/* Hero Banner Toggle */}
+                    <td className="px-3 py-3.5 whitespace-nowrap text-center">
+                      <button
+                        type="button"
+                        onClick={() => onToggleHeroFeatured && onToggleHeroFeatured(product)}
+                        title={
+                          product.isFeatured
+                            ? `Featured in banner: "${product.featuredBadge || 'Hero Banner'}" - Click to remove`
+                            : "Click to feature in Homepage Hero Banner"
+                        }
+                        className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold transition-all cursor-pointer ${
+                          product.isFeatured
+                            ? "bg-rose-500/20 text-rose-300 border border-rose-500/40 hover:bg-rose-500/30"
+                            : "bg-slate-800 text-slate-400 hover:text-rose-300 border border-slate-700 hover:border-rose-500/40"
+                        }`}
+                      >
+                        <span>{product.isFeatured ? "🌸" : "☆"}</span>
+                        <span className="truncate max-w-[110px]">
+                          {product.isFeatured
+                            ? product.featuredBadge || "Featured"
+                            : "+ Banner"}
+                        </span>
+                      </button>
                     </td>
 
                     {/* Availability Status Badge & Quick Toggle */}
@@ -182,13 +209,18 @@ const ProductTable = ({
                     </span>
                   </div>
 
-                  <div className="flex items-center gap-2 mt-1">
+                  <div className="flex flex-wrap items-center gap-2 mt-1">
                     <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-medium bg-slate-800 text-slate-300 border border-slate-700/60">
                       {product.category?.name || "Uncategorized"}
                     </span>
                     <span className="text-xs text-slate-400">
                       ⏱ {product.preparationTime || 10} min
                     </span>
+                    {product.isFeatured && (
+                      <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-bold bg-rose-500/20 text-rose-300 border border-rose-500/30">
+                        🌸 {product.featuredBadge || "Banner"}
+                      </span>
+                    )}
                   </div>
                 </div>
               </div>
@@ -200,11 +232,25 @@ const ProductTable = ({
                   lowStockThreshold={product.lowStockThreshold}
                 />
 
-                <ProductStatusBadge
-                  isAvailable={product.isAvailable}
-                  onToggle={() => onToggleAvailability(product)}
-                  loading={isToggling}
-                />
+                <div className="flex items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={() => onToggleHeroFeatured && onToggleHeroFeatured(product)}
+                    className={`px-2 py-1 rounded-lg text-[11px] font-semibold transition cursor-pointer ${
+                      product.isFeatured
+                        ? "bg-rose-500/20 text-rose-300 border border-rose-500/40"
+                        : "bg-slate-800 text-slate-400 border border-slate-700"
+                    }`}
+                  >
+                    {product.isFeatured ? "🌸 In Banner" : "+ Banner"}
+                  </button>
+
+                  <ProductStatusBadge
+                    isAvailable={product.isAvailable}
+                    onToggle={() => onToggleAvailability(product)}
+                    loading={isToggling}
+                  />
+                </div>
               </div>
 
               {/* Mobile Actions */}

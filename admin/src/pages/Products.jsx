@@ -18,6 +18,7 @@ const Products = () => {
   const [selectedCategory, setSelectedCategory] = useState("");
   const [selectedAvailability, setSelectedAvailability] = useState(""); // "" (All), "true", "false"
   const [selectedStockFilter, setSelectedStockFilter] = useState("all"); // "all", "in_stock", "low_stock", "out_of_stock"
+  const [showOnlyHeroBanner, setShowOnlyHeroBanner] = useState(false);
 
   // Modal states
   const [isFormModalOpen, setIsFormModalOpen] = useState(false);
@@ -104,13 +105,19 @@ const Products = () => {
     fetchProducts();
   }, [fetchProducts]);
 
-  // Apply client-side stock filter using individual product lowStockThreshold
+  // Apply client-side filters (stock and hero banner)
   const filteredProducts = useMemo(() => {
-    if (selectedStockFilter === "all") {
-      return products;
+    let list = products;
+
+    if (showOnlyHeroBanner) {
+      list = list.filter((p) => Boolean(p.isFeatured));
     }
 
-    return products.filter((item) => {
+    if (selectedStockFilter === "all") {
+      return list;
+    }
+
+    return list.filter((item) => {
       const stock = Number(item.stock) || 0;
       const threshold =
         item.lowStockThreshold !== undefined ? Number(item.lowStockThreshold) : 5;
@@ -126,7 +133,7 @@ const Products = () => {
       }
       return true;
     });
-  }, [products, selectedStockFilter]);
+  }, [products, selectedStockFilter, showOnlyHeroBanner]);
 
   // Reset all filters
   const handleClearFilters = () => {
@@ -135,13 +142,15 @@ const Products = () => {
     setSelectedCategory("");
     setSelectedAvailability("");
     setSelectedStockFilter("all");
+    setShowOnlyHeroBanner(false);
   };
 
   const isFiltered = Boolean(
     searchTerm.trim() ||
       selectedCategory ||
       selectedAvailability !== "" ||
-      selectedStockFilter !== "all"
+      selectedStockFilter !== "all" ||
+      showOnlyHeroBanner
   );
 
   // Create Product handler
@@ -237,6 +246,45 @@ const Products = () => {
       );
     } catch (err) {
       showToast(err.message || "Failed to update availability.", "error");
+    } finally {
+      setTogglingIds((prev) => {
+        const next = new Set(prev);
+        next.delete(productId);
+        return next;
+      });
+    }
+  };
+
+  // Quick Hero Banner Toggle
+  const handleToggleHeroFeatured = async (product) => {
+    const newFeatured = !product.isFeatured;
+    const productId = product.id;
+
+    setTogglingIds((prev) => new Set(prev).add(productId));
+
+    try {
+      await productService.updateProduct(productId, {
+        isFeatured: newFeatured,
+        featuredBadge: product.featuredBadge || (newFeatured ? "Campus Favorite" : ""),
+      });
+      setProducts((prev) =>
+        prev.map((p) =>
+          p.id === productId
+            ? {
+                ...p,
+                isFeatured: newFeatured,
+                featuredBadge: p.featuredBadge || (newFeatured ? "Campus Favorite" : ""),
+              }
+            : p
+        )
+      );
+      showToast(
+        newFeatured
+          ? `"${product.name}" added to Hero Banner!`
+          : `"${product.name}" removed from Hero Banner.`
+      );
+    } catch (err) {
+      showToast(err.message || "Failed to update Hero Banner status.", "error");
     } finally {
       setTogglingIds((prev) => {
         const next = new Set(prev);
@@ -386,15 +434,32 @@ const Products = () => {
         </div>
 
         {/* Filter status summary / Clear filters button */}
-        <div className="flex items-center justify-between pt-2 border-t border-slate-800/80 text-xs text-slate-400">
-          <div>
-            Showing <span className="font-bold text-white">{filteredProducts.length}</span>{" "}
-            {filteredProducts.length === 1 ? "product" : "products"}
-            {products.length !== filteredProducts.length && (
-              <span className="text-slate-500 ml-1">
-                (filtered from {products.length} total)
+        <div className="flex flex-wrap items-center justify-between gap-2 pt-2 border-t border-slate-800/80 text-xs text-slate-400">
+          <div className="flex items-center gap-3">
+            <div>
+              Showing <span className="font-bold text-white">{filteredProducts.length}</span>{" "}
+              {filteredProducts.length === 1 ? "product" : "products"}
+              {products.length !== filteredProducts.length && (
+                <span className="text-slate-500 ml-1">
+                  (filtered from {products.length} total)
+                </span>
+              )}
+            </div>
+
+            <button
+              type="button"
+              onClick={() => setShowOnlyHeroBanner((prev) => !prev)}
+              className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-semibold transition cursor-pointer ${
+                showOnlyHeroBanner
+                  ? "bg-rose-500 text-white shadow-xs"
+                  : "bg-slate-800 text-rose-300 hover:bg-slate-750 border border-rose-500/30"
+              }`}
+            >
+              <span>🌸</span>
+              <span>
+                Hero Banner ({products.filter((p) => Boolean(p.isFeatured)).length})
               </span>
-            )}
+            </button>
           </div>
 
           {isFiltered && (
@@ -484,6 +549,7 @@ const Products = () => {
           onEdit={handleOpenEditModal}
           onDelete={handleOpenDeleteModal}
           onToggleAvailability={handleToggleAvailability}
+          onToggleHeroFeatured={handleToggleHeroFeatured}
           togglingIds={togglingIds}
         />
       )}
