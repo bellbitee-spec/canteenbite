@@ -1,20 +1,21 @@
 import React, { useState, useEffect, useRef, useMemo } from "react";
-import { ChefHat, Flame, Star, ArrowRight, Heart, Award, Trophy } from "lucide-react";
+import { ChefHat, Flame, Star, ArrowRight, Heart, Award, Trophy, RotateCcw } from "lucide-react";
+import { getHeroImageUrl, getThumbnailUrl } from "../../utils/imageUtils";
 
-// Fallback high-res dishes if no products or while loading
+// Fallback high-res dishes used ONLY in explicit intentional fallback states
 const SAKURA_FALLBACK_DISHES = [
   {
     id: "katsu-donburi",
     name: "Sakura Crispy Katsu Bowl",
     tagline: "Crisp panko chicken · Teriyaki drizzle · Poached egg",
     price: 149,
-    originalPrice: 179,
+    originalPrice: null,
     prepTime: "10-12 min",
     rating: "4.9",
     reviewsCount: "1.2k+",
     tag: "Chef's Sakura Signature",
     dietary: "NON-VEG",
-    image: "/images/sakura-katsu-bowl.jpg",
+    image: "/images/sakura-katsu-bowl.webp",
     accentColor: "#C94F78",
     hotDish: true,
   },
@@ -23,13 +24,13 @@ const SAKURA_FALLBACK_DISHES = [
     name: "Artisan Blossom Ramen",
     tagline: "Slow-simmered broth · Chashu · Ajitsuke egg",
     price: 169,
-    originalPrice: 199,
+    originalPrice: null,
     prepTime: "12-15 min",
     rating: "4.8",
     reviewsCount: "980+",
     tag: "Steaming Fresh Broth",
     dietary: "NON-VEG",
-    image: "/images/sakura-ramen-bowl.jpg",
+    image: "/images/sakura-ramen-bowl.webp",
     accentColor: "#B33D65",
     hotDish: true,
   },
@@ -38,13 +39,13 @@ const SAKURA_FALLBACK_DISHES = [
     name: "Iced Sakura Matcha Latte",
     tagline: "Ceremonial matcha · Strawberry berry cream",
     price: 89,
-    originalPrice: 110,
+    originalPrice: null,
     prepTime: "3-5 min",
     rating: "4.9",
     reviewsCount: "2.1k+",
     tag: "Campus Favorite",
     dietary: "VEG",
-    image: "/images/sakura-matcha-latte.jpg",
+    image: "/images/sakura-matcha-latte.webp",
     accentColor: "#5F9A68",
     hotDish: false,
   },
@@ -62,7 +63,6 @@ const PETALS = [
 
 /**
  * Returns an authentic culinary or achievement icon based on tag text
- * Replaces generic AI star icons with purposeful food & badge icons.
  */
 const getBadgeIcon = (tag = "") => {
   const text = (tag || "").toLowerCase();
@@ -94,102 +94,145 @@ const getBadgeIcon = (tag = "") => {
   return Award;
 };
 
-const SakuraHeroShowcase = ({ products = [] }) => {
+const SakuraHeroShowcase = ({ products = [], loading = false, error = null, onRetry = null }) => {
   const [activeIndex, setActiveIndex] = useState(0);
   const [isHovered, setIsHovered] = useState(false);
   const [mouseOffset, setMouseOffset] = useState({ x: 0, y: 0 });
+  const [loadedSlideIndices, setLoadedSlideIndices] = useState(() => new Set([0, 1]));
   const containerRef = useRef(null);
 
-  // Compute dynamic dishes from products or fallback
+  // Derive dynamic dishes strictly from products - returns empty array while loading
   const dishes = useMemo(() => {
+    if (loading) return [];
     if (!products || !Array.isArray(products) || products.length === 0) {
-      return SAKURA_FALLBACK_DISHES;
+      return [];
     }
 
-    // 1. Try to find admin-featured dishes first
-    let candidates = products.filter((p) => p && p.isAvailable !== false && p.isFeatured);
+    // 1. Featured items (available)
+    const featured = products.filter(
+      (p) => p && p.isAvailable !== false && p.isFeatured
+    );
 
-    // 2. If no dishes are flagged as isFeatured by admin, pick top rated / top available
+    // 2. Non-featured items (available)
+    const featuredIds = new Set(featured.map((p) => p._id || p.id));
+    const nonFeatured = products
+      .filter((p) => p && p.isAvailable !== false && !featuredIds.has(p._id || p.id))
+      .sort((a, b) => {
+        // Prioritize dishes with images
+        const aHasImg = a.image && a.image.trim() ? 1 : 0;
+        const bHasImg = b.image && b.image.trim() ? 1 : 0;
+        if (bHasImg !== aHasImg) return bHasImg - aHasImg;
+        // Then sort by rating and price
+        const rA = Number(a.rating || 0);
+        const rB = Number(b.rating || 0);
+        if (rB !== rA) return rB - rA;
+        return (Number(b.price) || 0) - (Number(a.price) || 0);
+      });
+
+    // Assemble up to 3 to 5 candidate dishes
+    let candidates = [...featured];
+    if (candidates.length < 3) {
+      candidates = candidates.concat(nonFeatured.slice(0, 3 - candidates.length));
+    }
+    candidates = candidates.slice(0, 5);
+
     if (candidates.length === 0) {
-      candidates = [...products]
-        .filter((p) => p && p.isAvailable !== false)
-        .sort((a, b) => {
-          const rA = Number(a.rating || 0);
-          const rB = Number(b.rating || 0);
-          if (rB !== rA) return rB - rA;
-          return (Number(b.price) || 0) - (Number(a.price) || 0);
-        })
-        .slice(0, 3);
+      return [];
     }
-
-    if (candidates.length === 0) {
-      return SAKURA_FALLBACK_DISHES;
-    }
-
-    const fallbackImgs = [
-      "/images/sakura-katsu-bowl.jpg",
-      "/images/sakura-ramen-bowl.jpg",
-      "/images/sakura-matcha-latte.jpg",
-    ];
-
-    const fallbackBadges = [
-      "Chef's Sakura Signature",
-      "Steaming Fresh Broth",
-      "Campus Favorite",
-    ];
 
     const accentPalette = ["#C94F78", "#B33D65", "#5F9A68", "#D97706"];
 
-    return candidates.slice(0, 5).map((p, idx) => {
-      const ratingNum = p.rating ? Number(p.rating).toFixed(1) : "4.8";
-      const ordersCountStr = p.ratingCount
-        ? `${p.ratingCount}+`
-        : p.ordersCount
-        ? `${p.ordersCount}+`
-        : `${950 + idx * 240}+`;
-
+    return candidates.map((p, idx) => {
       const categoryName = (p.category?.name || "").toLowerCase();
-      const isColdDrink = categoryName.includes("drink") || categoryName.includes("beverage");
+      const isColdDrink =
+        categoryName.includes("drink") ||
+        categoryName.includes("beverage") ||
+        categoryName.includes("juice") ||
+        categoryName.includes("shake");
+
+      // Authentic rating & order counts - NEVER invent artificial statistics
+      const hasRealRating = p.rating && Number(p.rating) > 0;
+      const realRatingStr = hasRealRating ? Number(p.rating).toFixed(1) : null;
+      const realCount = Number(p.ratingCount || p.ordersCount || 0);
+      const ordersCountStr = realCount > 0 ? `${realCount}+` : null;
+
+      // Authentic tag
+      let tag = "";
+      if (p.featuredBadge && p.featuredBadge.trim()) {
+        tag = p.featuredBadge.trim();
+      } else if (p.isFeatured) {
+        tag = "Chef's Special";
+      } else if (categoryName) {
+        tag = p.category?.name;
+      } else {
+        tag = "Campus Favorite";
+      }
+
+      // Check genuine originalPrice (never invent fake markups)
+      const priceNum = Number(p.price) || 0;
+      const origPriceNum =
+        p.originalPrice && Number(p.originalPrice) > priceNum
+          ? Number(p.originalPrice)
+          : null;
 
       return {
-        id: p.id || p._id || `hero-${idx}`,
-        name: p.name,
+        id: p._id || p.id || `dish-${idx}`,
+        name: p.name || "Special Dish",
         tagline: p.description
           ? p.description.slice(0, 65) + (p.description.length > 65 ? "..." : "")
           : "Fresh campus meal · Made to order at live kitchen",
-        price: Number(p.price) || 99,
-        originalPrice: Math.round((Number(p.price) || 99) * 1.2),
+        price: priceNum,
+        originalPrice: origPriceNum,
         prepTime: p.preparationTime ? `${p.preparationTime} min` : "10-12 min",
-        rating: ratingNum,
+        rating: realRatingStr,
         reviewsCount: ordersCountStr,
-        tag: p.featuredBadge && p.featuredBadge.trim()
-          ? p.featuredBadge.trim()
-          : fallbackBadges[idx % fallbackBadges.length],
+        tag,
         dietary: p.isVeg !== false ? "VEG" : "NON-VEG",
-        image: p.image && p.image.trim() ? p.image : fallbackImgs[idx % fallbackImgs.length],
+        image: p.image && p.image.trim() ? p.image.trim() : "/images/sakura-katsu-bowl.webp",
         accentColor: accentPalette[idx % accentPalette.length],
         hotDish: !isColdDrink,
       };
     });
-  }, [products]);
+  }, [products, loading]);
 
-  // Keep activeIndex within bounds when dishes change
+  // Stable key representing dishes list
+  const dishesKey = useMemo(() => dishes.map((d) => d.id).join(","), [dishes]);
+
+  // Synchronize activeIndex and preloaded slides when products arrive or change
   useEffect(() => {
-    if (activeIndex >= dishes.length) {
+    setActiveIndex(0);
+    setLoadedSlideIndices(new Set([0, 1]));
+  }, [dishesKey]);
+
+  // Keep activeIndex within bounds if list shrinks
+  useEffect(() => {
+    if (dishes.length > 0 && activeIndex >= dishes.length) {
       setActiveIndex(0);
     }
   }, [dishes.length, activeIndex]);
 
-  // Auto-rotate every 4.8 seconds unless hovered
+  // Preload next upcoming slide as activeIndex changes
   useEffect(() => {
-    if (isHovered || dishes.length <= 1) return;
+    if (dishes.length > 0) {
+      setLoadedSlideIndices((prev) => {
+        const next = new Set(prev);
+        next.add(activeIndex);
+        next.add((activeIndex + 1) % dishes.length);
+        return next;
+      });
+    }
+  }, [activeIndex, dishes.length]);
+
+  // Auto-rotate every 4.8 seconds unless hovered or loading
+  useEffect(() => {
+    if (loading || isHovered || dishes.length <= 1) return;
     const timer = setInterval(() => {
       setActiveIndex((prev) => (prev + 1) % dishes.length);
     }, 4800);
     return () => clearInterval(timer);
-  }, [isHovered, dishes.length]);
+  }, [loading, isHovered, dishes.length]);
 
-  // Handle subtle 3D tilt interaction
+  // Subtle 3D tilt interaction
   const handleMouseMove = (e) => {
     if (!containerRef.current) return;
     const rect = containerRef.current.getBoundingClientRect();
@@ -203,8 +246,8 @@ const SakuraHeroShowcase = ({ products = [] }) => {
     setIsHovered(false);
   };
 
-  const currentDish = dishes[activeIndex] || dishes[0] || SAKURA_FALLBACK_DISHES[0];
-  const BadgeIcon = getBadgeIcon(currentDish.tag);
+  const currentDish = dishes[activeIndex] || dishes[0] || null;
+  const BadgeIcon = currentDish ? getBadgeIcon(currentDish.tag) : Award;
 
   return (
     <div
@@ -265,212 +308,342 @@ const SakuraHeroShowcase = ({ products = [] }) => {
         ))}
       </div>
 
-      {/* 2. Central Dish Showcase with Interactive 3D Tilt & Organic Float */}
-      <div
-        className="relative z-10 size-full flex items-center justify-center p-6 sm:p-8"
-        style={{
-          transform: `perspective(1000px) rotateX(${-mouseOffset.y}deg) rotateY(${mouseOffset.x}deg)`,
-          transition: "transform 0.2s cubic-bezier(0.2, 0, 0, 1)",
-        }}
-      >
-        {/* Floating Dish Unit */}
-        <div className="relative w-[78%] sm:w-[72%] max-w-[340px] aspect-square flex items-center justify-center">
-          {/* Animated Cast Shadow Beneath Platter */}
-          <div
-            className="absolute -bottom-4 left-1/2 -translate-x-1/2 w-[85%] h-8 rounded-full bg-[#352431]/25 blur-md pointer-events-none"
-            style={{
-              animation: "sakuraShadow 4s ease-in-out infinite",
-            }}
-          />
-
-          {/* Steaming Wisps for Hot Dishes */}
-          {currentDish.hotDish && (
-            <div className="absolute -top-3 left-1/2 -translate-x-1/2 flex gap-4 pointer-events-none z-20">
-              <span
-                className="w-1.5 h-6 bg-white/70 rounded-full blur-[1px]"
-                style={{ animation: "steamRise 2.8s ease-in-out infinite" }}
-              />
-              <span
-                className="w-2 h-7 bg-white/60 rounded-full blur-[1px]"
-                style={{ animation: "steamRise 3.2s ease-in-out infinite 0.7s" }}
-              />
-              <span
-                className="w-1.5 h-5 bg-white/70 rounded-full blur-[1px]"
-                style={{ animation: "steamRise 2.5s ease-in-out infinite 1.4s" }}
-              />
+      {/* 2. LOADING STATE: Clean skeleton platter without requesting any images */}
+      {loading ? (
+        <div className="relative z-10 size-full flex items-center justify-center p-6 sm:p-8">
+          {/* Skeleton Floating Dish Unit */}
+          <div className="relative w-[78%] sm:w-[72%] max-w-[340px] aspect-square flex items-center justify-center">
+            <div
+              className="relative size-full rounded-full p-2 bg-gradient-to-tr from-white via-[#FFF9F2] to-[#FBE7EE] border-2 border-white shadow-xl overflow-hidden flex items-center justify-center"
+              style={{ animation: "sakuraFloat 4s ease-in-out infinite" }}
+            >
+              <div className="size-full rounded-full bg-[#FBE7EE]/70 flex items-center justify-center animate-pulse">
+                <div className="w-28 h-28 rounded-full border-2 border-dashed border-[#C94F78]/25" />
+              </div>
             </div>
-          )}
+          </div>
 
-          {/* Main Dish Image on Elevated Lacquer Platter */}
+          {/* Top Left Skeleton Pill */}
+          <div className="absolute top-4 left-4 z-20 flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/90 border border-[#EBD4DC] shadow-xs animate-pulse">
+            <span className="size-2 rounded-full bg-[#5F9A68]/60" />
+            <span className="h-3 w-16 bg-[#EBD4DC] rounded-full" />
+          </div>
+
+          {/* Top Right Skeleton Pill */}
+          <div className="absolute top-4 right-4 z-20 flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#C94F78]/40 shadow-xs animate-pulse">
+            <span className="size-3 rounded-full bg-white/60" />
+            <span className="h-3 w-20 bg-white/60 rounded-full" />
+          </div>
+
+          {/* Bottom Left Skeleton Badge */}
+          <div className="absolute bottom-16 sm:bottom-14 left-4 z-20 flex items-center gap-2.5 px-3.5 py-2 rounded-2xl bg-white/90 border border-[#EBD4DC] shadow-sm animate-pulse">
+            <span className="h-4 w-7 rounded-md bg-[#5F9A68]/40" />
+            <div className="space-y-1">
+              <span className="h-2.5 w-14 bg-[#EBD4DC] rounded-full block" />
+              <span className="h-2 w-10 bg-[#EBD4DC]/70 rounded-full block" />
+            </div>
+          </div>
+
+          {/* Bottom Right Skeleton Badge */}
+          <div className="absolute bottom-16 sm:bottom-14 right-4 z-20 flex items-center gap-2 px-3.5 py-2 rounded-2xl bg-[#352431]/80 shadow-sm animate-pulse">
+            <div className="space-y-1 text-right">
+              <span className="h-3 w-10 bg-white/50 rounded-full block ml-auto" />
+              <span className="h-2 w-12 bg-[#F3A6BF]/50 rounded-full block ml-auto" />
+            </div>
+            <span className="size-7 rounded-full bg-[#C94F78]/50" />
+          </div>
+
+          {/* Bottom Switcher Skeleton Bar */}
+          <div className="absolute bottom-3 inset-x-3 z-30 flex items-center justify-between px-3 py-1.5 rounded-2xl bg-white/85 backdrop-blur-md border border-[#EBD4DC]/80">
+            <div className="flex items-center gap-2 overflow-x-auto no-scrollbar py-0.5">
+              {[1, 2, 3].map((i) => (
+                <div
+                  key={i}
+                  className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[#FFF9F2] border border-[#EBD4DC]/60 animate-pulse shrink-0"
+                >
+                  <span className="size-4 rounded-full bg-[#EBD4DC]" />
+                  <span className="h-3 w-14 bg-[#EBD4DC] rounded-full" />
+                </div>
+              ))}
+            </div>
+            <div className="flex items-center gap-1 pl-2 shrink-0">
+              {[1, 2, 3].map((i) => (
+                <span key={i} className="size-1.5 rounded-full bg-[#EBD4DC] animate-pulse" />
+              ))}
+            </div>
+          </div>
+        </div>
+      ) : error && dishes.length === 0 ? (
+        /* 3. ERROR STATE */
+        <div className="relative z-10 size-full flex flex-col items-center justify-center p-6 text-center">
+          <div className="w-12 h-12 rounded-full bg-[#FBE7EE] border border-[#EBD4DC] flex items-center justify-center mb-2.5 text-xl">
+            🌸
+          </div>
+          <p className="text-sm font-bold text-[#352431]">Unable to load campus specials</p>
+          <p className="text-xs text-[#735A67] mt-1 max-w-xs">{error}</p>
+          {onRetry && (
+            <button
+              type="button"
+              onClick={onRetry}
+              className="mt-3.5 inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full bg-[#C94F78] hover:bg-[#B33D65] text-white text-xs font-bold transition shadow-xs cursor-pointer active:scale-95"
+            >
+              <RotateCcw className="w-3.5 h-3.5" />
+              <span>Retry</span>
+            </button>
+          )}
+        </div>
+      ) : dishes.length === 0 ? (
+        /* 4. EMPTY MENU STATE */
+        <div className="relative z-10 size-full flex flex-col items-center justify-center p-6 text-center">
+          <div className="w-12 h-12 rounded-full bg-[#FBE7EE] border border-[#EBD4DC] flex items-center justify-center mb-2.5 text-xl">
+            🍱
+          </div>
+          <p className="text-sm font-bold text-[#352431]">Specials updating soon</p>
+          <p className="text-xs text-[#735A67] mt-1 max-w-xs">
+            Our campus chefs are prepping the counter. Browse the full menu below!
+          </p>
+        </div>
+      ) : (
+        /* 5. LIVE DISH SHOWCASE: Perfectly Synchronized Carousel */
+        <>
+          {/* Central Dish Showcase with 3D Tilt */}
           <div
-            className="relative size-full rounded-full p-2 bg-gradient-to-tr from-white via-[#FFF9F2] to-[#FBE7EE] border-2 border-white shadow-2xl overflow-hidden cursor-pointer group"
+            className="relative z-10 size-full flex items-center justify-center p-6 sm:p-8"
             style={{
-              animation: "sakuraFloat 4s ease-in-out infinite",
-            }}
-            onClick={() => {
-              const menuSection = document.getElementById(`product-${currentDish.id}`) || document.getElementById("menu");
-              if (menuSection) menuSection.scrollIntoView({ behavior: "smooth" });
+              transform: `perspective(1000px) rotateX(${-mouseOffset.y}deg) rotateY(${mouseOffset.x}deg)`,
+              transition: "transform 0.2s cubic-bezier(0.2, 0, 0, 1)",
             }}
           >
-            {/* Dish Plate Surface */}
-            <div className="relative size-full rounded-full overflow-hidden bg-[#FBE7EE]/60">
-              {dishes.map((dish, idx) => (
-                <img
-                  key={dish.id}
-                  src={dish.image}
-                  alt={dish.name}
-                  className={`absolute inset-0 size-full object-cover transition-all duration-700 ease-out ${
-                    idx === activeIndex
-                      ? "opacity-100 scale-100 rotate-0"
-                      : "opacity-0 scale-90 rotate-6 pointer-events-none"
-                  }`}
-                  loading="eager"
-                  onError={(e) => {
-                    // Fallback to high-res sakura bowl if custom image fails to load
-                    e.currentTarget.src = "/images/sakura-katsu-bowl.jpg";
-                  }}
-                />
-              ))}
+            {/* Floating Dish Unit */}
+            <div className="relative w-[78%] sm:w-[72%] max-w-[340px] aspect-square flex items-center justify-center">
+              {/* Cast Shadow */}
+              <div
+                className="absolute -bottom-4 left-1/2 -translate-x-1/2 w-[85%] h-8 rounded-full bg-[#352431]/25 blur-md pointer-events-none"
+                style={{ animation: "sakuraShadow 4s ease-in-out infinite" }}
+              />
 
-              {/* Glossy Rim Light Overlay */}
-              <div className="absolute inset-0 rounded-full bg-gradient-to-tr from-transparent via-transparent to-white/30 pointer-events-none" />
+              {/* Steaming Wisps for Hot Dishes */}
+              {currentDish.hotDish && (
+                <div className="absolute -top-3 left-1/2 -translate-x-1/2 flex gap-4 pointer-events-none z-20">
+                  <span
+                    className="w-1.5 h-6 bg-white/70 rounded-full blur-[1px]"
+                    style={{ animation: "steamRise 2.8s ease-in-out infinite" }}
+                  />
+                  <span
+                    className="w-2 h-7 bg-white/60 rounded-full blur-[1px]"
+                    style={{ animation: "steamRise 3.2s ease-in-out infinite 0.7s" }}
+                  />
+                  <span
+                    className="w-1.5 h-5 bg-white/70 rounded-full blur-[1px]"
+                    style={{ animation: "steamRise 2.5s ease-in-out infinite 1.4s" }}
+                  />
+                </div>
+              )}
+
+              {/* Platter with Hero Slide Images */}
+              <div
+                className="relative size-full rounded-full p-2 bg-gradient-to-tr from-white via-[#FFF9F2] to-[#FBE7EE] border-2 border-white shadow-2xl overflow-hidden cursor-pointer group"
+                style={{ animation: "sakuraFloat 4s ease-in-out infinite" }}
+                onClick={() => {
+                  const menuSection =
+                    document.getElementById(`product-${currentDish.id}`) ||
+                    document.getElementById("menu");
+                  if (menuSection) menuSection.scrollIntoView({ behavior: "smooth" });
+                }}
+              >
+                <div className="relative size-full rounded-full overflow-hidden bg-[#FBE7EE]/60 flex items-center justify-center">
+                  {dishes.map((dish, idx) => {
+                    if (!loadedSlideIndices.has(idx)) return null;
+                    const isCurrent = idx === activeIndex;
+                    return (
+                      <img
+                        key={dish.id}
+                        src={getHeroImageUrl(dish.image, 800)}
+                        alt={dish.name}
+                        width="480"
+                        height="480"
+                        className={`absolute inset-0 size-full object-cover transition-all duration-700 ease-out ${
+                          isCurrent
+                            ? "opacity-100 scale-100 rotate-0"
+                            : "opacity-0 scale-90 rotate-6 pointer-events-none"
+                        }`}
+                        loading={isCurrent ? "eager" : "lazy"}
+                        decoding="async"
+                        {...(isCurrent ? { fetchPriority: "high" } : { fetchPriority: "low" })}
+                        onError={(e) => {
+                          e.currentTarget.onerror = null;
+                          e.currentTarget.src = "/images/sakura-katsu-bowl.webp";
+                        }}
+                      />
+                    );
+                  })}
+
+                  {/* Glossy Rim Light Overlay */}
+                  <div className="absolute inset-0 rounded-full bg-gradient-to-tr from-transparent via-transparent to-white/30 pointer-events-none" />
+                </div>
+              </div>
             </div>
           </div>
-        </div>
-      </div>
 
-      {/* 3. Zomato-Style Signature Floating Micro-Badges */}
-
-      {/* Top Left: Live Status Tag */}
-      <div
-        className="absolute top-4 left-4 z-20 flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/95 backdrop-blur-md border border-[#EBD4DC] shadow-sm text-xs"
-        style={{ animation: "sakuraBadgeFloat 3.5s ease-in-out infinite" }}
-      >
-        <span className="relative flex size-2">
-          <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#5F9A68] opacity-75" />
-          <span className="relative inline-flex rounded-full size-2 bg-[#5F9A68]" />
-        </span>
-        <span className="font-bold text-[#352431] text-[11px] sm:text-xs tracking-tight">
-          Live Kitchen
-        </span>
-        <span className="text-[#927681] text-[10px] hidden sm:inline">·</span>
-        <span className="text-[#C94F78] font-bold text-[11px] hidden sm:inline">
-          {currentDish.prepTime}
-        </span>
-      </div>
-
-      {/* Top Right: Sakura Signature Badge (Culinary Icon replaces AI Star Sparkles) */}
-      <div
-        className="absolute top-4 right-4 z-20 flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-[#C94F78] text-white shadow-md shadow-[#C94F78]/25 text-xs font-bold"
-        style={{ animation: "sakuraBadgeFloat 4s ease-in-out infinite 0.5s" }}
-      >
-        <BadgeIcon className="w-3.5 h-3.5 text-white flex-shrink-0" />
-        <span className="text-[11px] sm:text-xs truncate max-w-[140px] sm:max-w-none">
-          {currentDish.tag}
-        </span>
-      </div>
-
-      {/* Bottom Left: Floating Rating & Orders Badge (Zomato App Hallmark with real ratings) */}
-      <div
-        className="absolute bottom-16 sm:bottom-14 left-4 z-20 flex items-center gap-2.5 px-3.5 py-2 rounded-2xl bg-white/95 backdrop-blur-md border border-[#EBD4DC] shadow-lg shadow-[#352431]/5"
-        style={{ animation: "sakuraBadgeFloat 3.8s ease-in-out infinite 1s" }}
-      >
-        <div className="flex items-center gap-1 px-1.5 py-0.5 rounded-md bg-[#5F9A68] text-white text-[10px] font-black">
-          <span>{currentDish.rating}</span>
-          <Star className="w-2.5 h-2.5 fill-white text-white" />
-        </div>
-        <div className="leading-tight">
-          <span className="text-[11px] font-bold text-[#352431] block">
-            {currentDish.reviewsCount} ordered
-          </span>
-          <span className="text-[9px] text-[#927681] font-semibold block">
-            Campus rated
-          </span>
-        </div>
-      </div>
-
-      {/* Bottom Right: Dynamic Dish Price & Order Button */}
-      <div
-        className="absolute bottom-16 sm:bottom-14 right-4 z-20 flex items-center gap-2 px-3.5 py-2 rounded-2xl bg-[#352431]/95 text-white backdrop-blur-md shadow-xl"
-        style={{ animation: "sakuraBadgeFloat 4.2s ease-in-out infinite 1.5s" }}
-      >
-        <div className="text-right">
-          <div className="flex items-baseline justify-end gap-1.5">
-            <span className="text-xs sm:text-sm font-black text-white">
-              ₹{currentDish.price}
+          {/* Top Left: Live Status Tag */}
+          <div
+            className="absolute top-4 left-4 z-20 flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/95 backdrop-blur-md border border-[#EBD4DC] shadow-xs text-xs"
+            style={{ animation: "sakuraBadgeFloat 3.5s ease-in-out infinite" }}
+          >
+            <span className="relative flex size-2">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#5F9A68] opacity-75" />
+              <span className="relative inline-flex rounded-full size-2 bg-[#5F9A68]" />
             </span>
-            {currentDish.originalPrice > currentDish.price && (
-              <span className="text-[10px] text-[#927681] line-through font-normal">
-                ₹{currentDish.originalPrice}
-              </span>
+            <span className="font-bold text-[#352431] text-[11px] sm:text-xs tracking-tight">
+              Live Kitchen
+            </span>
+            <span className="text-[#927681] text-[10px] hidden sm:inline">·</span>
+            <span className="text-[#C94F78] font-bold text-[11px] hidden sm:inline">
+              {currentDish.prepTime}
+            </span>
+          </div>
+
+          {/* Top Right: Tag Badge */}
+          <div
+            className="absolute top-4 right-4 z-20 flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-[#C94F78] text-white shadow-md shadow-[#C94F78]/25 text-xs font-bold"
+            style={{ animation: "sakuraBadgeFloat 4s ease-in-out infinite 0.5s" }}
+          >
+            <BadgeIcon className="w-3.5 h-3.5 text-white shrink-0" />
+            <span className="text-[11px] sm:text-xs truncate max-w-[140px] sm:max-w-none">
+              {currentDish.tag}
+            </span>
+          </div>
+
+          {/* Bottom Left: Authentic Rating / Live Counter Badge */}
+          <div
+            className="absolute bottom-16 sm:bottom-14 left-4 z-20 flex items-center gap-2.5 px-3.5 py-2 rounded-2xl bg-white/95 backdrop-blur-md border border-[#EBD4DC] shadow-lg shadow-[#352431]/5"
+            style={{ animation: "sakuraBadgeFloat 3.8s ease-in-out infinite 1s" }}
+          >
+            {currentDish.rating ? (
+              <>
+                <div className="flex items-center gap-1 px-1.5 py-0.5 rounded-md bg-[#5F9A68] text-white text-[10px] font-black">
+                  <span>{currentDish.rating}</span>
+                  <Star className="w-2.5 h-2.5 fill-white text-white" />
+                </div>
+                <div className="leading-tight">
+                  <span className="text-[11px] font-bold text-[#352431] block">
+                    {currentDish.reviewsCount ? `${currentDish.reviewsCount} ordered` : "Campus rated"}
+                  </span>
+                  <span className="text-[9px] text-[#927681] font-semibold block">
+                    Student favorite
+                  </span>
+                </div>
+              </>
+            ) : (
+              <div className="leading-tight flex items-center gap-2">
+                <div className="size-6 rounded-lg bg-[#FBE7EE] flex items-center justify-center text-xs">
+                  🍳
+                </div>
+                <div>
+                  <span className="text-[11px] font-bold text-[#352431] block">
+                    Live Counter
+                  </span>
+                  <span className="text-[9px] text-[#927681] font-semibold block">
+                    Made fresh to order
+                  </span>
+                </div>
+              </div>
             )}
           </div>
-          <span className="text-[9px] font-bold text-[#F3A6BF] uppercase tracking-wider block">
-            Special Value
-          </span>
-        </div>
-        <button
-          type="button"
-          onClick={() => {
-            const el = document.getElementById(`product-${currentDish.id}`) || document.getElementById("menu");
-            if (el) el.scrollIntoView({ behavior: "smooth" });
-          }}
-          className="size-7 rounded-full bg-[#C94F78] hover:bg-[#B33D65] flex items-center justify-center transition-transform active:scale-90 cursor-pointer"
-          aria-label={`Order ${currentDish.name}`}
-        >
-          <ArrowRight className="w-3.5 h-3.5 text-white" />
-        </button>
-      </div>
 
-      {/* 4. Bottom Switcher Bar: Interactive Dish Capsules (Zomato-style) */}
-      <div className="absolute bottom-3 inset-x-3 z-30 flex items-center justify-between px-3 py-1.5 rounded-2xl bg-white/85 backdrop-blur-md border border-[#EBD4DC]/80">
-        <div className="flex items-center gap-2 overflow-x-auto no-scrollbar py-0.5">
-          {dishes.map((dish, idx) => {
-            const isActive = idx === activeIndex;
-            return (
-              <button
-                key={dish.id}
-                type="button"
-                onClick={() => setActiveIndex(idx)}
-                className={`flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold transition-all shrink-0 cursor-pointer ${
-                  isActive
-                    ? "bg-[#C94F78] text-white shadow-xs scale-102"
-                    : "bg-[#FFF9F2] text-[#735A67] hover:bg-[#FBE7EE] hover:text-[#352431]"
-                }`}
-              >
-                <img
-                  src={dish.image}
-                  alt=""
-                  className="size-4 rounded-full object-cover shrink-0"
-                  onError={(e) => {
-                    e.currentTarget.src = "/images/sakura-katsu-bowl.jpg";
-                  }}
-                />
-                <span className="text-[11px] truncate max-w-[90px] sm:max-w-none">
-                  {dish.name.split(" ")[0]} {dish.name.split(" ")[1] || ""}
+          {/* Bottom Right: Authentic Price & Action */}
+          <div
+            className="absolute bottom-16 sm:bottom-14 right-4 z-20 flex items-center gap-2 px-3.5 py-2 rounded-2xl bg-[#352431]/95 text-white backdrop-blur-md shadow-xl"
+            style={{ animation: "sakuraBadgeFloat 4.2s ease-in-out infinite 1.5s" }}
+          >
+            <div className="text-right">
+              <div className="flex items-baseline justify-end gap-1.5">
+                <span className="text-xs sm:text-sm font-black text-white">
+                  ₹{currentDish.price}
                 </span>
-              </button>
-            );
-          })}
-        </div>
-
-        {/* Progress Dots Indicator */}
-        <div className="flex items-center gap-1 pl-2 shrink-0">
-          {dishes.map((_, idx) => (
+                {currentDish.originalPrice && currentDish.originalPrice > currentDish.price && (
+                  <span className="text-[10px] text-[#927681] line-through font-normal">
+                    ₹{currentDish.originalPrice}
+                  </span>
+                )}
+              </div>
+              <span className="text-[9px] font-bold text-[#F3A6BF] uppercase tracking-wider block">
+                {currentDish.originalPrice && currentDish.originalPrice > currentDish.price
+                  ? "Special Value"
+                  : "Campus Special"}
+              </span>
+            </div>
             <button
-              key={idx}
               type="button"
-              onClick={() => setActiveIndex(idx)}
-              className={`rounded-full transition-all duration-300 cursor-pointer ${
-                idx === activeIndex
-                  ? "w-4 h-1.5 bg-[#C94F78]"
-                  : "w-1.5 h-1.5 bg-[#EBD4DC] hover:bg-[#C94F78]/50"
-              }`}
-              aria-label={`Go to slide ${idx + 1}`}
-            />
-          ))}
-        </div>
-      </div>
+              onClick={() => {
+                const el =
+                  document.getElementById(`product-${currentDish.id}`) ||
+                  document.getElementById("menu");
+                if (el) el.scrollIntoView({ behavior: "smooth" });
+              }}
+              className="size-7 rounded-full bg-[#C94F78] hover:bg-[#B33D65] flex items-center justify-center transition-transform active:scale-90 cursor-pointer"
+              aria-label={`Order ${currentDish.name}`}
+            >
+              <ArrowRight className="w-3.5 h-3.5 text-white" />
+            </button>
+          </div>
+
+          {/* 4. Bottom Switcher Bar: Perfectly Synchronized Capsules */}
+          <div className="absolute bottom-3 inset-x-3 z-30 flex items-center justify-between px-3 py-1.5 rounded-2xl bg-white/85 backdrop-blur-md border border-[#EBD4DC]/80">
+            <div className="flex items-center gap-2 overflow-x-auto no-scrollbar py-0.5">
+              {dishes.map((dish, idx) => {
+                const isActive = idx === activeIndex;
+                return (
+                  <button
+                    key={dish.id}
+                    type="button"
+                    onClick={() => setActiveIndex(idx)}
+                    className={`flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold transition-all shrink-0 cursor-pointer ${
+                      isActive
+                        ? "bg-[#C94F78] text-white shadow-xs scale-102"
+                        : "bg-[#FFF9F2] text-[#735A67] hover:bg-[#FBE7EE] hover:text-[#352431]"
+                    }`}
+                  >
+                    <img
+                      src={getThumbnailUrl(dish.image, 60)}
+                      alt=""
+                      width="16"
+                      height="16"
+                      loading="lazy"
+                      decoding="async"
+                      className="size-4 rounded-full object-cover shrink-0"
+                      onError={(e) => {
+                        e.currentTarget.onerror = null;
+                        e.currentTarget.src = "/images/sakura-katsu-bowl.webp";
+                      }}
+                    />
+                    <span className="text-[11px] truncate max-w-[110px] sm:max-w-none">
+                      {dish.name}
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
+
+            {/* Progress Dots Indicator */}
+            <div className="flex items-center gap-1 pl-2 shrink-0">
+              {dishes.map((dish, idx) => (
+                <button
+                  key={dish.id}
+                  type="button"
+                  onClick={() => setActiveIndex(idx)}
+                  className={`rounded-full transition-all duration-300 cursor-pointer ${
+                    idx === activeIndex
+                      ? "w-4 h-1.5 bg-[#C94F78]"
+                      : "w-1.5 h-1.5 bg-[#EBD4DC] hover:bg-[#C94F78]/50"
+                  }`}
+                  aria-label={`Go to slide ${idx + 1}`}
+                />
+              ))}
+            </div>
+          </div>
+        </>
+      )}
     </div>
   );
 };

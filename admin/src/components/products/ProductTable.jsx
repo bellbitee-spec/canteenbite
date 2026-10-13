@@ -1,6 +1,7 @@
 import React from "react";
 import ProductStatusBadge from "./ProductStatusBadge";
 import StockIndicator from "./StockIndicator";
+import { getThumbnailUrl } from "../../utils/imageUtils";
 
 /**
  * ProductTable
@@ -50,11 +51,17 @@ const ProductTable = ({
                         <div className="w-10 h-10 rounded-xl bg-[#FFF9F2] border border-[#EBD4DC] flex items-center justify-center overflow-hidden flex-shrink-0">
                           {product.image ? (
                             <img
-                              src={product.image}
+                              src={getThumbnailUrl(product.image, 80)}
                               alt={product.name}
+                              width="40"
+                              height="40"
+                              loading="lazy"
+                              decoding="async"
                               className="w-full h-full object-cover"
                               onError={(e) => {
-                                e.target.style.display = "none";
+                                e.currentTarget.onerror = null;
+                                e.currentTarget.src = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='40' height='40' viewBox='0 0 24 24' fill='none' stroke='%23927681' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4'/%3E%3C/svg%3E";
+                                e.currentTarget.className = "w-5 h-5 m-auto object-contain";
                               }}
                             />
                           ) : (
@@ -184,11 +191,17 @@ const ProductTable = ({
                 <div className="w-14 h-14 rounded-2xl bg-[#FFF9F2] border border-[#EBD4DC] flex items-center justify-center overflow-hidden flex-shrink-0">
                   {product.image ? (
                     <img
-                      src={product.image}
+                      src={getThumbnailUrl(product.image, 112)}
                       alt={product.name}
+                      width="56"
+                      height="56"
+                      loading="lazy"
+                      decoding="async"
                       className="w-full h-full object-cover"
                       onError={(e) => {
-                        e.target.style.display = "none";
+                        e.currentTarget.onerror = null;
+                        e.currentTarget.src = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='56' height='56' viewBox='0 0 24 24' fill='none' stroke='%23927681' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4'/%3E%3C/svg%3E";
+                        e.currentTarget.className = "w-6 h-6 m-auto object-contain";
                       }}
                     />
                   ) : (

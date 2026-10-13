@@ -29,6 +29,7 @@ import {
 } from "../services/productService";
 import { getCombos } from "../services/comboService";
 import { getFoodImage } from "../utils/foodImages";
+import { getThumbnailUrl } from "../utils/imageUtils";
 
 const POPULAR_TAGS = [
   "Masala Dosa",
@@ -210,7 +211,12 @@ const Home = () => {
 
           {/* Right Column: Zomato-Style Animated Sakura Hero Showcase */}
           <div className="order-1 lg:order-2">
-            <SakuraHeroShowcase products={products} />
+            <SakuraHeroShowcase
+              products={products}
+              loading={loading}
+              error={error}
+              onRetry={fetchInitialData}
+            />
           </div>
         </section>
       )}
@@ -255,9 +261,16 @@ const Home = () => {
                   }`}
                 >
                   <img
-                    src={catImage}
+                    src={getThumbnailUrl(catImage, 60)}
                     alt=""
+                    width="28"
+                    height="28"
+                    decoding="async"
                     className="size-7 rounded-full object-cover"
+                    onError={(e) => {
+                      e.currentTarget.onerror = null;
+                      e.currentTarget.src = getFoodImage(cat);
+                    }}
                   />
                   <span>{cat.name}</span>
                 </button>

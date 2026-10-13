@@ -1,5 +1,6 @@
 import React, { useState, useRef } from "react";
 import uploadService from "../../services/uploadService";
+import { getThumbnailUrl } from "../../utils/imageUtils";
 
 const MAX_SIZE_BYTES = 5 * 1024 * 1024; // 5 MB
 const SUPPORTED_TYPES = ["image/jpeg", "image/png", "image/webp"];
@@ -142,8 +143,12 @@ const ImageUpload = ({
           <div className="w-16 h-16 rounded-xl bg-white border border-[#EBD4DC] flex items-center justify-center overflow-hidden flex-shrink-0 relative shadow-2xs">
             {value && !previewError ? (
               <img
-                src={value}
+                src={getThumbnailUrl(value, 128)}
                 alt="Preview"
+                width="64"
+                height="64"
+                loading="lazy"
+                decoding="async"
                 className="w-full h-full object-cover"
                 onError={() => setPreviewError(true)}
               />

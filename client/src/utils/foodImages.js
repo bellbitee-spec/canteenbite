@@ -1,3 +1,5 @@
+import { isValidImageUrl } from "./imageUtils";
+
 // Utility to provide crisp, appetizing food imagery fallbacks
 // matches dish names and category names to high-quality curated food visuals
 
@@ -82,7 +84,12 @@ export const getFoodImage = (itemOrName) => {
 
   // If item object has a valid non-empty image url, return it
   if (typeof itemOrName === "object") {
-    if (itemOrName.image && typeof itemOrName.image === "string" && itemOrName.image.startsWith("http")) {
+    if (
+      itemOrName.image &&
+      typeof itemOrName.image === "string" &&
+      itemOrName.image.startsWith("http") &&
+      isValidImageUrl(itemOrName.image)
+    ) {
       return itemOrName.image;
     }
     const nameToMatch = (itemOrName.name || "").toLowerCase();

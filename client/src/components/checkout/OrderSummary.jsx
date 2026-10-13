@@ -1,6 +1,8 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import { UtensilsCrossed, Layers, ShoppingBag } from "lucide-react";
+import { getThumbnailUrl } from "../../utils/imageUtils";
+import { getFoodImage } from "../../utils/foodImages";
 
 /**
  * OrderSummary Component
@@ -46,12 +48,16 @@ const OrderSummary = ({
               <div className="flex items-center gap-3 min-w-0">
                 {item.image ? (
                   <img
-                    src={item.image}
+                    src={getThumbnailUrl(item.image, 96)}
                     alt={item.name}
+                    width="48"
+                    height="48"
                     loading="lazy"
+                    decoding="async"
                     className="w-12 h-12 rounded-2xl object-cover bg-[#FBE7EE] shrink-0 border border-[#EBD4DC]"
                     onError={(e) => {
-                      e.target.style.display = "none";
+                      e.currentTarget.onerror = null;
+                      e.currentTarget.src = getFoodImage(item);
                     }}
                   />
                 ) : (

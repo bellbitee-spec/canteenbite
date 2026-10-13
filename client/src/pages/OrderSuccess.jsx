@@ -12,6 +12,8 @@ import {
 import PageContainer from "../components/layout/PageContainer";
 import orderService from "../services/orderService";
 import Loader from "../components/common/Loader";
+import { getThumbnailUrl } from "../utils/imageUtils";
+import { getFoodImage } from "../utils/foodImages";
 
 const formatExpectedTime = (dateStr) => {
   if (!dateStr) return null;
@@ -199,12 +201,16 @@ const OrderSuccess = () => {
                     <div className="flex items-center gap-3">
                       {itemImg ? (
                         <img
-                          src={itemImg}
+                          src={getThumbnailUrl(itemImg, 80)}
                           alt={item.name}
+                          width="40"
+                          height="40"
                           loading="lazy"
+                          decoding="async"
                           className="w-10 h-10 rounded-xl object-cover bg-[#FBE7EE] border border-[#EBD4DC]"
                           onError={(e) => {
-                            e.target.style.display = "none";
+                            e.currentTarget.onerror = null;
+                            e.currentTarget.src = getFoodImage(item);
                           }}
                         />
                       ) : (

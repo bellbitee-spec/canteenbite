@@ -3,6 +3,7 @@ import { Plus, Minus, Trash2, Clock, Layers, UtensilsCrossed } from "lucide-reac
 import useCart from "../../hooks/useCart";
 import { calculateItemSubtotal } from "../../utils/cartUtils";
 import { getFoodImage } from "../../utils/foodImages";
+import { getThumbnailUrl } from "../../utils/imageUtils";
 
 const CartItem = ({ item }) => {
   const { increaseQuantity, decreaseQuantity, removeItem } = useCart();
@@ -10,7 +11,8 @@ const CartItem = ({ item }) => {
 
   const itemSubtotal = calculateItemSubtotal(item);
   const isCombo = item.itemType === "COMBO";
-  const imageUrl = (!imageError && item.image) ? item.image : getFoodImage(item);
+  const rawImageUrl = (!imageError && item.image) ? item.image : getFoodImage(item);
+  const imageUrl = getThumbnailUrl(rawImageUrl, 128);
 
   return (
     <div className="flex items-start sm:items-center justify-between gap-3 sm:gap-4 p-3.5 sm:p-4 rounded-2xl bg-white border border-[#EBD4DC] shadow-sm hover:shadow-md transition-all">
@@ -21,9 +23,18 @@ const CartItem = ({ item }) => {
             <img
               src={imageUrl}
               alt={item.name}
+              width="64"
+              height="64"
               loading="lazy"
+              decoding="async"
               className="w-full h-full object-cover"
-              onError={() => setImageError(true)}
+              onError={(e) => {
+                if (!imageError) {
+                  setImageError(true);
+                } else {
+                  e.currentTarget.onerror = null;
+                }
+              }}
             />
           ) : isCombo ? (
             <Layers className="w-6 h-6 text-[#C94F78]" />

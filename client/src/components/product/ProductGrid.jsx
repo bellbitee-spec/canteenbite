@@ -33,8 +33,12 @@ const ProductGrid = ({
 
   return (
     <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-x-3.5 sm:gap-x-5 gap-y-6 sm:gap-y-8 pt-2">
-      {products.map((product) => (
-        <ProductCard key={product.id} product={product} />
+      {products.map((product, index) => (
+        <ProductCard
+          key={product.id}
+          product={product}
+          priority={index < 4}
+        />
       ))}
     </div>
   );

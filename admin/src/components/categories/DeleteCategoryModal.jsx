@@ -1,4 +1,5 @@
 import React, { useEffect } from "react";
+import { getThumbnailUrl } from "../../utils/imageUtils";
 
 /**
  * DeleteCategoryModal
@@ -77,11 +78,17 @@ const DeleteCategoryModal = ({
           <div className="w-12 h-12 rounded-xl bg-white flex items-center justify-center overflow-hidden flex-shrink-0 border border-[#EBD4DC]">
             {category.image ? (
               <img
-                src={category.image}
+                src={getThumbnailUrl(category.image, 96)}
                 alt={category.name}
+                width="48"
+                height="48"
+                loading="lazy"
+                decoding="async"
                 className="w-full h-full object-cover"
                 onError={(e) => {
-                  e.target.style.display = "none";
+                  e.currentTarget.onerror = null;
+                  e.currentTarget.src = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='48' height='48' viewBox='0 0 24 24' fill='none' stroke='%23927681' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z'/%3E%3C/svg%3E";
+                  e.currentTarget.className = "w-6 h-6 m-auto object-contain";
                 }}
               />
             ) : (

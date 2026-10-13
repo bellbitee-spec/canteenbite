@@ -18,6 +18,7 @@ import ErrorState from "../components/common/ErrorState";
 import { getProductById } from "../services/productService";
 import useCart from "../hooks/useCart";
 import { getFoodImage } from "../utils/foodImages";
+import { getHeroImageUrl, getResponsiveSrcSet } from "../utils/imageUtils";
 
 const Product = () => {
   const { id } = useParams();
@@ -124,10 +125,18 @@ const Product = () => {
             {/* Large Product Image */}
             <div className="relative aspect-square w-full rounded-2xl bg-[#FBE7EE] overflow-hidden border border-[#EBD4DC]">
               <img
-                src={product.image || getFoodImage(product)}
+                src={getHeroImageUrl(product.image || getFoodImage(product), 800)}
+                srcSet={getResponsiveSrcSet(product.image || getFoodImage(product), [400, 600, 800, 1000])}
+                sizes="(max-width: 768px) 100vw, 50vw"
                 alt={product.name}
+                width="600"
+                height="600"
+                loading="eager"
+                fetchPriority="high"
+                decoding="async"
                 className="w-full h-full object-cover"
                 onError={(e) => {
+                  e.currentTarget.onerror = null;
                   e.currentTarget.src = getFoodImage(product);
                 }}
               />

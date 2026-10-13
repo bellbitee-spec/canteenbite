@@ -1,5 +1,6 @@
 import React from "react";
 import CategoryStatusBadge from "./CategoryStatusBadge";
+import { getThumbnailUrl } from "../../utils/imageUtils";
 
 /**
  * CategoryTable
@@ -49,11 +50,17 @@ const CategoryTable = ({
                         <div className="w-10 h-10 rounded-xl bg-[#FFF9F2] border border-[#EBD4DC] flex items-center justify-center overflow-hidden flex-shrink-0">
                           {category.image ? (
                             <img
-                              src={category.image}
+                              src={getThumbnailUrl(category.image, 80)}
                               alt={category.name}
+                              width="40"
+                              height="40"
+                              loading="lazy"
+                              decoding="async"
                               className="w-full h-full object-cover"
                               onError={(e) => {
-                                e.target.style.display = "none";
+                                e.currentTarget.onerror = null;
+                                e.currentTarget.src = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='40' height='40' viewBox='0 0 24 24' fill='none' stroke='%23927681' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z'/%3E%3C/svg%3E";
+                                e.currentTarget.className = "w-5 h-5 m-auto object-contain";
                               }}
                             />
                           ) : (
@@ -154,11 +161,17 @@ const CategoryTable = ({
                 <div className="w-14 h-14 rounded-2xl bg-[#FFF9F2] border border-[#EBD4DC] flex items-center justify-center overflow-hidden flex-shrink-0">
                   {category.image ? (
                     <img
-                      src={category.image}
+                      src={getThumbnailUrl(category.image, 112)}
                       alt={category.name}
+                      width="56"
+                      height="56"
+                      loading="lazy"
+                      decoding="async"
                       className="w-full h-full object-cover"
                       onError={(e) => {
-                        e.target.style.display = "none";
+                        e.currentTarget.onerror = null;
+                        e.currentTarget.src = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='56' height='56' viewBox='0 0 24 24' fill='none' stroke='%23927681' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z'/%3E%3C/svg%3E";
+                        e.currentTarget.className = "w-6 h-6 m-auto object-contain";
                       }}
                     />
                   ) : (

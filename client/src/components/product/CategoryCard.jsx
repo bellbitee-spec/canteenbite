@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import { getFoodImage, getCategoryIcon } from "../../utils/foodImages";
+import { getThumbnailUrl } from "../../utils/imageUtils";
 
 const PASTEL_THEMES = [
   { bg: "bg-amber-100/70 border-amber-200/60 text-amber-800" },
@@ -36,19 +37,29 @@ const CategoryCard = ({ category, isSelected = false }) => {
       >
         {category.image && !imgError ? (
           <img
-            src={category.image}
+            src={getThumbnailUrl(category.image, 80)}
             alt={category.name}
-            loading="lazy"
+            width="36"
+            height="36"
+            decoding="async"
             className="w-8 h-8 sm:w-9 sm:h-9 object-cover rounded-xl"
-            onError={() => setImgError(true)}
+            onError={(e) => {
+              if (!imgError) setImgError(true);
+              else e.currentTarget.onerror = null;
+            }}
           />
         ) : fallbackUrl && !imgError ? (
           <img
-            src={fallbackUrl}
+            src={getThumbnailUrl(fallbackUrl, 80)}
             alt={category.name}
-            loading="lazy"
+            width="36"
+            height="36"
+            decoding="async"
             className="w-8 h-8 sm:w-9 sm:h-9 object-cover rounded-xl"
-            onError={() => setImgError(true)}
+            onError={(e) => {
+              if (!imgError) setImgError(true);
+              else e.currentTarget.onerror = null;
+            }}
           />
         ) : (
           <span className="text-2xl sm:text-3xl select-none">{icon}</span>

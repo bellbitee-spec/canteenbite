@@ -26,6 +26,8 @@ import paymentService, { loadRazorpayScript } from "../services/paymentService";
 import OrderTimeline from "../components/orders/OrderTimeline";
 import CancelCountdown from "../components/orders/CancelCountdown";
 import useOrderSocket from "../hooks/useOrderSocket";
+import { getThumbnailUrl } from "../utils/imageUtils";
+import { getFoodImage } from "../utils/foodImages";
 
 const formatCreatedTime = (dateStr) => {
   if (!dateStr) return "";
@@ -739,11 +741,16 @@ const OrderDetails = () => {
                   <div className="flex items-start gap-3">
                     {itemImg ? (
                       <img
-                        src={itemImg}
+                        src={getThumbnailUrl(itemImg, 96)}
                         alt={item.name}
+                        width="48"
+                        height="48"
+                        loading="lazy"
+                        decoding="async"
                         className="w-12 h-12 rounded-xl object-cover bg-[#FBE7EE] shrink-0 border border-[#EBD4DC]"
                         onError={(e) => {
-                          e.target.style.display = "none";
+                          e.currentTarget.onerror = null;
+                          e.currentTarget.src = getFoodImage(item);
                         }}
                       />
                     ) : (

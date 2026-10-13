@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback } from "react";
 import storeService from "../services/storeService";
 import productService from "../services/productService";
 import useStore from "../hooks/useStore";
+import { getThumbnailUrl } from "../utils/imageUtils";
 
 const DAY_NAMES = [
   "Sunday",
@@ -918,11 +919,17 @@ const StoreSettings = () => {
                       <div className="w-14 h-14 rounded-2xl bg-white border border-[#EBD4DC] overflow-hidden shrink-0">
                         {prod.image ? (
                           <img
-                            src={prod.image}
+                            src={getThumbnailUrl(prod.image, 112)}
                             alt={prod.name}
+                            width="56"
+                            height="56"
+                            loading="lazy"
+                            decoding="async"
                             className="w-full h-full object-cover"
                             onError={(e) => {
-                              e.currentTarget.src = "/images/sakura-katsu-bowl.jpg";
+                              e.currentTarget.onerror = null;
+                              e.currentTarget.src = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='56' height='56' viewBox='0 0 24 24' fill='none' stroke='%23927681' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4'/%3E%3C/svg%3E";
+                              e.currentTarget.className = "w-6 h-6 m-auto object-contain";
                             }}
                           />
                         ) : (

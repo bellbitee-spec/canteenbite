@@ -3,8 +3,9 @@ import { Link } from "react-router-dom";
 import { Plus, Minus, Clock, Flame } from "lucide-react";
 import useCart from "../../hooks/useCart";
 import { getFoodImage } from "../../utils/foodImages";
+import { getCardImageUrl, getResponsiveSrcSet } from "../../utils/imageUtils";
 
-const ProductCard = ({ product }) => {
+const ProductCard = ({ product, priority = false }) => {
   const { addProduct, increaseQuantity, decreaseQuantity, getItemQuantity } =
     useCart();
   const [imageError, setImageError] = useState(false);
@@ -34,7 +35,9 @@ const ProductCard = ({ product }) => {
   };
 
   const isVeg = product.isVeg !== undefined ? Boolean(product.isVeg) : true;
-  const imageUrl = !imageError && product.image ? product.image : getFoodImage(product);
+  const rawImageUrl = !imageError && product.image ? product.image : getFoodImage(product);
+  const imageUrl = getCardImageUrl(rawImageUrl);
+  const srcSet = getResponsiveSrcSet(rawImageUrl, [280, 400, 600]);
 
   return (
     <article className="group flex flex-col justify-between h-full rounded-2xl border border-[#EBD4DC] bg-white p-2.5 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-lg hover:shadow-[#C94F78]/10 overflow-hidden select-none">
@@ -46,10 +49,22 @@ const ProductCard = ({ product }) => {
       >
         <img
           src={imageUrl}
+          srcSet={srcSet}
+          sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
           alt={product.name}
-          loading="lazy"
+          width="400"
+          height="340"
+          loading={priority ? "eager" : "lazy"}
+          decoding="async"
+          {...(priority ? { fetchPriority: "high" } : { fetchPriority: "low" })}
           className="size-full object-cover transition duration-500 group-hover:scale-105"
-          onError={() => setImageError(true)}
+          onError={(e) => {
+            if (!imageError) {
+              setImageError(true);
+            } else {
+              e.currentTarget.onerror = null;
+            }
+          }}
         />
 
         {/* Tag / Category Badge (Top Left) */}

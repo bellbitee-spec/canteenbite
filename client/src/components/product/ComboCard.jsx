@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { Sparkles, Clock, Plus, Minus, Layers } from "lucide-react";
 import useCart from "../../hooks/useCart";
 import { getFoodImage } from "../../utils/foodImages";
+import { getThumbnailUrl } from "../../utils/imageUtils";
 
 const ComboCard = ({ combo }) => {
   const { addCombo, increaseQuantity, decreaseQuantity, getItemQuantity } =
@@ -29,7 +30,8 @@ const ComboCard = ({ combo }) => {
     decreaseQuantity(combo.id, "COMBO");
   };
 
-  const imageUrl = !imageError && combo.image ? combo.image : getFoodImage(combo);
+  const rawImageUrl = !imageError && combo.image ? combo.image : getFoodImage(combo);
+  const imageUrl = getThumbnailUrl(rawImageUrl, 200);
 
   return (
     <div className="bg-white rounded-2xl p-5 shadow-sm hover:shadow-lg hover:shadow-[#C94F78]/10 transition-all duration-300 flex flex-col justify-between relative overflow-hidden group border border-[#EBD4DC] select-none">
@@ -45,9 +47,18 @@ const ComboCard = ({ combo }) => {
             <img
               src={imageUrl}
               alt={combo.name}
+              width="88"
+              height="88"
               loading="lazy"
+              decoding="async"
               className="w-full h-full object-cover"
-              onError={() => setImageError(true)}
+              onError={(e) => {
+                if (!imageError) {
+                  setImageError(true);
+                } else {
+                  e.currentTarget.onerror = null;
+                }
+              }}
             />
           </div>
 
