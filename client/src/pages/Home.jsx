@@ -50,10 +50,11 @@ const Home = () => {
   const [searchTerm, setSearchTerm] = useState(queryParam);
   const [selectedCategory, setSelectedCategory] = useState("ALL");
   const [selectedFilter, setSelectedFilter] = useState("ALL");
-  const [loading, setLoading] = useState(true);
+  const [productsLoading, setProductsLoading] = useState(true);
+  const [categoriesLoading, setCategoriesLoading] = useState(true);
+  const [combosLoading, setCombosLoading] = useState(true);
   const [searching, setSearching] = useState(false);
   const [error, setError] = useState(null);
-
 
   // Sync search query param
   useEffect(() => {
@@ -62,25 +63,47 @@ const Home = () => {
     }
   }, [queryParam]);
 
-  const fetchInitialData = async () => {
-    try {
-      setLoading(true);
-      setError(null);
+  const fetchInitialData = () => {
+    setProductsLoading(true);
+    setCategoriesLoading(true);
+    setCombosLoading(true);
+    setError(null);
 
-      const [catsData, prodsData, combosData] = await Promise.all([
-        getCategories(),
-        getProducts(),
-        getCombos(),
-      ]);
+    // 1. Products (Hero showcase & main menu - Critical Above-the-Fold)
+    getProducts()
+      .then((data) => {
+        setProducts(data || []);
+      })
+      .catch((err) => {
+        setError(err.message || "Failed to load canteen menu");
+      })
+      .finally(() => {
+        setProductsLoading(false);
+      });
 
-      setCategories(catsData || []);
-      setProducts(prodsData || []);
-      setCombos(combosData || []);
-    } catch (err) {
-      setError(err.message || "Failed to load canteen menu");
-    } finally {
-      setLoading(false);
-    }
+    // 2. Categories (Category strip) - Independent, does not block hero or menu
+    getCategories()
+      .then((data) => {
+        setCategories(data || []);
+      })
+      .catch((err) => {
+        console.warn("Failed to load categories:", err.message);
+      })
+      .finally(() => {
+        setCategoriesLoading(false);
+      });
+
+    // 3. Combos (Below-the-fold value packs) - Independent, does not block hero or menu
+    getCombos()
+      .then((data) => {
+        setCombos(data || []);
+      })
+      .catch((err) => {
+        console.warn("Failed to load combos:", err.message);
+      })
+      .finally(() => {
+        setCombosLoading(false);
+      });
   };
 
   useEffect(() => {
@@ -213,7 +236,7 @@ const Home = () => {
           <div className="order-1 lg:order-2">
             <SakuraHeroShowcase
               products={products}
-              loading={loading}
+              loading={productsLoading}
               error={error}
               onRetry={fetchInitialData}
             />
@@ -281,7 +304,7 @@ const Home = () => {
       )}
 
       {/* Main State Handling */}
-      {loading ? (
+      {productsLoading ? (
         <div className="space-y-12">
           {/* Skeleton category capsules */}
           <div className="flex gap-3 overflow-x-auto no-scrollbar py-2">
@@ -426,7 +449,7 @@ const Home = () => {
           </section>
 
           {/* ================= STUDENT COMBOS SECTION ================= */}
-          {!searchTerm && combos.length > 0 && (
+          {!searchTerm && (combos.length > 0 || combosLoading) && (
             <section aria-labelledby="combos-heading" className="pt-2">
               <div className="flex items-center justify-between mb-5">
                 <div>
@@ -443,11 +466,29 @@ const Home = () => {
                 </div>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-                {combos.map((combo) => (
-                  <ComboCard key={combo.id} combo={combo} />
-                ))}
-              </div>
+              {combosLoading ? (
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+                  {[1, 2, 3].map((i) => (
+                    <div
+                      key={i}
+                      className="bg-white rounded-2xl p-5 border border-[#EBD4DC] flex gap-4 animate-pulse"
+                    >
+                      <div className="w-20 h-20 rounded-xl bg-[#FBE7EE]" />
+                      <div className="flex-1 space-y-2">
+                        <div className="h-4 bg-[#FBE7EE] rounded w-3/4" />
+                        <div className="h-3 bg-[#FBE7EE]/60 rounded w-1/2" />
+                        <div className="h-4 bg-[#FBE7EE] rounded w-1/4 mt-2" />
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+                  {combos.map((combo) => (
+                    <ComboCard key={combo.id} combo={combo} />
+                  ))}
+                </div>
+              )}
             </section>
           )}
         </div>

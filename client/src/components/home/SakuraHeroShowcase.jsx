@@ -232,16 +232,30 @@ const SakuraHeroShowcase = ({ products = [], loading = false, error = null, onRe
     return () => clearInterval(timer);
   }, [loading, isHovered, dishes.length]);
 
-  // Subtle 3D tilt interaction
+  // Subtle 3D tilt interaction (bounds cached on enter to eliminate forced reflow on mousemove)
+  const rectRef = useRef(null);
+
+  const handleMouseEnter = () => {
+    setIsHovered(true);
+    if (containerRef.current) {
+      rectRef.current = containerRef.current.getBoundingClientRect();
+    }
+  };
+
   const handleMouseMove = (e) => {
-    if (!containerRef.current) return;
-    const rect = containerRef.current.getBoundingClientRect();
+    let rect = rectRef.current;
+    if (!rect && containerRef.current) {
+      rect = containerRef.current.getBoundingClientRect();
+      rectRef.current = rect;
+    }
+    if (!rect || rect.width === 0 || rect.height === 0) return;
     const x = (e.clientX - rect.left) / rect.width - 0.5;
     const y = (e.clientY - rect.top) / rect.height - 0.5;
     setMouseOffset({ x: x * 10, y: y * 10 });
   };
 
   const handleMouseLeave = () => {
+    rectRef.current = null;
     setMouseOffset({ x: 0, y: 0 });
     setIsHovered(false);
   };
@@ -252,7 +266,7 @@ const SakuraHeroShowcase = ({ products = [], loading = false, error = null, onRe
   return (
     <div
       ref={containerRef}
-      onMouseEnter={() => setIsHovered(true)}
+      onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
       onMouseMove={handleMouseMove}
       className="relative z-10 w-full aspect-[1.18] sm:aspect-[1.25] lg:aspect-[1.12] overflow-hidden rounded-[32px] bg-gradient-to-b from-[#FFF0F5] via-[#FBE7EE] to-[#FFF9F2] border border-[#EBD4DC] shadow-[0_24px_60px_-25px_rgba(201,79,120,0.35)] select-none transition-all duration-300"
