@@ -25,6 +25,7 @@ const OrderTable = ({
   onViewDetails,
   onStatusChange,
   onCancelClick,
+  onRecordPayment,
 }) => {
   if (loading) {
     return (
@@ -68,6 +69,8 @@ const OrderTable = ({
               const orderId = order.id || order._id;
               const status = (order.orderStatus || "PENDING").toUpperCase();
               const paymentMethod = (order.paymentMethod || "CASH").toUpperCase();
+              const isCashOrCod = paymentMethod === "COD" || paymentMethod === "CASH";
+              const displayPaymentMethod = isCashOrCod ? "COD" : paymentMethod;
               const paymentStatus = (order.paymentStatus || "PENDING").toUpperCase();
               const isPaid = paymentStatus === "PAID";
 
@@ -120,8 +123,21 @@ const OrderTable = ({
                           : "bg-amber-50 text-amber-800 border-amber-200"
                       }`}
                     >
-                      {paymentMethod}: {paymentStatus}
+                      {displayPaymentMethod}: {isPaid ? "PAID" : "UNPAID"}
                     </span>
+                    {!isPaid && isCashOrCod && onRecordPayment && status !== "CANCELLED" && (
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          onRecordPayment(orderId, "PAID");
+                        }}
+                        className="ml-2 px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 hover:bg-emerald-200 text-emerald-800 border border-emerald-300 transition cursor-pointer"
+                        title="Collect Cash & Mark Paid"
+                      >
+                        💵 Collect
+                      </button>
+                    )}
                   </td>
 
                   {/* Status */}

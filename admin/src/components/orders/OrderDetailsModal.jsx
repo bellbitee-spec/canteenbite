@@ -21,6 +21,7 @@ const OrderDetailsModal = ({
   onClose,
   onStatusChange,
   onCancelClick,
+  onRecordPayment,
   loadingAction,
   actionError,
 }) => {
@@ -28,9 +29,10 @@ const OrderDetailsModal = ({
 
   const orderId = order.id || order._id;
   const status = (order.orderStatus || "PENDING").toUpperCase();
-  const paymentMethod = (order.paymentMethod || "CASH").toUpperCase();
+  const paymentMethod = (order.paymentMethod || "COD").toUpperCase();
   const paymentStatus = (order.paymentStatus || "PENDING").toUpperCase();
   const isPaid = paymentStatus === "PAID";
+  const isCashOrCod = paymentMethod === "COD" || paymentMethod === "CASH";
   const isOnlineUnpaid = paymentMethod === "ONLINE" && !isPaid;
 
   return (
@@ -105,8 +107,10 @@ const OrderDetailsModal = ({
               <p className="text-xs text-[#735A67] font-semibold mb-1">
                 Payment Info
               </p>
-              <div className="flex items-center gap-2">
-                <span className="font-bold text-[#352431]">{paymentMethod}</span>
+              <div className="flex items-center gap-2 flex-wrap">
+                <span className="font-bold text-[#352431]">
+                  {isCashOrCod ? "Cash on Delivery (COD)" : "Online Payment"}
+                </span>
                 <span
                   className={`px-2 py-0.5 rounded text-[11px] font-bold border ${
                     isPaid
@@ -114,12 +118,22 @@ const OrderDetailsModal = ({
                       : "bg-amber-50 text-amber-700 border-amber-200"
                   }`}
                 >
-                  {paymentStatus}
+                  {isPaid ? "PAID" : "UNPAID"}
                 </span>
               </div>
               <p className="text-xs text-[#735A67] font-mono mt-0.5">
                 Total: ₹{order.totalAmount}
               </p>
+              {!isPaid && isCashOrCod && status !== "CANCELLED" && onRecordPayment && (
+                <button
+                  type="button"
+                  disabled={loadingAction}
+                  onClick={() => onRecordPayment(orderId)}
+                  className="mt-2 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold transition shadow-xs cursor-pointer disabled:opacity-50"
+                >
+                  💵 Mark Cash Collected (PAID)
+                </button>
+              )}
             </div>
           </div>
 

@@ -223,12 +223,12 @@ const SakuraHeroShowcase = ({ products = [], loading = false, error = null, onRe
     }
   }, [activeIndex, dishes.length]);
 
-  // Auto-rotate every 4.8 seconds unless hovered or loading
+  // Auto-rotate every 6.0 seconds unless hovered or loading
   useEffect(() => {
     if (loading || isHovered || dishes.length <= 1) return;
     const timer = setInterval(() => {
       setActiveIndex((prev) => (prev + 1) % dishes.length);
-    }, 4800);
+    }, 6000);
     return () => clearInterval(timer);
   }, [loading, isHovered, dishes.length]);
 
@@ -469,6 +469,7 @@ const SakuraHeroShowcase = ({ products = [], loading = false, error = null, onRe
                   {dishes.map((dish, idx) => {
                     if (!loadedSlideIndices.has(idx)) return null;
                     const isCurrent = idx === activeIndex;
+                    const isLcpSlide = idx === 0;
                     return (
                       <img
                         key={dish.id}
@@ -481,9 +482,9 @@ const SakuraHeroShowcase = ({ products = [], loading = false, error = null, onRe
                             ? "opacity-100 scale-100 rotate-0"
                             : "opacity-0 scale-90 rotate-6 pointer-events-none"
                         }`}
-                        loading={isCurrent ? "eager" : "lazy"}
+                        loading={isCurrent || isLcpSlide ? "eager" : "lazy"}
                         decoding="async"
-                        {...(isCurrent ? { fetchPriority: "high" } : { fetchPriority: "low" })}
+                        fetchPriority={isCurrent || isLcpSlide ? "high" : "low"}
                         onError={(e) => {
                           e.currentTarget.onerror = null;
                           e.currentTarget.src = "/images/sakura-katsu-bowl.webp";

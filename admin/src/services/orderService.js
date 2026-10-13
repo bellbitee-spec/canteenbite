@@ -61,6 +61,14 @@ const orderService = {
   cancelOrder: async (id, reason) => {
     return await api.post(`/admin/orders/${id}/cancel`, { reason });
   },
+
+  /**
+   * Admin record payment status (e.g. cash collected for COD)
+   * Endpoint: PATCH /api/admin/orders/:id/payment
+   */
+  recordPayment: async (id, data = { paymentStatus: "PAID" }) => {
+    return await api.patch(`/admin/orders/${id}/payment`, data);
+  },
 };
 
 export default orderService;

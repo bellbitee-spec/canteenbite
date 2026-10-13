@@ -48,6 +48,13 @@ router.post(
   orderController.adminCancelOrder
 );
 
+// PATCH /api/admin/orders/:id/payment - Admin record payment status (e.g. cash collected for COD)
+router.patch(
+  "/orders/:id/payment",
+  getOrderByIdValidator,
+  orderController.recordPayment
+);
+
 // --- STORE SCHEDULE & SETTINGS MANAGEMENT ROUTES (PART 16) ---
 
 // GET /api/admin/store/status - Get authoritative store status

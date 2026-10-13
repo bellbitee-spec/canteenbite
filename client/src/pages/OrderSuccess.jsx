@@ -14,6 +14,7 @@ import orderService from "../services/orderService";
 import Loader from "../components/common/Loader";
 import { getThumbnailUrl } from "../utils/imageUtils";
 import { getFoodImage } from "../utils/foodImages";
+import useOrderSocket from "../hooks/useOrderSocket";
 
 const formatExpectedTime = (dateStr) => {
   if (!dateStr) return null;
@@ -54,6 +55,29 @@ const OrderSuccess = () => {
         .finally(() => setLoading(false));
     }
   }, [id, order]);
+
+  // Real-time synchronization: reflect admin acceptance or payment updates immediately
+  useOrderSocket({
+    orderId: id || order?.id || order?._id,
+    enabled: !!(id || order?.id || order?._id),
+    onOrderUpdated: (eventData) => {
+      setOrder((prev) => {
+        if (!prev) return prev;
+        return {
+          ...prev,
+          orderStatus: eventData.orderStatus || prev.orderStatus,
+          paymentStatus: eventData.paymentStatus || prev.paymentStatus,
+          expectedReadyAt: eventData.expectedReadyAt || prev.expectedReadyAt,
+        };
+      });
+    },
+    onReconnect: () => {
+      const targetId = id || order?.id || order?._id;
+      if (targetId) {
+        orderService.getOrderById(targetId).then(setOrder).catch(() => {});
+      }
+    },
+  });
 
   if (loading) {
     return (
@@ -129,7 +153,9 @@ const OrderSuccess = () => {
                 Payment Method
               </span>
               <span className="font-bold text-[#352431] block mt-0.5">
-                {order.paymentMethod === "CASH" ? "Cash at Counter" : "Online Payment"}
+                {order.paymentMethod === "COD" || order.paymentMethod === "CASH"
+                  ? "Cash on Delivery (COD)"
+                  : "Online Payment"}
               </span>
             </div>
 
@@ -142,7 +168,11 @@ const OrderSuccess = () => {
                   order.paymentStatus === "PAID" ? "text-[#5F9A68]" : "text-amber-600"
                 }`}
               >
-                {order.paymentStatus || "PENDING"}
+                {order.paymentStatus === "PAID"
+                  ? "PAID"
+                  : order.paymentMethod === "COD" || order.paymentMethod === "CASH"
+                  ? "UNPAID (Pay on Delivery / Collection)"
+                  : "PENDING"}
               </span>
             </div>
 

@@ -39,6 +39,7 @@ const OrderCard = ({
   onStatusChange,
   onCancelClick,
   onViewDetails,
+  onRecordPayment,
   loadingAction = false,
 }) => {
   if (!order) return null;
@@ -46,6 +47,8 @@ const OrderCard = ({
   const orderId = order.id || order._id;
   const status = (order.orderStatus || "PENDING").toUpperCase();
   const paymentMethod = (order.paymentMethod || "CASH").toUpperCase();
+  const isCashOrCod = paymentMethod === "COD" || paymentMethod === "CASH";
+  const displayPaymentMethod = isCashOrCod ? "COD" : paymentMethod;
   const paymentStatus = (order.paymentStatus || "PENDING").toUpperCase();
   const isPaid = paymentStatus === "PAID";
   const isOnlineUnpaid = paymentMethod === "ONLINE" && !isPaid;
@@ -129,7 +132,7 @@ const OrderCard = ({
 
       {/* Payment & Expected Time Info */}
       <div className="flex items-center justify-between pt-2 border-t border-[#EBD4DC]/80 text-xs">
-        <div className="flex items-center gap-1.5">
+        <div className="flex items-center gap-1.5 flex-wrap">
           <span
             className={`px-2 py-0.5 rounded-full text-[10px] font-bold tracking-wide border ${
               isPaid
@@ -139,11 +142,25 @@ const OrderCard = ({
                 : "bg-amber-50 text-amber-800 border-amber-200"
             }`}
           >
-            {paymentMethod}: {isPaid ? "PAID" : "PENDING"}
+            {displayPaymentMethod}: {isPaid ? "PAID" : "UNPAID"}
           </span>
           <span className="font-mono font-black text-[#352431]">
             ₹{order.totalAmount}
           </span>
+          {!isPaid && isCashOrCod && onRecordPayment && status !== "CANCELLED" && (
+            <button
+              type="button"
+              disabled={loadingAction}
+              onClick={(e) => {
+                e.stopPropagation();
+                onRecordPayment(orderId, "PAID");
+              }}
+              className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 hover:bg-emerald-200 text-emerald-800 border border-emerald-300 transition cursor-pointer"
+              title="Collect Cash & Mark Paid"
+            >
+              💵 Collect
+            </button>
+          )}
         </div>
 
         {expectedTimeStr && (

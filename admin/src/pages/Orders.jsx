@@ -348,6 +348,39 @@ const Orders = () => {
     }
   };
 
+  /**
+   * Handle admin recording payment (e.g. Cash collected for COD)
+   */
+  const handleRecordPayment = async (orderId) => {
+    setLoadingActionId(orderId);
+    try {
+      const res = await orderService.recordPayment(orderId, { paymentStatus: "PAID" });
+      const updated = res.order || (res.data && res.data.order);
+      showToast("Payment recorded as PAID.", "success");
+
+      if (updated) {
+        setOrders((prev) =>
+          prev.map((o) =>
+            (o.id || o._id)?.toString() === orderId.toString() ? updated : o
+          )
+        );
+        if (
+          selectedOrder &&
+          (selectedOrder.id || selectedOrder._id)?.toString() === orderId.toString()
+        ) {
+          setSelectedOrder(updated);
+        }
+      } else {
+        await loadOrders(true);
+      }
+    } catch (err) {
+      const errMsg = err.data?.message || err.message || "Failed to record payment.";
+      showToast(errMsg, "error");
+    } finally {
+      setLoadingActionId(null);
+    }
+  };
+
   const handleOpenCancelModal = (order) => {
     setOrderToCancel(order);
     setIsCancelModalOpen(true);
@@ -620,6 +653,7 @@ const Orders = () => {
                           onStatusChange={handleStatusChange}
                           onCancelClick={handleOpenCancelModal}
                           onViewDetails={handleOpenDetails}
+                          onRecordPayment={handleRecordPayment}
                           loadingAction={loadingActionId === (ord.id || ord._id)}
                         />
                       ))
@@ -713,7 +747,8 @@ const Orders = () => {
                   className="w-full px-3.5 py-2.5 rounded-xl bg-[#FFF9F2] border border-[#EBD4DC] text-[#352431] focus:outline-hidden focus:border-[#C94F78] cursor-pointer"
                 >
                   <option value="all">All Payment Methods</option>
-                  <option value="CASH">CASH</option>
+                  <option value="COD">Cash on Delivery (COD)</option>
+                  <option value="CASH">CASH (Legacy)</option>
                   <option value="ONLINE">ONLINE</option>
                 </select>
               </div>
@@ -765,6 +800,7 @@ const Orders = () => {
             onViewDetails={handleOpenDetails}
             onStatusChange={handleStatusChange}
             onCancelClick={handleOpenCancelModal}
+            onRecordPayment={handleRecordPayment}
           />
         </div>
       )}
@@ -779,6 +815,7 @@ const Orders = () => {
         }}
         onStatusChange={handleStatusChange}
         onCancelClick={handleOpenCancelModal}
+        onRecordPayment={handleRecordPayment}
         loadingAction={loadingActionId === (selectedOrder?.id || selectedOrder?._id)}
       />
 

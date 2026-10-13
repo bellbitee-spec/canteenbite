@@ -410,6 +410,43 @@ const adminCancelOrder = async (req, res) => {
   }
 };
 
+/**
+ * PATCH /api/admin/orders/:id/payment
+ * Admin record payment collection (e.g. Cash on Delivery / Counter collection)
+ */
+const recordPayment = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { paymentStatus } = req.body;
+
+    const order = await orderService.recordPayment({
+      orderId: id,
+      adminId: req.user._id,
+      paymentStatus: paymentStatus || "PAID",
+    });
+
+    const formattedOrder = formatAdminOrder(order);
+
+    return res.status(200).json({
+      success: true,
+      message: "Order payment status updated successfully",
+      order: formattedOrder,
+      data: {
+        order: formattedOrder,
+      },
+    });
+  } catch (error) {
+    const statusCode = error.statusCode || 500;
+    const message =
+      statusCode === 500 ? "Internal server error" : error.message;
+
+    return res.status(statusCode).json({
+      success: false,
+      message,
+    });
+  }
+};
+
 module.exports = {
   createOrder,
   getMyOrders,
@@ -420,4 +457,5 @@ module.exports = {
   getAdminOrderById,
   updateOrderStatus,
   adminCancelOrder,
+  recordPayment,
 };

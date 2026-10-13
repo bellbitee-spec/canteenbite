@@ -990,7 +990,12 @@ const getAdminOrders = async ({
   }
 
   if (paymentMethod && typeof paymentMethod === "string" && paymentMethod.trim()) {
-    filter.paymentMethod = paymentMethod.trim().toUpperCase();
+    const pm = paymentMethod.trim().toUpperCase();
+    if (pm === "COD" || pm === "CASH") {
+      filter.paymentMethod = { $in: ["COD", "CASH"] };
+    } else {
+      filter.paymentMethod = pm;
+    }
   }
 
   if (from || to) {
@@ -1558,6 +1563,60 @@ const cleanupAbandonedOnlineOrders = async (timeoutMinutes = 15) => {
   return releasedOrders;
 };
 
+/**
+ * Admin: Record payment collection (e.g. Cash on Delivery / Counter collection)
+ */
+const recordPayment = async ({ orderId, adminId, paymentStatus = "PAID" }) => {
+  const order = await Order.findById(orderId).populate("items");
+  if (!order) {
+    const err = new Error("Order not found");
+    err.statusCode = 404;
+    throw err;
+  }
+
+  if (order.orderStatus === "CANCELLED") {
+    const err = new Error("Cannot record payment for a cancelled order");
+    err.statusCode = 400;
+    throw err;
+  }
+
+  const validStatuses = ["PAID", "PENDING", "FAILED"];
+  const targetStatus = (paymentStatus || "PAID").toUpperCase();
+  if (!validStatuses.includes(targetStatus)) {
+    const err = new Error(`Invalid payment status: ${paymentStatus}`);
+    err.statusCode = 400;
+    throw err;
+  }
+
+  // Update order paymentStatus
+  const updatedOrder = await Order.findByIdAndUpdate(
+    orderId,
+    { $set: { paymentStatus: targetStatus } },
+    { new: true }
+  )
+    .populate("user", "name email role")
+    .populate("items");
+
+  // Update payment record
+  const paymentUpdate = {
+    status: targetStatus,
+  };
+  if (targetStatus === "PAID") {
+    paymentUpdate.paidAt = new Date();
+    paymentUpdate.provider =
+      order.paymentMethod === "ONLINE" ? "ONLINE_MANUAL" : order.paymentMethod;
+  }
+
+  await Payment.findOneAndUpdate(
+    { order: orderId },
+    { $set: paymentUpdate },
+    { upsert: true, new: true }
+  );
+
+  emitOrderUpdated(updatedOrder);
+  return updatedOrder;
+};
+
 module.exports = {
   createOrder,
   cancelOrder,
@@ -1568,6 +1627,7 @@ module.exports = {
   getAdminOrderById,
   updateOrderStatus,
   adminCancelOrder,
+  recordPayment,
   systemCancelUnpaidOrder,
   cleanupAbandonedOnlineOrders,
   checkTransactionSupport,

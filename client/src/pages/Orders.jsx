@@ -111,8 +111,9 @@ const getPaymentBadge = (method, status) => {
   const isPaid = status === "PAID";
   const isFailed = status === "FAILED";
   const isRefunded = status === "REFUNDED";
+  const isCashOrCod = method === "COD" || method === "CASH";
 
-  let statusLabel = "Payment pending";
+  let statusLabel = isCashOrCod ? "Unpaid (COD)" : "Payment pending";
   let statusColor = "text-amber-600";
 
   if (isPaid) {
@@ -127,7 +128,7 @@ const getPaymentBadge = (method, status) => {
   }
 
   return {
-    methodLabel: method === "CASH" ? "CASH" : "ONLINE",
+    methodLabel: isCashOrCod ? "COD" : "ONLINE",
     statusLabel,
     statusColor,
   };

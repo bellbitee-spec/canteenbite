@@ -661,8 +661,8 @@ const OrderDetails = () => {
                 Payment Method
               </span>
               <span className="font-bold text-[#352431] block mt-0.5">
-                {order.paymentMethod === "CASH"
-                  ? "Cash at Counter"
+                {order.paymentMethod === "COD" || order.paymentMethod === "CASH"
+                  ? "Cash on Delivery (COD)"
                   : "Online Payment (Razorpay)"}
               </span>
             </div>
@@ -688,6 +688,8 @@ const OrderDetails = () => {
                   ? "Refund processed"
                   : isPaymentFailed
                   ? "Payment failed"
+                  : order.paymentMethod === "COD" || order.paymentMethod === "CASH"
+                  ? "Cash pending at counter"
                   : "Payment pending"}
               </span>
             </div>

@@ -37,7 +37,7 @@ const Checkout = () => {
   const { user, isAuthenticated, loading: authLoading, login } = useAuth();
 
   // Form States
-  const [paymentMethod, setPaymentMethod] = useState("CASH"); // 'CASH' | 'ONLINE'
+  const [paymentMethod, setPaymentMethod] = useState("COD"); // 'COD' | 'ONLINE' | 'CASH'
   const [notes, setNotes] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [errorMessage, setErrorMessage] = useState(null);
@@ -585,8 +585,8 @@ const Checkout = () => {
                   <span>Orders Unavailable</span>
                 ) : !isAuthenticated ? (
                   <span>Log In to Place Order</span>
-                ) : paymentMethod === "CASH" ? (
-                  <span>Confirm Order (Cash) — ₹{subtotal}</span>
+                ) : paymentMethod === "COD" || paymentMethod === "CASH" ? (
+                  <span>Confirm Order (Cash on Delivery) — ₹{subtotal}</span>
                 ) : (
                   <span>Pay Online — ₹{subtotal}</span>
                 )}

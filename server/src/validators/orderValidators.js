@@ -38,8 +38,8 @@ const createOrderValidator = [
   body("paymentMethod")
     .notEmpty()
     .withMessage("Payment method is required")
-    .isIn(["CASH", "ONLINE"])
-    .withMessage("Payment method must be either CASH or ONLINE"),
+    .isIn(["CASH", "COD", "ONLINE"])
+    .withMessage("Payment method must be CASH, COD, or ONLINE"),
 
   body("notes")
     .optional()
