@@ -127,11 +127,48 @@ const adminCancelOrderValidator = [
   handleValidationErrors,
 ];
 
+const updatePreparationTimeValidator = [
+  param("id")
+    .notEmpty()
+    .withMessage("Order ID is required")
+    .isMongoId()
+    .withMessage("Order ID must be a valid MongoDB ObjectId"),
+
+  body("adjustmentMinutes")
+    .optional()
+    .isInt({ min: -120, max: 240 })
+    .withMessage("adjustmentMinutes must be an integer between -120 and 240"),
+
+  body("remainingMinutes")
+    .optional()
+    .isInt({ min: 1, max: 300 })
+    .withMessage("remainingMinutes must be an integer between 1 and 300"),
+
+  body("customMinutes")
+    .optional()
+    .isInt({ min: 1, max: 300 })
+    .withMessage("customMinutes must be an integer between 1 and 300"),
+
+  body().custom((value) => {
+    if (
+      value.adjustmentMinutes === undefined &&
+      value.remainingMinutes === undefined &&
+      value.customMinutes === undefined
+    ) {
+      throw new Error("Must provide adjustmentMinutes, remainingMinutes, or customMinutes");
+    }
+    return true;
+  }),
+
+  handleValidationErrors,
+];
+
 module.exports = {
   createOrderValidator,
   getOrderByIdValidator,
   cancelOrderValidator,
   updateOrderStatusValidator,
   adminCancelOrderValidator,
+  updatePreparationTimeValidator,
 };
 

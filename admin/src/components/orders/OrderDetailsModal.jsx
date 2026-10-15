@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import OrderStatusBadge from "./OrderStatusBadge";
 
 const formatDateTime = (dateStr) => {
@@ -15,6 +15,13 @@ const formatDateTime = (dateStr) => {
   }
 };
 
+const formatTimeMMSS = (totalSeconds) => {
+  const safe = Math.max(0, Math.floor(totalSeconds));
+  const m = Math.floor(safe / 60);
+  const s = safe % 60;
+  return `${String(m).padStart(2, "0")}:${String(s).padStart(2, "0")}`;
+};
+
 const OrderDetailsModal = ({
   order,
   isOpen,
@@ -22,6 +29,7 @@ const OrderDetailsModal = ({
   onStatusChange,
   onCancelClick,
   onRecordPayment,
+  onUpdatePreparationTime,
   loadingAction,
   actionError,
 }) => {
@@ -34,6 +42,48 @@ const OrderDetailsModal = ({
   const isPaid = paymentStatus === "PAID";
   const isCashOrCod = paymentMethod === "COD" || paymentMethod === "CASH";
   const isOnlineUnpaid = paymentMethod === "ONLINE" && !isPaid;
+  const isActive = status !== "COMPLETED" && status !== "CANCELLED";
+
+  // Custom minute input state
+  const [customInput, setCustomInput] = useState("");
+  const [showCustom, setShowCustom] = useState(false);
+
+  // Remaining time countdown calculation
+  const readyTimestamp = order.estimatedReadyAt || order.expectedReadyAt;
+  const calculateRemaining = () => {
+    if (!readyTimestamp) return 0;
+    const diff = Math.floor((new Date(readyTimestamp).getTime() - Date.now()) / 1000);
+    return diff;
+  };
+
+  const [remainingSecs, setRemainingSecs] = useState(calculateRemaining);
+
+  useEffect(() => {
+    setRemainingSecs(calculateRemaining());
+    if (!isActive || status === "READY") return;
+
+    const interval = setInterval(() => {
+      setRemainingSecs(calculateRemaining());
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, [readyTimestamp, status, isActive]);
+
+  const handleAdjustMinutes = (mins) => {
+    if (!onUpdatePreparationTime || loadingAction) return;
+    onUpdatePreparationTime(orderId, { adjustmentMinutes: mins });
+  };
+
+  const handleSetCustomRemaining = (e) => {
+    e.preventDefault();
+    const val = parseInt(customInput, 10);
+    if (isNaN(val) || val < 1 || val > 300) return;
+    if (onUpdatePreparationTime && !loadingAction) {
+      onUpdatePreparationTime(orderId, { remainingMinutes: val });
+      setCustomInput("");
+      setShowCustom(false);
+    }
+  };
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 bg-black/50 backdrop-blur-xs overflow-y-auto">
@@ -45,7 +95,7 @@ const OrderDetailsModal = ({
         <div className="flex items-center justify-between p-5 sm:p-6 border-b border-[#EBD4DC] bg-white sticky top-0 z-10">
           <div className="flex items-center gap-3">
             <h3 className="text-xl font-bold text-[#352431] tracking-tight">
-              Order #{order.orderNumber || orderId.slice(-6)}
+              Order {order.orderNumber ? order.orderNumber : `#${orderId.slice(-6)}`}
             </h3>
             <OrderStatusBadge status={status} size="md" />
           </div>
@@ -122,7 +172,7 @@ const OrderDetailsModal = ({
                 </span>
               </div>
               <p className="text-xs text-[#735A67] font-mono mt-0.5">
-                Total: ₹{order.totalAmount}
+                Total Amount: ₹{order.totalAmount}
               </p>
               {!isPaid && isCashOrCod && status !== "CANCELLED" && onRecordPayment && (
                 <button
@@ -136,6 +186,117 @@ const OrderDetailsModal = ({
               )}
             </div>
           </div>
+
+          {/* LIVE PREPARATION TIMER & ADMIN CONTROL */}
+          {isActive && (
+            <div className="p-4 rounded-2xl bg-white border-2 border-[#C94F78]/30 shadow-xs space-y-3">
+              <div className="flex items-center justify-between gap-2 flex-wrap">
+                <div>
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-[#C94F78] block">
+                    Live Preparation Timer & Synchronization
+                  </span>
+                  <div className="flex items-baseline gap-2 mt-0.5">
+                    {status === "READY" ? (
+                      <span className="font-bold text-base text-[#5F9A68]">
+                        🔔 Ready for Pickup
+                      </span>
+                    ) : remainingSecs <= 0 ? (
+                      <span className="font-bold text-sm text-amber-700">
+                        ⚠️ Taking longer than expected ({formatTimeMMSS(Math.abs(remainingSecs))} overdue)
+                      </span>
+                    ) : (
+                      <>
+                        <span className="font-mono font-black text-2xl text-[#352431]">
+                          {formatTimeMMSS(remainingSecs)}
+                        </span>
+                        <span className="text-xs font-bold text-[#735A67]">
+                          remaining ({Math.ceil(remainingSecs / 60)} min{Math.ceil(remainingSecs / 60) === 1 ? "" : "s"})
+                        </span>
+                      </>
+                    )}
+                  </div>
+                </div>
+
+                <div className="text-right">
+                  <span className="text-[10px] text-[#927681] block">
+                    Expected Ready
+                  </span>
+                  <span className="font-mono font-bold text-xs text-[#352431]">
+                    {formatDateTime(order.estimatedReadyAt || order.expectedReadyAt) || "—"}
+                  </span>
+                </div>
+              </div>
+
+              {/* Adjustment Controls */}
+              {status !== "READY" && onUpdatePreparationTime && (
+                <div className="pt-2 border-t border-[#EBD4DC]/80 space-y-2">
+                  <span className="text-xs font-bold text-[#735A67] block">
+                    Adjust Preparation Time (Updates student live):
+                  </span>
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <button
+                      type="button"
+                      disabled={loadingAction || remainingSecs <= 60}
+                      onClick={() => handleAdjustMinutes(-5)}
+                      className="px-3 py-1.5 rounded-xl border border-rose-200 bg-rose-50 hover:bg-rose-100 text-rose-700 font-bold text-xs transition cursor-pointer disabled:opacity-40"
+                      title="Decrease prep time by 5 minutes"
+                    >
+                      −5 min
+                    </button>
+
+                    <button
+                      type="button"
+                      disabled={loadingAction}
+                      onClick={() => handleAdjustMinutes(5)}
+                      className="px-3 py-1.5 rounded-xl border border-[#EBD4DC] bg-[#FFF9F2] hover:bg-[#FBE7EE] text-[#352431] font-bold text-xs transition cursor-pointer disabled:opacity-40"
+                      title="Increase prep time by 5 minutes"
+                    >
+                      +5 min
+                    </button>
+
+                    <button
+                      type="button"
+                      disabled={loadingAction}
+                      onClick={() => handleAdjustMinutes(10)}
+                      className="px-3 py-1.5 rounded-xl border border-[#EBD4DC] bg-[#FFF9F2] hover:bg-[#FBE7EE] text-[#352431] font-bold text-xs transition cursor-pointer disabled:opacity-40"
+                      title="Increase prep time by 10 minutes"
+                    >
+                      +10 min
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => setShowCustom(!showCustom)}
+                      className="px-3 py-1.5 rounded-xl border border-dashed border-[#EBD4DC] hover:border-[#C94F78] text-[#735A67] hover:text-[#C94F78] text-xs font-semibold transition cursor-pointer"
+                    >
+                      {showCustom ? "Cancel" : "Custom Min..."}
+                    </button>
+                  </div>
+
+                  {showCustom && (
+                    <form onSubmit={handleSetCustomRemaining} className="flex items-center gap-2 pt-1">
+                      <input
+                        type="number"
+                        min="1"
+                        max="180"
+                        placeholder="Minutes remaining..."
+                        value={customInput}
+                        onChange={(e) => setCustomInput(e.target.value)}
+                        className="px-3 py-1.5 rounded-xl border border-[#EBD4DC] text-xs w-36 focus:outline-hidden focus:border-[#C94F78]"
+                      />
+                      <button
+                        type="submit"
+                        disabled={loadingAction || !customInput}
+                        className="px-3.5 py-1.5 rounded-xl bg-[#C94F78] hover:bg-[#B33D65] text-white text-xs font-bold transition shadow-xs disabled:opacity-50 cursor-pointer"
+                      >
+                        Set Remaining
+                      </button>
+                    </form>
+                  )}
+                </div>
+              )}
+            </div>
+          )}
 
           {/* Special Kitchen Notes */}
           {order.notes && order.notes.trim() && (
@@ -199,18 +360,18 @@ const OrderDetailsModal = ({
               </div>
 
               <div className="p-2.5 rounded-xl bg-[#FFF9F2] border border-[#EBD4DC]">
-                <span className="text-[#735A67] block text-[10px]">Est. Prep Time</span>
+                <span className="text-[#735A67] block text-[10px]">Total Est. Prep Time</span>
                 <span className="text-[#352431] font-medium">
-                  {order.estimatedPreparationTime
-                    ? `${order.estimatedPreparationTime} mins`
+                  {order.estimatedPreparationMinutes || order.estimatedPreparationTime
+                    ? `${order.estimatedPreparationMinutes || order.estimatedPreparationTime} mins`
                     : "—"}
                 </span>
               </div>
 
               <div className="p-2.5 rounded-xl bg-[#FFF9F2] border border-[#EBD4DC]">
-                <span className="text-[#735A67] block text-[10px]">Expected Ready</span>
+                <span className="text-[#735A67] block text-[10px]">Expected Ready At</span>
                 <span className="text-[#352431] font-medium">
-                  {formatDateTime(order.expectedReadyAt) || "—"}
+                  {formatDateTime(order.estimatedReadyAt || order.expectedReadyAt) || "—"}
                 </span>
               </div>
 

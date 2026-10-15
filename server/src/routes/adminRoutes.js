@@ -10,6 +10,7 @@ const {
   getOrderByIdValidator,
   updateOrderStatusValidator,
   adminCancelOrderValidator,
+  updatePreparationTimeValidator,
 } = require("../validators/orderValidators");
 const {
   updateScheduleValidator,
@@ -39,6 +40,13 @@ router.patch(
   "/orders/:id/status",
   updateOrderStatusValidator,
   orderController.updateOrderStatus
+);
+
+// PATCH /api/admin/orders/:id/preparation-time - Admin adjust estimated preparation time
+router.patch(
+  "/orders/:id/preparation-time",
+  updatePreparationTimeValidator,
+  orderController.updatePreparationTime
 );
 
 // POST /api/admin/orders/:id/cancel - Admin cancel order with reason

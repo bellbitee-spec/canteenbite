@@ -70,7 +70,7 @@ const generateOrderNumber = () => {
   const day = String(now.getDate()).padStart(2, "0");
   const dateStr = `${year}${month}${day}`;
   const randomSuffix = crypto.randomBytes(4).toString("hex").toUpperCase();
-  return `CAN-${dateStr}-${randomSuffix}`;
+  return `BB-${dateStr}-${randomSuffix}`;
 };
 
 /**
@@ -147,7 +147,7 @@ const createOrder = async ({ userId, items, paymentMethod, notes, idempotencyKey
     throw err;
   }
 
-  const defaultPreparationTime = storeStatus.defaultPreparationTime || 10;
+  const defaultPreparationTime = storeStatus.defaultPreparationTime || 15;
   const hasReplicaSet = await checkTransactionSupport();
 
   let order;
@@ -240,10 +240,12 @@ const executeWithReplicaSetTransaction = async ({
       const fallbackPrepTime =
         typeof defaultPreparationTime === "number" && defaultPreparationTime >= 0
           ? defaultPreparationTime
-          : 10;
-      const estimatedPreparationTime =
+          : 15;
+      const estimatedPreparationMinutes =
         maxPreparationTime > 0 ? maxPreparationTime : fallbackPrepTime;
-      const expectedReadyAt = new Date(Date.now() + estimatedPreparationTime * 60 * 1000);
+      const estimatedPreparationTime = estimatedPreparationMinutes;
+      const estimatedReadyAt = new Date(Date.now() + estimatedPreparationMinutes * 60 * 1000);
+      const expectedReadyAt = estimatedReadyAt;
       const orderNumber = generateOrderNumber();
 
       // Cancellation Window Calculation (Part 9)
@@ -265,7 +267,10 @@ const executeWithReplicaSetTransaction = async ({
             cancellationWindowOpen: true,
             cancelUntil,
             estimatedPreparationTime,
+            estimatedPreparationMinutes,
             expectedReadyAt,
+            estimatedReadyAt,
+            preparationEstimateUpdatedAt: new Date(),
             notes: notes ? notes.trim() : "",
             idempotencyKey: trimmedKey,
           },
@@ -372,10 +377,12 @@ const executeWithAtomicCompensation = async ({
     const fallbackPrepTime =
       typeof defaultPreparationTime === "number" && defaultPreparationTime >= 0
         ? defaultPreparationTime
-        : 10;
-    const estimatedPreparationTime =
+        : 15;
+    const estimatedPreparationMinutes =
       maxPreparationTime > 0 ? maxPreparationTime : fallbackPrepTime;
-    const expectedReadyAt = new Date(Date.now() + estimatedPreparationTime * 60 * 1000);
+    const estimatedPreparationTime = estimatedPreparationMinutes;
+    const estimatedReadyAt = new Date(Date.now() + estimatedPreparationMinutes * 60 * 1000);
+    const expectedReadyAt = estimatedReadyAt;
     const orderNumber = generateOrderNumber();
 
     const cancellationWindowSeconds = await getCancellationWindowSeconds();
@@ -394,7 +401,10 @@ const executeWithAtomicCompensation = async ({
       cancellationWindowOpen: true,
       cancelUntil,
       estimatedPreparationTime,
+      estimatedPreparationMinutes,
       expectedReadyAt,
+      estimatedReadyAt,
+      preparationEstimateUpdatedAt: new Date(),
       notes: notes ? notes.trim() : "",
       idempotencyKey: trimmedKey,
     });
@@ -1191,12 +1201,23 @@ const updateOrderStatus = async (orderId, newStatus) => {
   };
 
   const now = new Date();
-  if (newStatus === "PREPARING") {
+  if (newStatus === "CONFIRMED") {
+    if (!order.expectedReadyAt && !order.estimatedReadyAt) {
+      const minutes = order.estimatedPreparationMinutes || order.estimatedPreparationTime || 15;
+      const readyAt = new Date(now.getTime() + minutes * 60 * 1000);
+      updateDoc.expectedReadyAt = readyAt;
+      updateDoc.estimatedReadyAt = readyAt;
+      updateDoc.preparationEstimateUpdatedAt = now;
+    }
+  } else if (newStatus === "PREPARING") {
     updateDoc.preparationStartedAt = now;
+    updateDoc.cancellationWindowOpen = false;
   } else if (newStatus === "READY") {
     updateDoc.readyAt = now;
+    updateDoc.cancellationWindowOpen = false;
   } else if (newStatus === "COMPLETED") {
     updateDoc.completedAt = now;
+    updateDoc.cancellationWindowOpen = false;
   } else if (newStatus === "DELAYED") {
     updateDoc.delayedAt = now;
   }
@@ -1617,6 +1638,146 @@ const recordPayment = async ({ orderId, adminId, paymentStatus = "PAID" }) => {
   return updatedOrder;
 };
 
+/**
+ * Admin: Adjust preparation time (+/- minutes or custom remaining minutes)
+ * Keeps countdown and server-side estimated ready time mathematically consistent.
+ */
+const updatePreparationTime = async ({
+  orderId,
+  adminId,
+  adjustmentMinutes,
+  customMinutes,
+  remainingMinutes,
+  expectedUpdatedAt,
+}) => {
+  const order = await Order.findById(orderId);
+  if (!order) {
+    const err = new Error("Order not found");
+    err.statusCode = 404;
+    throw err;
+  }
+
+  if (order.orderStatus === "CANCELLED" || order.orderStatus === "COMPLETED") {
+    const err = new Error(
+      `Cannot adjust preparation time for an order that is already ${order.orderStatus.toLowerCase()}.`
+    );
+    err.statusCode = 400;
+    throw err;
+  }
+
+  const now = new Date();
+  let currentReadyAt = order.estimatedReadyAt || order.expectedReadyAt;
+  if (!currentReadyAt || isNaN(new Date(currentReadyAt).getTime())) {
+    currentReadyAt = new Date(now.getTime() + (order.estimatedPreparationMinutes || 15) * 60 * 1000);
+  } else {
+    currentReadyAt = new Date(currentReadyAt);
+  }
+
+  let newReadyAt;
+
+  if (typeof adjustmentMinutes === "number" && !isNaN(adjustmentMinutes)) {
+    if (adjustmentMinutes < -120 || adjustmentMinutes > 240) {
+      const err = new Error("Adjustment minutes must be between -120 and +240 minutes.");
+      err.statusCode = 400;
+      throw err;
+    }
+
+    if (adjustmentMinutes === 0) {
+      return await Order.findById(orderId)
+        .populate("user", "name email role")
+        .populate("items");
+    }
+
+    if (adjustmentMinutes > 0) {
+      // If ready time has already passed, adjust forward relative to now so student sees a positive countdown
+      const baseTime = currentReadyAt.getTime() < now.getTime() ? now.getTime() : currentReadyAt.getTime();
+      newReadyAt = new Date(baseTime + adjustmentMinutes * 60 * 1000);
+    } else {
+      // Decreasing preparation time
+      newReadyAt = new Date(currentReadyAt.getTime() + adjustmentMinutes * 60 * 1000);
+      const minAllowed = new Date(now.getTime() + 60 * 1000); // at least 1 minute remaining
+      if (newReadyAt.getTime() < minAllowed.getTime()) {
+        const err = new Error(
+          "Cannot decrease preparation time below 1 minute from current time."
+        );
+        err.statusCode = 400;
+        throw err;
+      }
+    }
+  } else if (typeof remainingMinutes === "number" && !isNaN(remainingMinutes)) {
+    if (remainingMinutes < 1 || remainingMinutes > 300) {
+      const err = new Error("Remaining preparation minutes must be between 1 and 300.");
+      err.statusCode = 400;
+      throw err;
+    }
+    newReadyAt = new Date(now.getTime() + remainingMinutes * 60 * 1000);
+  } else if (typeof customMinutes === "number" && !isNaN(customMinutes)) {
+    if (customMinutes < 1 || customMinutes > 300) {
+      const err = new Error("Custom preparation minutes must be between 1 and 300.");
+      err.statusCode = 400;
+      throw err;
+    }
+    newReadyAt = new Date(order.createdAt.getTime() + customMinutes * 60 * 1000);
+    if (newReadyAt.getTime() <= now.getTime()) {
+      newReadyAt = new Date(now.getTime() + 60 * 1000);
+    }
+  } else {
+    const err = new Error("Must provide adjustmentMinutes, remainingMinutes, or customMinutes.");
+    err.statusCode = 400;
+    throw err;
+  }
+
+  const orderCreatedAt = order.createdAt ? new Date(order.createdAt) : now;
+  const newTotalPrepMinutes = Math.max(
+    1,
+    Math.round((newReadyAt.getTime() - orderCreatedAt.getTime()) / (60 * 1000))
+  );
+
+  const query = {
+    _id: orderId,
+    orderStatus: { $nin: ["CANCELLED", "COMPLETED"] },
+  };
+  if (expectedUpdatedAt) {
+    query.updatedAt = new Date(expectedUpdatedAt);
+  }
+
+  const updatedOrder = await Order.findOneAndUpdate(
+    query,
+    {
+      $set: {
+        estimatedReadyAt: newReadyAt,
+        expectedReadyAt: newReadyAt,
+        estimatedPreparationMinutes: newTotalPrepMinutes,
+        estimatedPreparationTime: newTotalPrepMinutes,
+        preparationEstimateUpdatedAt: now,
+      },
+    },
+    { new: true }
+  )
+    .populate("user", "name email role")
+    .populate("items");
+
+  if (!updatedOrder) {
+    const current = await Order.findById(orderId);
+    if (!current) {
+      const err = new Error("Order not found");
+      err.statusCode = 404;
+      throw err;
+    }
+    if (current.orderStatus === "CANCELLED" || current.orderStatus === "COMPLETED") {
+      const err = new Error(`Order is already ${current.orderStatus.toLowerCase()}.`);
+      err.statusCode = 400;
+      throw err;
+    }
+    const err = new Error("Order was concurrently updated by another administrator. Please refresh.");
+    err.statusCode = 409;
+    throw err;
+  }
+
+  emitOrderUpdated(updatedOrder);
+  return updatedOrder;
+};
+
 module.exports = {
   createOrder,
   cancelOrder,
@@ -1626,6 +1787,7 @@ module.exports = {
   getAdminOrderStats,
   getAdminOrderById,
   updateOrderStatus,
+  updatePreparationTime,
   adminCancelOrder,
   recordPayment,
   systemCancelUnpaidOrder,

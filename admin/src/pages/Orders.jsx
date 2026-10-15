@@ -174,6 +174,22 @@ const Orders = () => {
                   eventData.expectedReadyAt !== undefined
                     ? eventData.expectedReadyAt
                     : ord.expectedReadyAt,
+                estimatedReadyAt:
+                  eventData.estimatedReadyAt !== undefined
+                    ? eventData.estimatedReadyAt
+                    : ord.estimatedReadyAt,
+                estimatedPreparationMinutes:
+                  eventData.estimatedPreparationMinutes !== undefined
+                    ? eventData.estimatedPreparationMinutes
+                    : ord.estimatedPreparationMinutes,
+                estimatedPreparationTime:
+                  eventData.estimatedPreparationTime !== undefined
+                    ? eventData.estimatedPreparationTime
+                    : ord.estimatedPreparationTime,
+                preparationEstimateUpdatedAt:
+                  eventData.preparationEstimateUpdatedAt !== undefined
+                    ? eventData.preparationEstimateUpdatedAt
+                    : ord.preparationEstimateUpdatedAt,
                 preparationStartedAt:
                   eventData.preparationStartedAt !== undefined
                     ? eventData.preparationStartedAt
@@ -375,6 +391,40 @@ const Orders = () => {
       }
     } catch (err) {
       const errMsg = err.data?.message || err.message || "Failed to record payment.";
+      showToast(errMsg, "error");
+    } finally {
+      setLoadingActionId(null);
+    }
+  };
+
+  /**
+   * Handle admin adjusting preparation time (+/- minutes or custom remaining minutes)
+   */
+  const handleUpdatePreparationTime = async (orderId, data) => {
+    setLoadingActionId(orderId);
+    try {
+      const res = await orderService.updatePreparationTime(orderId, data);
+      const updated = res.order || (res.data && res.data.order);
+      showToast("Preparation time adjusted successfully.", "success");
+
+      if (updated) {
+        setOrders((prev) =>
+          prev.map((o) =>
+            (o.id || o._id)?.toString() === orderId.toString() ? updated : o
+          )
+        );
+        if (
+          selectedOrder &&
+          (selectedOrder.id || selectedOrder._id)?.toString() === orderId.toString()
+        ) {
+          setSelectedOrder(updated);
+        }
+      } else {
+        await loadOrders(true);
+      }
+    } catch (err) {
+      const errMsg =
+        err.data?.message || err.message || "Failed to adjust preparation time.";
       showToast(errMsg, "error");
     } finally {
       setLoadingActionId(null);
@@ -654,6 +704,7 @@ const Orders = () => {
                           onCancelClick={handleOpenCancelModal}
                           onViewDetails={handleOpenDetails}
                           onRecordPayment={handleRecordPayment}
+                          onUpdatePreparationTime={handleUpdatePreparationTime}
                           loadingAction={loadingActionId === (ord.id || ord._id)}
                         />
                       ))
@@ -801,6 +852,7 @@ const Orders = () => {
             onStatusChange={handleStatusChange}
             onCancelClick={handleOpenCancelModal}
             onRecordPayment={handleRecordPayment}
+            onUpdatePreparationTime={handleUpdatePreparationTime}
           />
         </div>
       )}
@@ -816,6 +868,7 @@ const Orders = () => {
         onStatusChange={handleStatusChange}
         onCancelClick={handleOpenCancelModal}
         onRecordPayment={handleRecordPayment}
+        onUpdatePreparationTime={handleUpdatePreparationTime}
         loadingAction={loadingActionId === (selectedOrder?.id || selectedOrder?._id)}
       />
 

@@ -82,7 +82,7 @@ const OrderTable = ({
                 >
                   {/* Order Number */}
                   <td className="px-4 py-3.5 font-mono font-black text-[#352431]">
-                    #{order.orderNumber || orderId.slice(-6)}
+                    {order.orderNumber || `#${orderId.slice(-6)}`}
                   </td>
 
                   {/* Customer */}
@@ -140,9 +140,26 @@ const OrderTable = ({
                     )}
                   </td>
 
-                  {/* Status */}
+                  {/* Status & Timing */}
                   <td className="px-4 py-3.5 whitespace-nowrap">
-                    <OrderStatusBadge status={status} size="sm" />
+                    <div className="flex flex-col gap-1 items-start">
+                      <OrderStatusBadge status={status} size="sm" />
+                      {order.estimatedReadyAt && status !== "COMPLETED" && status !== "CANCELLED" && (
+                        <span
+                          className={`px-1.5 py-0.5 rounded text-[10px] font-bold ${
+                            Math.round((new Date(order.estimatedReadyAt).getTime() - Date.now()) / 60000) <= 0
+                              ? "bg-rose-100 text-rose-800"
+                              : Math.round((new Date(order.estimatedReadyAt).getTime() - Date.now()) / 60000) <= 5
+                              ? "bg-amber-100 text-amber-800"
+                              : "bg-[#FBE7EE] text-[#C94F78]"
+                          }`}
+                        >
+                          ⏱️ {Math.round((new Date(order.estimatedReadyAt).getTime() - Date.now()) / 60000) <= 0
+                            ? "Late"
+                            : `${Math.round((new Date(order.estimatedReadyAt).getTime() - Date.now()) / 60000)}m left`}
+                        </span>
+                      )}
+                    </div>
                   </td>
 
                   {/* Actions */}

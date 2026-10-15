@@ -32,9 +32,12 @@ const formatOrder = (order) => {
     cancelUntil: obj.cancelUntil,
     cancelledBy: obj.cancelledBy || null,
     cancelledAt: obj.cancelledAt || null,
-    cancellationReason: obj.cancellationReason || null,
-    estimatedPreparationTime: obj.estimatedPreparationTime,
-    expectedReadyAt: obj.expectedReadyAt,
+    estimatedPreparationTime: obj.estimatedPreparationTime || obj.estimatedPreparationMinutes || 15,
+    estimatedPreparationMinutes: obj.estimatedPreparationMinutes || obj.estimatedPreparationTime || 15,
+    expectedReadyAt: obj.expectedReadyAt || obj.estimatedReadyAt || null,
+    estimatedReadyAt: obj.estimatedReadyAt || obj.expectedReadyAt || null,
+    preparationEstimateUpdatedAt: obj.preparationEstimateUpdatedAt || obj.updatedAt || null,
+    serverTime: new Date().toISOString(),
     preparationStartedAt: obj.preparationStartedAt || null,
     readyAt: obj.readyAt || null,
     completedAt: obj.completedAt || null,
@@ -239,9 +242,12 @@ const formatAdminOrder = (order) => {
     cancelUntil: obj.cancelUntil,
     cancelledBy: obj.cancelledBy || null,
     cancelledAt: obj.cancelledAt || null,
-    cancellationReason: obj.cancellationReason || null,
-    estimatedPreparationTime: obj.estimatedPreparationTime,
-    expectedReadyAt: obj.expectedReadyAt,
+    estimatedPreparationTime: obj.estimatedPreparationTime || obj.estimatedPreparationMinutes || 15,
+    estimatedPreparationMinutes: obj.estimatedPreparationMinutes || obj.estimatedPreparationTime || 15,
+    expectedReadyAt: obj.expectedReadyAt || obj.estimatedReadyAt || null,
+    estimatedReadyAt: obj.estimatedReadyAt || obj.expectedReadyAt || null,
+    preparationEstimateUpdatedAt: obj.preparationEstimateUpdatedAt || obj.updatedAt || null,
+    serverTime: new Date().toISOString(),
     preparationStartedAt: obj.preparationStartedAt || null,
     readyAt: obj.readyAt || null,
     completedAt: obj.completedAt || null,
@@ -447,6 +453,46 @@ const recordPayment = async (req, res) => {
   }
 };
 
+/**
+ * PATCH /api/admin/orders/:id/preparation-time
+ * Admin adjust estimated preparation time (+/- minutes, remaining minutes, or custom)
+ */
+const updatePreparationTime = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { adjustmentMinutes, customMinutes, remainingMinutes, expectedUpdatedAt } = req.body;
+
+    const order = await orderService.updatePreparationTime({
+      orderId: id,
+      adminId: req.user._id,
+      adjustmentMinutes: adjustmentMinutes !== undefined ? parseInt(adjustmentMinutes, 10) : undefined,
+      customMinutes: customMinutes !== undefined ? parseInt(customMinutes, 10) : undefined,
+      remainingMinutes: remainingMinutes !== undefined ? parseInt(remainingMinutes, 10) : undefined,
+      expectedUpdatedAt,
+    });
+
+    const formattedOrder = formatAdminOrder(order);
+
+    return res.status(200).json({
+      success: true,
+      message: "Order preparation time updated successfully",
+      order: formattedOrder,
+      data: {
+        order: formattedOrder,
+      },
+    });
+  } catch (error) {
+    const statusCode = error.statusCode || 500;
+    const message =
+      statusCode === 500 ? "Internal server error" : error.message;
+
+    return res.status(statusCode).json({
+      success: false,
+      message,
+    });
+  }
+};
+
 module.exports = {
   createOrder,
   getMyOrders,
@@ -456,6 +502,7 @@ module.exports = {
   getAdminOrderStats,
   getAdminOrderById,
   updateOrderStatus,
+  updatePreparationTime,
   adminCancelOrder,
   recordPayment,
 };

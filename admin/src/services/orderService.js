@@ -55,6 +55,14 @@ const orderService = {
   },
 
   /**
+   * Adjust estimated preparation time (+/- minutes or custom remaining minutes)
+   * Endpoint: PATCH /api/admin/orders/:id/preparation-time
+   */
+  updatePreparationTime: async (id, data = {}) => {
+    return await api.patch(`/admin/orders/${id}/preparation-time`, data);
+  },
+
+  /**
    * Admin cancellation of an order
    * Endpoint: POST /api/admin/orders/:id/cancel
    */

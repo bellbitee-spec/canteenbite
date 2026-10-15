@@ -40,6 +40,7 @@ const OrderCard = ({
   onCancelClick,
   onViewDetails,
   onRecordPayment,
+  onUpdatePreparationTime,
   loadingAction = false,
 }) => {
   if (!order) return null;
@@ -54,8 +55,13 @@ const OrderCard = ({
   const isOnlineUnpaid = paymentMethod === "ONLINE" && !isPaid;
   const isDelayed = status === "DELAYED";
   const isReady = status === "READY";
+  const isActive = status !== "COMPLETED" && status !== "CANCELLED";
 
-  const expectedTimeStr = formatExpectedTime(order.expectedReadyAt);
+  const targetTime = order.estimatedReadyAt || order.expectedReadyAt;
+  const remainingMinutes = targetTime
+    ? Math.round((new Date(targetTime).getTime() - Date.now()) / 60000)
+    : null;
+  const expectedTimeStr = formatExpectedTime(targetTime);
 
   return (
     <div
@@ -73,7 +79,7 @@ const OrderCard = ({
         <div>
           <div className="flex items-center gap-2">
             <span className="font-mono font-black text-base text-[#352431] tracking-tight">
-              #{order.orderNumber || orderId.slice(-6)}
+              {order.orderNumber || `#${orderId.slice(-6)}`}
             </span>
             {isDelayed && (
               <span className="px-1.5 py-0.5 rounded text-[10px] font-black uppercase tracking-wider bg-rose-600 text-white animate-pulse">
@@ -163,12 +169,41 @@ const OrderCard = ({
           )}
         </div>
 
-        {expectedTimeStr && (
-          <div className="text-[11px] font-semibold text-[#735A67] flex items-center gap-1">
-            <span>⏱️</span>
-            <span>{expectedTimeStr}</span>
-          </div>
-        )}
+        <div className="flex items-center gap-1.5 flex-wrap">
+          {expectedTimeStr && (
+            <div className="text-[11px] font-semibold text-[#735A67] flex items-center gap-1">
+              <span>⏱️</span>
+              <span>{expectedTimeStr}</span>
+            </div>
+          )}
+          {remainingMinutes !== null && isActive && (
+            <span
+              className={`px-1.5 py-0.5 rounded text-[10px] font-bold ${
+                remainingMinutes <= 0
+                  ? "bg-rose-100 text-rose-800"
+                  : remainingMinutes <= 5
+                  ? "bg-amber-100 text-amber-800"
+                  : "bg-[#FBE7EE] text-[#C94F78]"
+              }`}
+            >
+              {remainingMinutes <= 0 ? "Late" : `${remainingMinutes}m left`}
+            </span>
+          )}
+          {isActive && onUpdatePreparationTime && (
+            <button
+              type="button"
+              disabled={loadingAction}
+              onClick={(e) => {
+                e.stopPropagation();
+                onUpdatePreparationTime(orderId, { adjustmentMinutes: 5 });
+              }}
+              className="px-1.5 py-0.5 rounded text-[10px] font-bold bg-[#FBE7EE] hover:bg-[#F2BAC9] text-[#C94F78] border border-[#EBD4DC] transition cursor-pointer"
+              title="Add 5 minutes prep time"
+            >
+              +5m
+            </button>
+          )}
+        </div>
       </div>
 
       {/* Action Buttons Section */}

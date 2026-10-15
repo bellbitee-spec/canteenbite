@@ -25,6 +25,7 @@ import orderService from "../services/orderService";
 import paymentService, { loadRazorpayScript } from "../services/paymentService";
 import OrderTimeline from "../components/orders/OrderTimeline";
 import CancelCountdown from "../components/orders/CancelCountdown";
+import PreparationTime from "../components/order/PreparationTime";
 import useOrderSocket from "../hooks/useOrderSocket";
 import { getThumbnailUrl } from "../utils/imageUtils";
 import { getFoodImage } from "../utils/foodImages";
@@ -170,10 +171,23 @@ const OrderDetails = () => {
             eventData.estimatedPreparationTime !== undefined
               ? eventData.estimatedPreparationTime
               : prev.estimatedPreparationTime,
+          estimatedPreparationMinutes:
+            eventData.estimatedPreparationMinutes !== undefined
+              ? eventData.estimatedPreparationMinutes
+              : prev.estimatedPreparationMinutes,
           expectedReadyAt:
             eventData.expectedReadyAt !== undefined
               ? eventData.expectedReadyAt
               : prev.expectedReadyAt,
+          estimatedReadyAt:
+            eventData.estimatedReadyAt !== undefined
+              ? eventData.estimatedReadyAt
+              : prev.estimatedReadyAt,
+          preparationEstimateUpdatedAt:
+            eventData.preparationEstimateUpdatedAt !== undefined
+              ? eventData.preparationEstimateUpdatedAt
+              : prev.preparationEstimateUpdatedAt,
+          serverTime: eventData.serverTime || prev.serverTime,
           preparationStartedAt:
             eventData.preparationStartedAt !== undefined
               ? eventData.preparationStartedAt
@@ -591,29 +605,9 @@ const OrderDetails = () => {
               />
             )}
 
-          {/* Section 26: Preparation Estimate & Expected Ready Time */}
+          {/* Section 26: Live Preparation Timer Synchronization */}
           {orderStatus !== "CANCELLED" && orderStatus !== "COMPLETED" && (
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2">
-              <div className="bg-[#FBE7EE]/40 p-3.5 rounded-2xl border border-[#EBD4DC]">
-                <span className="text-[10px] font-bold uppercase tracking-wider text-[#927681] block">
-                  Estimated Preparation
-                </span>
-                <span className="font-bold text-sm text-[#352431] flex items-center gap-1.5 mt-0.5">
-                  <Clock className="w-4 h-4 text-[#C94F78]" />
-                  <span>{order.estimatedPreparationTime ? `${order.estimatedPreparationTime} mins` : "10-15 mins"}</span>
-                </span>
-              </div>
-
-              <div className="bg-[#FBE7EE]/40 p-3.5 rounded-2xl border border-[#EBD4DC]">
-                <span className="text-[10px] font-bold uppercase tracking-wider text-[#927681] block">
-                  Expected Ready By
-                </span>
-                <span className="font-bold text-sm text-[#352431] flex items-center gap-1.5 mt-0.5">
-                  <Clock className="w-4 h-4 text-[#5F9A68]" />
-                  <span>{expectedReadyFormatted || "Calculating estimate..."}</span>
-                </span>
-              </div>
-            </div>
+            <PreparationTime order={order} className="mt-2" />
           )}
         </div>
 

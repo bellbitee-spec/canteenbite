@@ -101,10 +101,26 @@ const orderSchema = new mongoose.Schema(
     estimatedPreparationTime: {
       type: Number,
       min: 0,
-      default: 10,
+      default: 15,
+    },
+
+    estimatedPreparationMinutes: {
+      type: Number,
+      min: 0,
+      default: 15,
     },
 
     expectedReadyAt: {
+      type: Date,
+      default: null,
+    },
+
+    estimatedReadyAt: {
+      type: Date,
+      default: null,
+    },
+
+    preparationEstimateUpdatedAt: {
       type: Date,
       default: null,
     },

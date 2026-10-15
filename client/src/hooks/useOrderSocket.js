@@ -83,8 +83,40 @@ export const useOrderSocket = ({
     socket.on("order:updated", handleOrderUpdated);
     socket.on("connect", handleConnect);
 
-    // 4. Cleanup on unmount or id changes
+    // 4. Safe polling fallback when socket is disconnected or unavailable
+    let fallbackInterval = null;
+    const startPolling = () => {
+      if (!fallbackInterval) {
+        fallbackInterval = setInterval(() => {
+          if (!socket.connected && typeof onReconnectRef.current === "function") {
+            onReconnectRef.current();
+          }
+        }, 8000);
+      }
+    };
+
+    const stopPolling = () => {
+      if (fallbackInterval) {
+        clearInterval(fallbackInterval);
+        fallbackInterval = null;
+      }
+    };
+
+    const handleDisconnect = () => {
+      startPolling();
+    };
+
+    socket.on("disconnect", handleDisconnect);
+    socket.on("connect_error", handleDisconnect);
+    socket.on("connect", stopPolling);
+
+    if (!socket.connected) {
+      startPolling();
+    }
+
+    // 5. Cleanup on unmount or id changes
     return () => {
+      stopPolling();
       if (orderId) {
         socket.emit("order:leave", { orderId });
       } else if (Array.isArray(orderIds) && orderIds.length > 0) {
@@ -92,6 +124,9 @@ export const useOrderSocket = ({
       }
       socket.off("order:updated", handleOrderUpdated);
       socket.off("connect", handleConnect);
+      socket.off("connect", stopPolling);
+      socket.off("disconnect", handleDisconnect);
+      socket.off("connect_error", handleDisconnect);
     };
   }, [orderId, orderIdsKey, isAuthenticated, token, enabled]);
 };

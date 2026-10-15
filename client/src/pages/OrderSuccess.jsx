@@ -15,6 +15,7 @@ import Loader from "../components/common/Loader";
 import { getThumbnailUrl } from "../utils/imageUtils";
 import { getFoodImage } from "../utils/foodImages";
 import useOrderSocket from "../hooks/useOrderSocket";
+import PreparationTime from "../components/order/PreparationTime";
 
 const formatExpectedTime = (dateStr) => {
   if (!dateStr) return null;
@@ -68,6 +69,20 @@ const OrderSuccess = () => {
           orderStatus: eventData.orderStatus || prev.orderStatus,
           paymentStatus: eventData.paymentStatus || prev.paymentStatus,
           expectedReadyAt: eventData.expectedReadyAt || prev.expectedReadyAt,
+          estimatedReadyAt: eventData.estimatedReadyAt || prev.estimatedReadyAt,
+          estimatedPreparationMinutes:
+            eventData.estimatedPreparationMinutes !== undefined
+              ? eventData.estimatedPreparationMinutes
+              : prev.estimatedPreparationMinutes,
+          estimatedPreparationTime:
+            eventData.estimatedPreparationTime !== undefined
+              ? eventData.estimatedPreparationTime
+              : prev.estimatedPreparationTime,
+          preparationEstimateUpdatedAt:
+            eventData.preparationEstimateUpdatedAt !== undefined
+              ? eventData.preparationEstimateUpdatedAt
+              : prev.preparationEstimateUpdatedAt,
+          serverTime: eventData.serverTime || prev.serverTime,
         };
       });
     },
@@ -186,32 +201,8 @@ const OrderSuccess = () => {
             </div>
           </div>
 
-          {/* Timings Highlight Box */}
-          <div className="bg-[#FBE7EE]/60 rounded-2xl border border-[#EBD4DC] p-4 flex flex-col sm:flex-row items-center justify-around gap-3 text-center sm:text-left">
-            <div>
-              <span className="text-[11px] font-bold text-[#C94F78] uppercase tracking-wider block">
-                Estimated Preparation
-              </span>
-              <span className="text-lg font-bold text-[#352431]">
-                {order.estimatedPreparationTime ? `${order.estimatedPreparationTime} mins` : "10-15 mins"}
-              </span>
-            </div>
-
-            {expectedReadyFormatted && (
-              <>
-                <div className="hidden sm:block h-8 w-px bg-[#EBD4DC]" />
-                <div>
-                  <span className="text-[11px] font-bold text-[#C94F78] uppercase tracking-wider block">
-                    Expected Ready By
-                  </span>
-                  <span className="text-lg font-bold text-[#352431] flex items-center justify-center sm:justify-start gap-1">
-                    <Clock className="w-4 h-4 text-[#C94F78]" />
-                    <span>{expectedReadyFormatted}</span>
-                  </span>
-                </div>
-              </>
-            )}
-          </div>
+          {/* Live Preparation Timer */}
+          <PreparationTime order={order} />
 
           {/* Items Breakdown */}
           <div className="space-y-3">

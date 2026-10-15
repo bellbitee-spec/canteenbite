@@ -53,9 +53,44 @@ export const useOrderSocket = ({
     socket.on("order:updated", handleOrderUpdated);
     socket.on("connect", handleConnect);
 
+    // Safe polling fallback when socket is disconnected or unavailable
+    let fallbackInterval = null;
+    const startPolling = () => {
+      if (!fallbackInterval) {
+        fallbackInterval = setInterval(() => {
+          if (!socket.connected && typeof onReconnectRef.current === "function") {
+            onReconnectRef.current();
+          }
+        }, 8000);
+      }
+    };
+
+    const stopPolling = () => {
+      if (fallbackInterval) {
+        clearInterval(fallbackInterval);
+        fallbackInterval = null;
+      }
+    };
+
+    const handleDisconnect = () => {
+      startPolling();
+    };
+
+    socket.on("disconnect", handleDisconnect);
+    socket.on("connect_error", handleDisconnect);
+    socket.on("connect", stopPolling);
+
+    if (!socket.connected) {
+      startPolling();
+    }
+
     return () => {
+      stopPolling();
       socket.off("order:updated", handleOrderUpdated);
       socket.off("connect", handleConnect);
+      socket.off("connect", stopPolling);
+      socket.off("disconnect", handleDisconnect);
+      socket.off("connect_error", handleDisconnect);
     };
   }, [user, enabled]);
 };
