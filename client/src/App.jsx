@@ -1,5 +1,5 @@
 import React from "react";
-import { Routes, Route } from "react-router-dom";
+import { Routes, Route, Navigate } from "react-router-dom";
 import Home from "./pages/Home.jsx";
 import Categories from "./pages/Categories.jsx";
 import Product from "./pages/Product.jsx";
@@ -11,6 +11,7 @@ import Orders from "./pages/Orders.jsx";
 import OrderDetails from "./pages/OrderDetails.jsx";
 import Profile from "./pages/Profile.jsx";
 import Login from "./pages/Login.jsx";
+import Policies from "./pages/Policies.jsx";
 import NotFound from "./pages/NotFound.jsx";
 
 const App = () => {
@@ -28,6 +29,12 @@ const App = () => {
       <Route path="/profile" element={<Profile />} />
       <Route path="/login" element={<Login />} />
       <Route path="/store-closed" element={<StoreClosed />} />
+      <Route path="/policies" element={<Policies />} />
+      <Route path="/privacy-policy" element={<Navigate to="/policies?tab=privacy" replace />} />
+      <Route path="/refund-policy" element={<Navigate to="/policies?tab=refund" replace />} />
+      <Route path="/return-policy" element={<Navigate to="/policies?tab=return" replace />} />
+      <Route path="/disclaimer" element={<Navigate to="/policies?tab=disclaimer" replace />} />
+      <Route path="/contact" element={<Navigate to="/policies?tab=contact" replace />} />
       <Route path="*" element={<NotFound />} />
     </Routes>
   );

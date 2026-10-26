@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import {
   CreditCard,
   Banknote,
@@ -32,9 +32,10 @@ const generateIdempotencyKey = () => {
 
 const Checkout = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const { items, itemCount, subtotal, clearCart } = useCart();
   const { store, loading: storeLoading, refreshStoreStatus } = useStore();
-  const { user, isAuthenticated, loading: authLoading, login } = useAuth();
+  const { user, isAuthenticated, loading: authLoading, login, logout } = useAuth();
 
   // Form States
   const [paymentMethod, setPaymentMethod] = useState("COD"); // 'COD' | 'ONLINE' | 'CASH'
@@ -271,8 +272,9 @@ const Checkout = () => {
         err.data?.message || err.message || "Failed to submit order.";
 
       if (status === 401) {
+        logout();
         setErrorType("AUTH");
-        setErrorMessage("Your session has expired. Please log in again.");
+        setErrorMessage("Your session has expired. Please log in again to complete your order.");
       } else if (status === 409) {
         setErrorType("STOCK");
         setErrorMessage(
@@ -382,12 +384,18 @@ const Checkout = () => {
             className={`p-4 rounded-2xl border text-xs font-medium flex items-start justify-between gap-3 shadow-sm animate-fade-in ${
               errorType === "NETWORK"
                 ? "bg-amber-50 border-amber-300 text-amber-900"
+                : errorType === "AUTH"
+                ? "bg-rose-50 border-rose-200 text-rose-900"
                 : "bg-[#FBE7EE] border-[#EBD4DC] text-[#352431]"
             }`}
             role="alert"
           >
             <div className="flex items-start gap-2.5">
-              <AlertCircle className="w-4 h-4 mt-0.5 shrink-0 text-[#C94F78]" />
+              <AlertCircle
+                className={`w-4 h-4 mt-0.5 shrink-0 ${
+                  errorType === "AUTH" ? "text-rose-600" : "text-[#C94F78]"
+                }`}
+              />
               <div>
                 <span className="font-bold block text-sm mb-0.5">
                   {errorType === "STOCK"
@@ -396,6 +404,8 @@ const Checkout = () => {
                     ? "Canteen Unavailable"
                     : errorType === "NETWORK"
                     ? "Connection Notice"
+                    : errorType === "AUTH"
+                    ? "Session Expired"
                     : "Notice"}
                 </span>
                 <p className="leading-relaxed">{errorMessage}</p>
@@ -406,6 +416,18 @@ const Checkout = () => {
                       className="font-bold underline text-[#C94F78] hover:text-[#B33D65]"
                     >
                       Return to Tray to adjust quantities →
+                    </Link>
+                  </div>
+                )}
+                {errorType === "AUTH" && (
+                  <div className="pt-2">
+                    <Link
+                      to="/login"
+                      state={{ from: location }}
+                      className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-[#C94F78] hover:bg-[#B33D65] text-white font-bold text-xs shadow-xs transition active:scale-95"
+                    >
+                      <span>Log In to Continue</span>
+                      <span>→</span>
                     </Link>
                   </div>
                 )}

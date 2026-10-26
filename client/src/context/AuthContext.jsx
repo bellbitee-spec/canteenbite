@@ -4,9 +4,59 @@ import authService from "../services/authService";
 export const AuthContext = createContext(null);
 
 export const AuthProvider = ({ children }) => {
-  const [user, setUser] = useState(authService.getCurrentUser);
-  const [token, setToken] = useState(authService.getToken);
+  const [user, setUser] = useState(() => authService.getCurrentUser());
+  const [token, setToken] = useState(() => authService.getToken());
   const [loading, setLoading] = useState(false);
+
+  const logout = useCallback(() => {
+    authService.logout();
+    setUser(null);
+    setToken(null);
+  }, []);
+
+  // Listen for unauthorized events (e.g. from api.js 401s) and cross-tab storage changes
+  useEffect(() => {
+    const handleUnauthorized = () => {
+      logout();
+    };
+
+    const handleStorageChange = (e) => {
+      if (
+        !e.key ||
+        e.key === "student_token" ||
+        e.key === "student_user" ||
+        e.key === "token"
+      ) {
+        setUser(authService.getCurrentUser());
+        setToken(authService.getToken());
+      }
+    };
+
+    window.addEventListener("auth:unauthorized", handleUnauthorized);
+    window.addEventListener("storage", handleStorageChange);
+
+    // Initial background token validation if token exists
+    const currentToken = authService.getToken();
+    if (currentToken) {
+      authService
+        .getMe()
+        .then((freshUser) => {
+          if (freshUser) {
+            setUser(freshUser);
+          }
+        })
+        .catch((err) => {
+          if (err.status === 401) {
+            logout();
+          }
+        });
+    }
+
+    return () => {
+      window.removeEventListener("auth:unauthorized", handleUnauthorized);
+      window.removeEventListener("storage", handleStorageChange);
+    };
+  }, [logout]);
 
   const isAuthenticated = Boolean(token && user);
 
@@ -32,12 +82,6 @@ export const AuthProvider = ({ children }) => {
     } finally {
       setLoading(false);
     }
-  };
-
-  const logout = () => {
-    authService.logout();
-    setUser(null);
-    setToken(null);
   };
 
   const value = {

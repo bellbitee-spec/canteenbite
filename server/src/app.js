@@ -20,6 +20,9 @@ const uploadRoutes = require("./routes/uploadRoutes");
 
 const app = express();
 
+// Trust reverse proxy (e.g. Render, Cloudflare) so rate limiting identifies the true client IP
+app.set("trust proxy", 1);
+
 // HTTP Security Headers
 app.use(
   helmet({
@@ -68,9 +71,7 @@ app.use(
       if (isAllowedOrigin(origin)) {
         return callback(null, true);
       }
-      return callback(
-        new Error("CORS policy violation: Access forbidden from this origin.")
-      );
+      return callback(null, false);
     },
     credentials: true,
   })

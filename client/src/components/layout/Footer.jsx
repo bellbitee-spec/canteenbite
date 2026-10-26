@@ -59,8 +59,8 @@ const Footer = () => {
                 </Link>
               </li>
               <li>
-                <Link to="/store-closed" className="hover:text-[#C94F78] transition-colors">
-                  Canteen Hours & Schedule
+                <Link to="/policies" className="hover:text-[#C94F78] transition-colors">
+                  Policies & Legal
                 </Link>
               </li>
             </ul>
@@ -100,14 +100,38 @@ const Footer = () => {
         </div>
 
         {/* Bottom Subfooter */}
-        <div className="mt-10 pt-6 border-t border-[#EBD4DC] flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-[#927681]">
+        <div className="mt-10 pt-6 border-t border-[#EBD4DC] flex flex-col md:flex-row items-center justify-between gap-4 text-xs text-[#927681]">
           <div className="flex items-center gap-1.5 font-medium">
             <span>Built for campus life with</span>
             <Heart className="w-3.5 h-3.5 text-[#C94F78] fill-[#C94F78]" />
             <span>by the BellBite team.</span>
           </div>
+
+          {/* Legal policy direct links */}
+          <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-1 font-semibold text-[11px] text-[#735A67]">
+            <Link to="/policies?tab=return" className="hover:text-[#C94F78] transition-colors">
+              Return Policy
+            </Link>
+            <span>•</span>
+            <Link to="/policies?tab=refund" className="hover:text-[#C94F78] transition-colors">
+              Refund Policy
+            </Link>
+            <span>•</span>
+            <Link to="/policies?tab=privacy" className="hover:text-[#C94F78] transition-colors">
+              Privacy Policy
+            </Link>
+            <span>•</span>
+            <Link to="/policies?tab=disclaimer" className="hover:text-[#C94F78] transition-colors">
+              Disclaimer
+            </Link>
+            <span>•</span>
+            <Link to="/policies?tab=contact" className="hover:text-[#C94F78] transition-colors">
+              About & Contact
+            </Link>
+          </div>
+
           <div>
-            <span><strong className="text-[#C94F78]">bellbite.</strong> Made for campus days · © 2026 BellBite</span>
+            <span><strong className="text-[#C94F78]">bellbite.</strong> © 2026</span>
           </div>
         </div>
       </div>

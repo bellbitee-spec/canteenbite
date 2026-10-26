@@ -64,6 +64,17 @@ export const request = async (endpoint, options = {}) => {
     }
 
     if (!response.ok) {
+      // Auto-clear invalid/expired sessions on 401 Unauthorized
+      if (response.status === 401) {
+        if (typeof window !== "undefined" && window.localStorage) {
+          localStorage.removeItem("token");
+          localStorage.removeItem("student_token");
+          localStorage.removeItem("student_user");
+          localStorage.removeItem("auth_token");
+          window.dispatchEvent(new CustomEvent("auth:unauthorized"));
+        }
+      }
+
       const errorMessage =
         (data && typeof data === "object" && (data.message || data.error)) ||
         (typeof data === "string" && data) ||

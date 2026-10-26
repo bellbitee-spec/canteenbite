@@ -3,12 +3,13 @@ const rateLimit = require("express-rate-limit");
 const isTest = process.env.NODE_ENV === "test";
 
 /**
- * Strict rate limiter for authentication routes (login / register)
- * 20 attempts per 15 minutes per IP
+ * Rate limiter for authentication routes (login / register)
+ * 100 attempts per 15 minutes per IP; skips successful requests so valid logins don't burn quota
  */
 const authLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
-  max: isTest ? 2000 : 20,
+  max: isTest ? 2000 : 100,
+  skipSuccessfulRequests: true,
   standardHeaders: true,
   legacyHeaders: false,
   message: {

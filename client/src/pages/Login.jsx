@@ -7,7 +7,7 @@ import useAuth from "../hooks/useAuth";
 const Login = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const { login, register, isAuthenticated } = useAuth();
+  const { login, register, logout, isAuthenticated, user } = useAuth();
 
   const [isRegisterMode, setIsRegisterMode] = useState(false);
   const [name, setName] = useState("");
@@ -17,13 +17,18 @@ const Login = () => {
   const [error, setError] = useState(null);
   const [successMessage, setSuccessMessage] = useState(null);
 
-  // If already authenticated, redirect
   const from = location.state?.from?.pathname || "/";
+  const isSwitchingAccount =
+    location.search.includes("switch") || location.search.includes("reauth");
+
+  // If already authenticated and not explicitly switching accounts, redirect to target
   React.useEffect(() => {
-    if (isAuthenticated) {
+    if (location.search.includes("logout")) {
+      logout();
+    } else if (isAuthenticated && !isSwitchingAccount) {
       navigate(from, { replace: true });
     }
-  }, [isAuthenticated, navigate, from]);
+  }, [isAuthenticated, navigate, from, isSwitchingAccount, location.search, logout]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -75,6 +80,36 @@ const Login = () => {
                 : "Sign in to order ahead and skip counter queues"}
             </p>
           </div>
+
+          {/* Already Logged In / Switch Account Banner */}
+          {isAuthenticated && (
+            <div className="mb-6 p-4 rounded-2xl bg-[#FBE7EE] border border-[#EBD4DC] text-xs space-y-2">
+              <div className="flex items-center justify-between">
+                <span className="font-bold text-[#352431]">
+                  Currently signed in as:
+                </span>
+                <span className="font-semibold text-[#C94F78] truncate max-w-[160px]">
+                  {user?.name || user?.email}
+                </span>
+              </div>
+              <div className="flex items-center gap-2 pt-1">
+                <button
+                  type="button"
+                  onClick={() => navigate(from, { replace: true })}
+                  className="flex-1 py-1.5 px-3 rounded-full bg-[#C94F78] hover:bg-[#B33D65] text-white font-bold text-xs transition"
+                >
+                  Continue to Canteen
+                </button>
+                <button
+                  type="button"
+                  onClick={() => logout()}
+                  className="py-1.5 px-3 rounded-full border border-[#EBD4DC] hover:bg-white text-[#735A67] hover:text-[#352431] font-bold text-xs transition"
+                >
+                  Sign Out
+                </button>
+              </div>
+            </div>
+          )}
 
           {/* Tab Selector */}
           <div className="flex p-1 bg-[#FBE7EE] rounded-full border border-[#EBD4DC] mb-6">

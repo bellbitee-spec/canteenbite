@@ -112,20 +112,21 @@ const Categories = () => {
             <button
               type="button"
               onClick={() => setSearchParams({})}
-              className="flex flex-col items-center gap-1.5 shrink-0 group cursor-pointer w-[72px] sm:w-[80px] select-none"
+              className="flex flex-col items-center gap-1.5 shrink-0 group cursor-pointer w-[72px] sm:w-[80px] select-none text-left"
+              aria-pressed={!selectedCategoryId}
             >
               <div
-                className={`w-14 h-14 sm:w-16 sm:h-16 rounded-2xl sm:rounded-3xl flex items-center justify-center transition-all duration-300 shadow-2xs group-hover:scale-105 group-hover:-translate-y-1 border ${
+                className={`w-14 h-14 sm:w-16 sm:h-16 rounded-2xl sm:rounded-3xl flex items-center justify-center transition-all duration-300 shadow-2xs group-hover:scale-105 group-hover:-translate-y-1 ${
                   !selectedCategoryId
-                    ? "bg-[#C94F78] text-white shadow-md shadow-[#C94F78]/25 ring-2 ring-[#C94F78]/20 border-[#C94F78]"
-                    : "bg-[#FBE7EE]/50 hover:bg-[#FBE7EE] border-[#EBD4DC] text-[#352431]"
+                    ? "bg-[#C94F78] text-white shadow-md shadow-[#C94F78]/25 ring-2 ring-[#C94F78]/30 border-2 border-[#C94F78]"
+                    : "bg-[#FBE7EE] hover:bg-[#FBE7EE]/80 border border-[#EBD4DC] group-hover:border-[#C94F78]/60 text-[#352431]"
                 }`}
               >
                 <span className="text-2xl sm:text-3xl select-none">🍱</span>
               </div>
               <span
                 className={`font-bold text-[11px] sm:text-xs truncate tracking-tight text-center w-full block transition-colors leading-tight ${
-                  !selectedCategoryId ? "text-[#C94F78] font-bold" : "text-[#735A67] group-hover:text-[#C94F78]"
+                  !selectedCategoryId ? "text-[#C94F78] font-black" : "text-[#735A67] group-hover:text-[#C94F78]"
                 }`}
               >
                 All
@@ -136,13 +137,12 @@ const Categories = () => {
             {categories.map((cat) => {
               const isSelected = cat.id === selectedCategoryId;
               return (
-                <div
+                <CategoryCard
                   key={cat.id}
+                  category={cat}
+                  isSelected={isSelected}
                   onClick={() => handleSelectCategory(cat.id)}
-                  className="cursor-pointer"
-                >
-                  <CategoryCard category={cat} isSelected={isSelected} />
-                </div>
+                />
               );
             })}
           </div>
