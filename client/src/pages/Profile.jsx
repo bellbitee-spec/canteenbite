@@ -26,12 +26,18 @@ const Profile = () => {
           <p className="text-xs text-[#735A67] leading-relaxed font-medium">
             Please sign in to view your canteen orders and campus profile.
           </p>
-          <div className="pt-2">
+          <div className="pt-2 flex items-center justify-center gap-2.5">
             <Link
               to="/login"
-              className="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-full bg-[#C94F78] hover:bg-[#B33D65] text-white font-bold text-xs transition shadow-sm active:scale-95"
+              className="inline-flex items-center justify-center gap-2 px-6 py-2.5 rounded-full bg-[#C94F78] hover:bg-[#B33D65] text-white font-bold text-xs transition shadow-sm active:scale-95"
             >
               Sign In
+            </Link>
+            <Link
+              to="/signup"
+              className="inline-flex items-center justify-center gap-2 px-6 py-2.5 rounded-full bg-white hover:bg-[#FBE7EE] text-[#352431] border border-[#EBD4DC] font-bold text-xs transition shadow-sm active:scale-95"
+            >
+              Sign Up
             </Link>
           </div>
         </div>

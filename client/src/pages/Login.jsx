@@ -4,12 +4,21 @@ import { User, Mail, Lock, ArrowRight, UtensilsCrossed, AlertCircle, CheckCircle
 import PageContainer from "../components/layout/PageContainer";
 import useAuth from "../hooks/useAuth";
 
-const Login = () => {
+const Login = ({ initialMode = "login" }) => {
   const navigate = useNavigate();
   const location = useLocation();
   const { login, register, logout, isAuthenticated, user } = useAuth();
 
-  const [isRegisterMode, setIsRegisterMode] = useState(false);
+  // Determine initial mode from props, route path (/signup, /register), or query params (?mode=signup, ?tab=register)
+  const computeIsRegisterMode = () => {
+    if (initialMode === "register" || initialMode === "signup") return true;
+    if (location.pathname === "/signup" || location.pathname === "/register") return true;
+    const searchParams = new URLSearchParams(location.search);
+    const modeParam = (searchParams.get("mode") || searchParams.get("tab") || "").toLowerCase();
+    return modeParam === "signup" || modeParam === "register";
+  };
+
+  const [isRegisterMode, setIsRegisterMode] = useState(computeIsRegisterMode);
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -17,7 +26,22 @@ const Login = () => {
   const [error, setError] = useState(null);
   const [successMessage, setSuccessMessage] = useState(null);
 
-  const from = location.state?.from?.pathname || "/";
+  // Sync mode whenever URL route or query param changes
+  React.useEffect(() => {
+    if (location.pathname === "/signup" || location.pathname === "/register") {
+      setIsRegisterMode(true);
+    } else if (location.pathname === "/login") {
+      const searchParams = new URLSearchParams(location.search);
+      const modeParam = (searchParams.get("mode") || searchParams.get("tab") || "").toLowerCase();
+      if (modeParam === "signup" || modeParam === "register") {
+        setIsRegisterMode(true);
+      } else if (modeParam === "login" || modeParam === "signin") {
+        setIsRegisterMode(false);
+      }
+    }
+  }, [location.pathname, location.search]);
+
+  const from = location.state?.from?.pathname || (typeof location.state?.from === "string" ? location.state.from : "/");
   const isSwitchingAccount =
     location.search.includes("switch") || location.search.includes("reauth");
 
@@ -139,7 +163,7 @@ const Login = () => {
                   : "text-[#735A67] hover:text-[#352431]"
               }`}
             >
-              Register
+              Sign Up
             </button>
           </div>
 
@@ -244,7 +268,7 @@ const Login = () => {
                   onClick={() => setIsRegisterMode(true)}
                   className="font-bold text-[#C94F78] hover:underline cursor-pointer"
                 >
-                  Create an account
+                  Sign up / Create account
                 </button>
               </p>
             )}

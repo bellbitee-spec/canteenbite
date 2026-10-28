@@ -28,6 +28,8 @@ const App = () => {
       <Route path="/order-history" element={<Orders />} />
       <Route path="/profile" element={<Profile />} />
       <Route path="/login" element={<Login />} />
+      <Route path="/signup" element={<Login initialMode="register" />} />
+      <Route path="/register" element={<Login initialMode="register" />} />
       <Route path="/store-closed" element={<StoreClosed />} />
       <Route path="/policies" element={<Policies />} />
       <Route path="/privacy-policy" element={<Navigate to="/policies?tab=privacy" replace />} />

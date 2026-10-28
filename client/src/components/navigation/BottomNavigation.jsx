@@ -125,7 +125,7 @@ const BottomNavigation = () => {
         <Link
           to={isAuthenticated ? "/profile" : "/login"}
           className={`flex flex-col items-center gap-1 transition-all py-1 px-2.5 rounded-xl active:scale-90 ${
-            isCurrent("/profile") || isCurrent("/login")
+            isCurrent("/profile") || isCurrent("/login") || isCurrent("/signup") || isCurrent("/register")
               ? "text-[#C94F78] font-bold"
               : "text-[#927681] hover:text-[#352431] font-semibold"
           }`}

@@ -109,8 +109,9 @@ const Checkout = () => {
 
     // 2. Authentication Check
     if (!isAuthenticated) {
-      setErrorMessage("Please log in with your student account to place an order.");
+      setErrorMessage("Please log in or sign up with your student account to place an order.");
       setErrorType("AUTH");
+      navigate("/login", { state: { from: location } });
       return;
     }
 
@@ -420,13 +421,21 @@ const Checkout = () => {
                   </div>
                 )}
                 {errorType === "AUTH" && (
-                  <div className="pt-2">
+                  <div className="pt-2 flex items-center gap-2">
                     <Link
                       to="/login"
                       state={{ from: location }}
                       className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-[#C94F78] hover:bg-[#B33D65] text-white font-bold text-xs shadow-xs transition active:scale-95"
                     >
-                      <span>Log In to Continue</span>
+                      <span>Log In</span>
+                      <span>→</span>
+                    </Link>
+                    <Link
+                      to="/signup"
+                      state={{ from: location }}
+                      className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-white hover:bg-[#FBE7EE] text-[#352431] border border-[#EBD4DC] font-bold text-xs shadow-xs transition active:scale-95"
+                    >
+                      <span>Sign Up</span>
                       <span>→</span>
                     </Link>
                   </div>
@@ -500,11 +509,11 @@ const Checkout = () => {
                 <div className="flex items-center gap-2">
                   <Lock className="w-4 h-4 text-[#C94F78]" />
                   <h3 className="font-bold text-sm text-[#352431]">
-                    Student Login Required
+                    Student Account Required
                   </h3>
                 </div>
                 <p className="text-xs text-[#735A67] leading-relaxed font-medium">
-                  Please log in with your college credentials to place your order.
+                  Please log in or create an account to place your order.
                 </p>
 
                 {loginError && (
@@ -548,6 +557,17 @@ const Checkout = () => {
                     {loginSubmitting ? "Logging in..." : "Log In & Continue"}
                   </button>
                 </form>
+
+                <div className="pt-2 text-center text-[11px] text-[#735A67] border-t border-[#EBD4DC]/60 flex items-center justify-between">
+                  <span>Don't have an account?</span>
+                  <Link
+                    to="/signup"
+                    state={{ from: location }}
+                    className="font-bold text-[#C94F78] hover:text-[#B33D65] hover:underline"
+                  >
+                    Sign up / Register →
+                  </Link>
+                </div>
               </div>
             )}
 
@@ -583,15 +603,13 @@ const Checkout = () => {
                   submitting ||
                   storeLoading ||
                   !canOrder ||
-                  itemCount === 0 ||
-                  !isAuthenticated
+                  itemCount === 0
                 }
                 className={`w-full py-3.5 px-6 rounded-full font-bold text-sm transition-all shadow-sm flex items-center justify-center gap-2 ${
                   submitting ||
                   storeLoading ||
                   !canOrder ||
-                  itemCount === 0 ||
-                  !isAuthenticated
+                  itemCount === 0
                     ? "bg-[#FBE7EE] text-[#927681] cursor-not-allowed border border-[#EBD4DC] shadow-none"
                     : "bg-[#C94F78] hover:bg-[#B33D65] text-white shadow-[#C94F78]/20 active:scale-98"
                 }`}
@@ -606,7 +624,7 @@ const Checkout = () => {
                 ) : !canOrder ? (
                   <span>Orders Unavailable</span>
                 ) : !isAuthenticated ? (
-                  <span>Log In to Place Order</span>
+                  <span>Log In / Sign Up to Place Order</span>
                 ) : paymentMethod === "COD" || paymentMethod === "CASH" ? (
                   <span>Confirm Order (Cash on Delivery) — ₹{subtotal}</span>
                 ) : (
