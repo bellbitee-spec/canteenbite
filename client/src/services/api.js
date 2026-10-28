@@ -35,21 +35,23 @@ export const request = async (endpoint, options = {}) => {
   let authHeader = {};
   if (typeof window !== "undefined" && window.localStorage) {
     const token =
-      localStorage.getItem("token") ||
       localStorage.getItem("student_token") ||
+      localStorage.getItem("token") ||
       localStorage.getItem("auth_token");
     if (token && typeof token === "string" && token.trim().length > 0) {
       authHeader = { Authorization: `Bearer ${token.trim()}` };
     }
   }
 
+  const { headers: customHeaders, ...restOptions } = options;
+
   const config = {
+    ...restOptions,
     headers: {
       "Content-Type": "application/json",
       ...authHeader,
-      ...options.headers,
+      ...(customHeaders || {}),
     },
-    ...options,
   };
 
   try {

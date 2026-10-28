@@ -275,7 +275,11 @@ const Checkout = () => {
       if (status === 401) {
         logout();
         setErrorType("AUTH");
-        setErrorMessage("Your session has expired. Please log in again to complete your order.");
+        setErrorMessage(
+          backendMessage && !backendMessage.includes("Internal")
+            ? backendMessage
+            : "Your session has expired. Please log in again to complete your order."
+        );
       } else if (status === 409) {
         setErrorType("STOCK");
         setErrorMessage(
